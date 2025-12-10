@@ -729,14 +729,48 @@
             z-index: -1;
         }
 
+        /* Enhanced Project Cards with Holographic Effect */
         .project-card {
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            position: relative;
+            transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.5s ease;
+            transform-style: preserve-3d;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, 
+                transparent 20%, 
+                rgba(0, 191, 255, 0.1) 40%, 
+                rgba(0, 245, 212, 0.2) 50%, 
+                rgba(0, 191, 255, 0.1) 60%, 
+                transparent 80%);
+            border-radius: inherit;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+            animation: holographic-shimmer 3s ease-in-out infinite;
+            animation-play-state: paused;
+        }
+
+        @keyframes holographic-shimmer {
+            0%, 100% { background-position: -200% center; }
+            50% { background-position: 200% center; }
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+            animation-play-state: running;
         }
 
         .project-card:hover {
-            transform: translateY(-10px) scale(1.03);
-            box-shadow: 0 0 50px color-mix(in srgb, var(--accent-color) 40%, transparent),
-                0 0 20px color-mix(in srgb, var(--accent-color) 30%, transparent);
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                0 0 60px rgba(0, 191, 255, 0.15),
+                0 0 100px rgba(0, 191, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         .project-thumbnail {
@@ -745,6 +779,56 @@
             border-radius: 0.5rem;
             margin-bottom: 1rem;
             border: 1px solid var(--border-color);
+            transition: transform 0.5s ease, filter 0.3s ease;
+        }
+
+        .project-card:hover .project-thumbnail {
+            transform: scale(1.03);
+            filter: brightness(1.1) contrast(1.05);
+        }
+
+        /* Project card content animations */
+        .project-card h3,
+        .project-card p,
+        .project-card .flex {
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .project-card:hover h3 {
+            color: var(--accent-color);
+        }
+
+        /* Staggered entrance for project cards */
+        .project-card {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: card-entrance 0.6s ease forwards;
+        }
+
+        .project-card:nth-child(1) { animation-delay: 0.1s; }
+        .project-card:nth-child(2) { animation-delay: 0.2s; }
+        .project-card:nth-child(3) { animation-delay: 0.3s; }
+        .project-card:nth-child(4) { animation-delay: 0.4s; }
+        .project-card:nth-child(5) { animation-delay: 0.5s; }
+        .project-card:nth-child(6) { animation-delay: 0.6s; }
+        .project-card:nth-child(7) { animation-delay: 0.7s; }
+
+        @keyframes card-entrance {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tag pills enhancement */
+        .project-card .tag-pill {
+            transition: all 0.3s ease;
+        }
+
+        .project-card:hover .tag-pill {
+            background: rgba(0, 191, 255, 0.15);
+            border-color: rgba(0, 191, 255, 0.4);
+            color: var(--accent-color);
         }
 
         .project-button {
@@ -1877,10 +1961,11 @@
         <section id="projects" role="region" class="min-h-screen container mx-auto px-4 sm:px-6 py-20 view-section"
             aria-labelledby="projects-heading">
             <h2 id="projects-heading"
-                class="font-display text-3xl sm:text-4xl font-bold text-primary text-center mb-12 section-heading">
+                class="font-display text-3xl sm:text-4xl font-bold text-primary text-center mb-4 section-heading">
                 My Creations
             </h2>
-            <div id="projects-filters" class="flex flex-wrap gap-3 justify-center mb-6"></div>
+            <p class="text-secondary text-center mb-10 max-w-2xl mx-auto">A showcase of projects I've built with passion and creativity</p>
+            
             <div id="projects-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             </div>
         </section>
@@ -2104,51 +2189,28 @@
 
         function renderProjects() {
             const grid = document.getElementById("projects-grid");
-            const filters = document.getElementById("projects-filters");
             if (!grid) return;
 
-            // determine selected tag from the search input (if present)
-            const inputEl = document.getElementById('project-filter-input');
-            let selected = "All";
-            if (inputEl) {
-                const v = inputEl.value.trim();
-                if (v) {
-                    const tags = getUniqueTags();
-                    const exact = tags.find((t) => t.toLowerCase() === v.toLowerCase());
-                    if (exact) selected = exact;
-                    else {
-                        const fuzzy = tags.find((t) => t.toLowerCase().includes(v.toLowerCase()));
-                        if (fuzzy) selected = fuzzy;
-                    }
-                }
-            }
-
-            // keep original index to allow opening modal by index
             const displayed = projectsData
-                .map((p, i) => ({ ...p, _idx: i }))
-                .filter((p) => selected === "All" || (p.tags && p.tags.includes(selected)));
+                .map((p, i) => ({ ...p, _idx: i }));
 
             grid.innerHTML = displayed
-                .map((p) => {
-                    // responsive small image handling for placehold.co or explicit small image
-                    let smallImage = p.imageUrlSmall || p.imageUrl || "";
-                    if (p.imageUrl && p.imageUrl.includes("placehold.co") && p.imageUrl.includes("600x400")) {
-                        smallImage = p.imageUrl.replace("600x400", "400x267");
-                    }
-                    const srcset = smallImage && p.imageUrl ? `${smallImage} 400w, ${p.imageUrl} 800w` : p.imageUrl || smallImage;
+                .map((p, index) => {
                     const tagsHtml = (p.tags || [])
-                        .map((t) => `<span class="inline-block text-xs px-2 py-1 rounded-full border border-border-color text-secondary bg-black/30">${t}</span>`)
+                        .map((t) => `<span class="tag-pill inline-block text-xs px-2 py-1 rounded-full border border-border-color text-secondary bg-black/30">${t}</span>`)
                         .join(" ");
 
-                    return `<article role="button" tabindex="0" onclick="openProjectModal(${p._idx})" class="glass-card p-6 rounded-lg flex flex-col project-card" aria-label="Open ${p.title} details">
-                        <img src="${smallImage || p.imageUrl || ''}" srcset="${srcset}" sizes="(max-width:640px) 100vw, 33vw" alt="${p.title} thumbnail" class="project-thumbnail" loading="lazy" decoding="async" width="600" height="400">
-                        <h3 class="font-display text-2xl text-accent-secondary mb-3">${p.title}</h3>
-                        <p class="text-secondary mb-4 flex-grow">${p.description || ''}</p>
-                        <div class="mt-2 flex flex-wrap gap-2">${tagsHtml}</div>
-                        <div class="mt-auto pt-4">
-                            <div class="flex items-center gap-4 flex-wrap">
-                                <a href="${p.githubUrl || '#'}" target="_blank" rel="noopener noreferrer" class="project-button secondary"><i class="fab fa-github" aria-hidden="true"></i> View Code</a>
-                                ${p.liveUrl ? `<a href="${p.liveUrl}" target="_blank" rel="noopener noreferrer" class="project-button primary"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Live Demo</a>` : ""}
+                    return `<article role="button" tabindex="0" onclick="openProjectModal(${p._idx})" class="glass-card p-6 rounded-lg flex flex-col project-card" style="animation-delay: ${index * 0.1}s" aria-label="Open ${p.title} details">
+                        <div class="overflow-hidden rounded-lg mb-4">
+                            <img src="${p.imageUrl || ''}" alt="${p.title} thumbnail" class="project-thumbnail w-full" loading="lazy" decoding="async">
+                        </div>
+                        <h3 class="font-display text-xl text-primary mb-2 transition-colors duration-300">${p.title}</h3>
+                        <p class="text-secondary text-sm mb-4 flex-grow line-clamp-2">${p.description || ''}</p>
+                        <div class="mt-2 flex flex-wrap gap-2 mb-4">${tagsHtml}</div>
+                        <div class="mt-auto pt-2 border-t border-border-color">
+                            <div class="flex items-center gap-3 flex-wrap pt-3">
+                                <a href="${p.githubUrl || '#'}" target="_blank" rel="noopener noreferrer" class="project-button secondary" onclick="event.stopPropagation()"><i class="fab fa-github" aria-hidden="true"></i> Code</a>
+                                ${p.liveUrl ? `<a href="${p.liveUrl}" target="_blank" rel="noopener noreferrer" class="project-button primary" onclick="event.stopPropagation()"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> Demo</a>` : ""}
                             </div>
                         </div>
                     </article>`;

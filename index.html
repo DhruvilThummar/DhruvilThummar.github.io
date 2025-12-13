@@ -703,6 +703,79 @@
             transform: translate(-50%, -50%) scale(0.7);
         }
 
+        /* Download CV Button */
+        .download-cv-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.75rem;
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark-color));
+            color: #000;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 9999px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 191, 255, 0.3),
+                        0 0 40px rgba(0, 191, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-cv-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .download-cv-btn:hover::before {
+            transform: translateX(100%);
+        }
+
+        .download-cv-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 30px rgba(0, 191, 255, 0.5),
+                        0 0 60px rgba(0, 191, 255, 0.2);
+        }
+
+        .download-cv-btn i {
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+        }
+
+        .download-cv-btn:hover i {
+            transform: translateY(2px);
+            animation: bounce-down 0.6s ease infinite;
+        }
+
+        @keyframes bounce-down {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(3px); }
+        }
+
+        .scroll-down-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .scroll-down-btn:hover {
+            color: var(--accent-color);
+            background: rgba(0, 191, 255, 0.1);
+            border-color: var(--accent-color);
+            transform: translateY(5px);
+        }
+
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -1624,9 +1697,14 @@
                     class="mt-4 text-secondary text-md sm:text-lg md:text-2xl flex justify-center items-center gap-2">
                     <span class="text-accent font-semibold">Computer Engineering Student at L.J. University</span>
                 </p>
-                <div id="hero-cta-container" class="mt-8 flex justify-center items-center gap-6">
-                    <a href="#about" class="text-secondary" aria-label="Scroll to About section"><i
-                            class="fa-solid fa-chevron-down text-2xl" aria-hidden="true"></i></a>
+                <div id="hero-cta-container" class="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <a href="assets/Dhruvil_Thummar_CV.pdf" download class="download-cv-btn">
+                        <i class="fas fa-download"></i>
+                        <span>Download CV</span>
+                    </a>
+                    <a href="#about" class="scroll-down-btn" aria-label="Scroll to About section">
+                        <i class="fa-solid fa-chevron-down text-2xl" aria-hidden="true"></i>
+                    </a>
                 </div>
             </div>
         </section>
@@ -2028,7 +2106,7 @@
                                 </span>
                             </button>
                         </form>
-                        <div class="flex justify-center gap-8 mb-10">
+                        <div class="flex flex-wrap justify-center gap-6 mb-10">
                             <a href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" target="_blank"
                                 rel="noopener noreferrer" class="text-secondary glow-link text-3xl magnetic-icon"
                                 aria-label="Visit my LinkedIn Profile"><i class="fab fa-linkedin"
@@ -2045,6 +2123,10 @@
                                 class="text-secondary glow-link text-3xl magnetic-icon" aria-label="Send me an Email"><i
                                     class="fa-solid fa-envelope" aria-hidden="true"></i></a>
                         </div>
+                        <a href="assets/Dhruvil_Thummar_CV.pdf" download class="download-cv-btn mb-8 inline-flex">
+                            <i class="fas fa-download"></i>
+                            <span>Download My CV</span>
+                        </a>
                     </div>
                 </div>
             </div>

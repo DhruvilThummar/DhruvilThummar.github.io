@@ -1054,6 +1054,7 @@
                 0 2px 8px rgba(0, 0, 0, 0.1),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
             max-width: 100%;
+            z-index: 1;
         }
 
         @keyframes gradient-shift {
@@ -1321,69 +1322,111 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            background: rgba(139, 92, 246, 0.2);
-            border: 2px solid rgba(139, 92, 246, 0.4);
-            border-radius: 50%;
+            gap: 0.4rem;
+            padding: 0.5rem 0.9rem;
+            background: rgba(139, 92, 246, 0.15);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(139, 92, 246, 0.4);
+            border-radius: 30px;
             color: var(--text-primary);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 
-                0 2px 8px rgba(139, 92, 246, 0.2),
+                0 4px 12px rgba(139, 92, 246, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.1);
             flex-shrink: 0;
+            position: relative;
+            white-space: nowrap;
+        }
+
+        .podcast-language-toggle::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 30px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.25));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .podcast-language-toggle:hover::before {
+            opacity: 1;
+        }
+
+        .podcast-language-toggle .flag {
+            font-size: 1.1rem;
+            line-height: 1;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .podcast-language-toggle i,
+        .podcast-language-toggle span:not(.flag) {
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s ease;
         }
 
         .podcast-language-toggle:hover {
-            transform: scale(1.1) rotate(15deg);
+            transform: translateY(-2px);
             box-shadow: 
-                0 4px 12px rgba(139, 92, 246, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+                0 6px 20px rgba(139, 92, 246, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
             border-color: rgba(139, 92, 246, 0.6);
-            background: rgba(139, 92, 246, 0.3);
+        }
+
+        .podcast-language-toggle:hover .flag {
+            transform: scale(1.15);
         }
 
         .podcast-language-toggle:active {
-            transform: scale(1.05) rotate(10deg);
+            transform: translateY(0);
         }
 
         .podcast-language-dropdown {
             position: absolute;
-            top: calc(100% + 0.75rem);
+            bottom: calc(100% + 0.5rem);
             right: 0;
-            background: rgba(17, 24, 39, 0.96);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 2px solid rgba(139, 92, 246, 0.4);
-            border-radius: 16px;
-            padding: 0.75rem;
+            background: rgba(17, 24, 39, 0.97);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: 2px solid rgba(139, 92, 246, 0.5);
+            border-radius: 18px;
+            padding: 0.6rem;
             display: none;
             flex-direction: column;
-            gap: 0.5rem;
-            min-width: 160px;
+            gap: 0.4rem;
+            width: 180px;
+            max-width: 90vw;
             box-shadow: 
-                0 12px 40px rgba(0, 0, 0, 0.5),
-                0 0 60px rgba(139, 92, 246, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            z-index: 100;
-            animation: dropdownSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                0 16px 48px rgba(0, 0, 0, 0.7),
+                0 0 80px rgba(139, 92, 246, 0.3),
+                inset 0 1px 2px rgba(255, 255, 255, 0.15);
+            z-index: 10000;
+            animation: dropdownFadeIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         body.light-mode .podcast-language-dropdown {
-            background: rgba(255, 255, 255, 0.96);
+            background: rgba(255, 255, 255, 0.97);
+            border-color: rgba(139, 92, 246, 0.5);
+            box-shadow: 
+                0 16px 48px rgba(0, 0, 0, 0.2),
+                0 0 80px rgba(139, 92, 246, 0.25),
+                inset 0 1px 2px rgba(255, 255, 255, 0.4);
         }
 
-        @keyframes dropdownSlideDown {
-            from {
+        @keyframes dropdownFadeIn {
+            0% {
                 opacity: 0;
-                transform: translateY(-10px);
+                transform: translateY(10px) scale(0.95);
             }
-            to {
+            100% {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
@@ -1392,7 +1435,7 @@
         }
 
         .podcast-language-option {
-            padding: 0.7rem 1rem;
+            padding: 0.7rem 0.9rem;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1402,7 +1445,7 @@
             align-items: center;
             gap: 0.75rem;
             font-weight: 500;
-            border: 2px solid transparent;
+            border: 1.5px solid transparent;
             position: relative;
             overflow: hidden;
         }
@@ -1411,9 +1454,21 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(6, 182, 212, 0.15));
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(6, 182, 212, 0.2));
             opacity: 0;
             transition: opacity 0.3s ease;
+        }
+
+        .podcast-language-option::after {
+            content: '✓';
+            position: absolute;
+            right: 0.9rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #a78bfa;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .podcast-language-option:hover::before {
@@ -1421,40 +1476,57 @@
         }
 
         .podcast-language-option:hover {
-            transform: translateX(6px) scale(1.02);
+            transform: translateX(4px);
             border-color: rgba(139, 92, 246, 0.4);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25);
         }
 
         .podcast-language-option.active {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(6, 182, 212, 0.25));
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.3));
             color: #c4b5fd;
             font-weight: 700;
             border-color: rgba(139, 92, 246, 0.6);
             box-shadow: 
                 0 4px 16px rgba(139, 92, 246, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+                inset 0 1px 2px rgba(255, 255, 255, 0.15);
         }
 
         .podcast-language-option.active::before {
             opacity: 1;
         }
 
+        .podcast-language-option.active::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
         .podcast-language-option .flag {
-            font-size: 1.5rem;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
-            transition: transform 0.3s ease;
+            font-size: 1.4rem;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            transition: all 0.3s ease;
             position: relative;
             z-index: 1;
+            line-height: 1;
         }
 
         .podcast-language-option:hover .flag {
-            transform: scale(1.15) rotate(5deg);
+            transform: scale(1.15);
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.25));
+        }
+
+        .podcast-language-option.active .flag {
+            animation: flag-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes flag-bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.25); }
         }
 
         .podcast-language-option span:not(.flag) {
             position: relative;
             z-index: 1;
+            transition: all 0.3s ease;
         }
 
         .podcast-wave {
@@ -2768,7 +2840,8 @@
                             </div>
                         </div>
                         <button class="podcast-language-toggle" id="podcast-language-toggle" onclick="event.stopPropagation();" aria-label="Change language">
-                            <i class="fas fa-globe"></i>
+                            <span class="flag" id="current-lang-flag">🇬🇧</span>
+                            <i class="fas fa-chevron-down" style="font-size: 0.7rem;"></i>
                         </button>
                         <div class="podcast-language-dropdown" id="podcast-language-dropdown" onclick="event.stopPropagation();">
                             <div class="podcast-language-option active" data-lang="en">
@@ -4394,6 +4467,12 @@
                     langBadge.textContent = languageFlags[lang];
                 }
                 
+                // Update current flag in toggle button
+                const currentLangFlag = document.getElementById('current-lang-flag');
+                if (currentLangFlag) {
+                    currentLangFlag.textContent = languageFlags[lang];
+                }
+                
                 // Update active state
                 languageOptions.forEach(opt => {
                     opt.classList.toggle('active', opt.dataset.lang === lang);
@@ -4407,13 +4486,84 @@
                 languageDropdown.classList.remove('show');
             }
             
+            // Position dropdown dynamically
+            function positionDropdown() {
+                if (!languageToggle || !languageDropdown) return;
+                
+                const toggleRect = languageToggle.getBoundingClientRect();
+                const viewportHeight = window.innerHeight;
+                const viewportWidth = window.innerWidth;
+                
+                // Make dropdown visible temporarily to get actual height
+                languageDropdown.style.display = 'flex';
+                const dropdownRect = languageDropdown.getBoundingClientRect();
+                const dropdownHeight = dropdownRect.height;
+                const dropdownWidth = dropdownRect.width;
+                
+                const spaceBelow = viewportHeight - toggleRect.bottom;
+                const spaceAbove = toggleRect.top;
+                const margin = 12;
+                
+                // Calculate vertical position
+                let topPosition;
+                if (spaceBelow >= dropdownHeight + margin + 10) {
+                    // Place below button
+                    topPosition = toggleRect.bottom + margin;
+                } else if (spaceAbove >= dropdownHeight + margin + 10) {
+                    // Place above button
+                    topPosition = toggleRect.top - dropdownHeight - margin;
+                } else {
+                    // Not enough space either way - place where there's most room
+                    if (spaceBelow > spaceAbove) {
+                        topPosition = Math.min(toggleRect.bottom + margin, viewportHeight - dropdownHeight - 10);
+                    } else {
+                        topPosition = Math.max(10, toggleRect.top - dropdownHeight - margin);
+                    }
+                }
+                
+                // Ensure top position is within viewport
+                topPosition = Math.max(10, Math.min(topPosition, viewportHeight - dropdownHeight - 10));
+                
+                // Calculate horizontal position (centered, but stay in viewport)
+                const centerPosition = toggleRect.left + (toggleRect.width / 2);
+                let leftPosition = centerPosition - (dropdownWidth / 2);
+                
+                // Ensure dropdown stays within horizontal viewport bounds
+                if (leftPosition < 10) {
+                    leftPosition = 10;
+                } else if (leftPosition + dropdownWidth > viewportWidth - 10) {
+                    leftPosition = viewportWidth - dropdownWidth - 10;
+                }
+                
+                // Apply positions
+                languageDropdown.style.top = `${topPosition}px`;
+                languageDropdown.style.left = `${leftPosition}px`;
+                languageDropdown.style.transform = 'none';
+            }
+            
             // Language dropdown toggle
             if (languageToggle) {
                 languageToggle.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    languageDropdown.classList.toggle('show');
+                    const isShowing = languageDropdown.classList.toggle('show');
+                    if (isShowing) {
+                        positionDropdown();
+                    }
                 });
             }
+            
+            // Reposition on scroll/resize
+            window.addEventListener('scroll', () => {
+                if (languageDropdown.classList.contains('show')) {
+                    positionDropdown();
+                }
+            });
+            
+            window.addEventListener('resize', () => {
+                if (languageDropdown.classList.contains('show')) {
+                    positionDropdown();
+                }
+            });
             
             // Language option click
             languageOptions.forEach(option => {

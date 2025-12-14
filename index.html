@@ -4486,84 +4486,13 @@
                 languageDropdown.classList.remove('show');
             }
             
-            // Position dropdown dynamically
-            function positionDropdown() {
-                if (!languageToggle || !languageDropdown) return;
-                
-                const toggleRect = languageToggle.getBoundingClientRect();
-                const viewportHeight = window.innerHeight;
-                const viewportWidth = window.innerWidth;
-                
-                // Make dropdown visible temporarily to get actual height
-                languageDropdown.style.display = 'flex';
-                const dropdownRect = languageDropdown.getBoundingClientRect();
-                const dropdownHeight = dropdownRect.height;
-                const dropdownWidth = dropdownRect.width;
-                
-                const spaceBelow = viewportHeight - toggleRect.bottom;
-                const spaceAbove = toggleRect.top;
-                const margin = 12;
-                
-                // Calculate vertical position
-                let topPosition;
-                if (spaceBelow >= dropdownHeight + margin + 10) {
-                    // Place below button
-                    topPosition = toggleRect.bottom + margin;
-                } else if (spaceAbove >= dropdownHeight + margin + 10) {
-                    // Place above button
-                    topPosition = toggleRect.top - dropdownHeight - margin;
-                } else {
-                    // Not enough space either way - place where there's most room
-                    if (spaceBelow > spaceAbove) {
-                        topPosition = Math.min(toggleRect.bottom + margin, viewportHeight - dropdownHeight - 10);
-                    } else {
-                        topPosition = Math.max(10, toggleRect.top - dropdownHeight - margin);
-                    }
-                }
-                
-                // Ensure top position is within viewport
-                topPosition = Math.max(10, Math.min(topPosition, viewportHeight - dropdownHeight - 10));
-                
-                // Calculate horizontal position (centered, but stay in viewport)
-                const centerPosition = toggleRect.left + (toggleRect.width / 2);
-                let leftPosition = centerPosition - (dropdownWidth / 2);
-                
-                // Ensure dropdown stays within horizontal viewport bounds
-                if (leftPosition < 10) {
-                    leftPosition = 10;
-                } else if (leftPosition + dropdownWidth > viewportWidth - 10) {
-                    leftPosition = viewportWidth - dropdownWidth - 10;
-                }
-                
-                // Apply positions
-                languageDropdown.style.top = `${topPosition}px`;
-                languageDropdown.style.left = `${leftPosition}px`;
-                languageDropdown.style.transform = 'none';
-            }
-            
             // Language dropdown toggle
             if (languageToggle) {
-                languageToggle.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const isShowing = languageDropdown.classList.toggle('show');
-                    if (isShowing) {
-                        positionDropdown();
-                    }
-                });
-            }
-            
-            // Reposition on scroll/resize
-            window.addEventListener('scroll', () => {
-                if (languageDropdown.classList.contains('show')) {
-                    positionDropdown();
+                    languageToggle.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        languageDropdown.classList.toggle('show');
+                    });
                 }
-            });
-            
-            window.addEventListener('resize', () => {
-                if (languageDropdown.classList.contains('show')) {
-                    positionDropdown();
-                }
-            });
             
             // Language option click
             languageOptions.forEach(option => {

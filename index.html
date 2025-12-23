@@ -3,14 +3,7 @@
 
 <head>
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4071330366245102"
-     crossorigin="anonymous"></script>
-
-<script async custom-element="amp-auto-ads"
-        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
-</script>
-
-<meta name="google-adsense-account" content="ca-pub-4071330366245102">
+<!-- Removed Google AdSense integration -->
 
         <!-- Google tag (gtag.js) -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-VD4K7YG2KP"></script>
@@ -1035,7 +1028,7 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.6rem 0.6rem 0.6rem 0.6rem;
+            padding: 0.85rem 1rem;
             background: linear-gradient(135deg, 
                 rgba(139, 92, 246, 0.2), 
                 rgba(6, 182, 212, 0.15),
@@ -1324,7 +1317,7 @@
             align-items: center;
             justify-content: center;
             gap: 0.4rem;
-            padding: 0.5rem 0.9rem;
+            padding: 0.65rem 1.1rem;
             background: rgba(139, 92, 246, 0.15);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
@@ -1563,14 +1556,14 @@
         /* Responsive improvements for mobile */
         @media (max-width: 768px) {
             .podcast-btn {
-                padding: 0.5rem;
-                gap: 0.6rem;
+                padding: 0.7rem 0.9rem;
+                gap: 0.45rem;
             }
 
             .podcast-icon {
-                width: 46px;
-                height: 46px;
-                font-size: 1rem;
+                width: 42px;
+                height: 42px;
+                font-size: 0.95rem;
             }
 
             .podcast-lang-badge {
@@ -1580,16 +1573,15 @@
             }
 
             .podcast-title {
-                font-size: 0.85rem;
+                font-size: 0.95rem;
             }
 
             .podcast-subtitle {
-                font-size: 0.68rem;
+                font-size: 0.74rem;
             }
 
             .podcast-language-toggle {
-                width: 32px;
-                height: 32px;
+                padding: 0.55rem 1rem;
                 font-size: 0.85rem;
             }
 
@@ -1600,41 +1592,60 @@
 
         @media (max-width: 480px) {
             .podcast-btn {
-                padding: 0.45rem;
-                gap: 0.5rem;
+                padding: 0.65rem 0.85rem;
+                gap: 0.35rem;
+                width: 100%;
+                max-width: 260px;
+                justify-content: flex-start;
             }
 
             .podcast-icon {
-                width: 44px;
-                height: 44px;
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
             }
 
             .podcast-title {
-                font-size: 0.8rem;
+                font-size: 0.95rem;
             }
 
             .podcast-subtitle {
-                font-size: 0.65rem;
+                font-size: 0.74rem;
             }
 
             .podcast-language-toggle {
-                width: 30px;
-                height: 30px;
-                font-size: 0.8rem;
+                padding: 0.5rem 0.9rem;
+                font-size: 0.82rem;
+            }
+
+            .podcast-content {
+                gap: 0.18rem;
             }
         }
 
         /* iPhone SE and small devices optimization for podcast button */
         @media (max-width: 375px) {
             .podcast-btn {
-                padding: 0.4rem;
-                gap: 0.45rem;
+                padding: 0.6rem 0.75rem;
+                gap: 0.4rem;
+                max-width: 100%;
+                width: 100%;
+                flex-wrap: wrap;
             }
 
             .podcast-icon {
-                width: 40px;
-                height: 40px;
-                font-size: 0.85rem;
+                width: 36px;
+                height: 36px;
+                font-size: 0.82rem;
+                flex-shrink: 0;
+            }
+
+            .podcast-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.15rem;
+                flex: 1;
+                min-width: 0;
             }
 
             .podcast-lang-badge {
@@ -1645,10 +1656,20 @@
 
             .podcast-title {
                 font-size: 0.75rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .podcast-subtitle {
-                font-size: 0.6rem;
+                font-size: 0.55rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .notebooklm-badge {
+                font-size: 0.48rem;
             }
 
             .notebooklm-badge {
@@ -1657,9 +1678,8 @@
             }
 
             .podcast-language-toggle {
-                width: 28px;
-                height: 28px;
-                font-size: 0.75rem;
+                padding: 0.48rem 0.88rem;
+                font-size: 0.8rem;
             }
 
             .podcast-language-dropdown {
@@ -1668,9 +1688,9 @@
             }
 
             .podcast-language-option {
-                padding: 0.55rem 0.75rem;
-                font-size: 0.8rem;
-                gap: 0.55rem;
+                padding: 0.5rem 0.75rem;
+                font-size: 0.78rem;
+                gap: 0.5rem;
             }
 
             .podcast-language-option .flag {
@@ -1690,14 +1710,26 @@
         /* Extra small devices for podcast button */
         @media (max-width: 320px) {
             .podcast-btn {
-                padding: 0.35rem;
-                gap: 0.4rem;
+                padding: 0.55rem 0.7rem;
+                gap: 0.3rem;
+                max-width: 100%;
+                width: 100%;
+                flex-wrap: wrap;
             }
 
             .podcast-icon {
-                width: 36px;
-                height: 36px;
-                font-size: 0.8rem;
+                width: 34px;
+                height: 34px;
+                font-size: 0.78rem;
+                flex-shrink: 0;
+            }
+
+            .podcast-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.1rem;
+                flex: 1;
+                min-width: 0;
             }
 
             .podcast-lang-badge {
@@ -1708,10 +1740,20 @@
 
             .podcast-title {
                 font-size: 0.7rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }
 
             .podcast-subtitle {
-                font-size: 0.55rem;
+                font-size: 0.5rem;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .notebooklm-badge {
+                font-size: 0.42rem;
             }
 
             .notebooklm-badge {
@@ -1720,9 +1762,8 @@
             }
 
             .podcast-language-toggle {
-                width: 26px;
-                height: 26px;
-                font-size: 0.7rem;
+                padding: 0.46rem 0.85rem;
+                font-size: 0.78rem;
             }
 
             .podcast-language-dropdown {
@@ -1731,8 +1772,8 @@
             }
 
             .podcast-language-option {
-                padding: 0.45rem 0.65rem;
-                font-size: 0.75rem;
+                padding: 0.48rem 0.72rem;
+                font-size: 0.76rem;
             }
 
             .podcast-language-option .flag {
@@ -2704,12 +2745,6 @@
 <body class="bg-background text-primary">
 
 
-<amp-auto-ads type="adsense"
-        data-ad-client="ca-pub-4071330366245102">
-</amp-auto-ads>
-
-
-
     <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 z-40 hidden transition-opacity duration-300 opacity-0">
     </div>
     <aside id="sidebar-menu"
@@ -2839,7 +2874,7 @@
                             </div>
                         </div>
                         <button class="podcast-language-toggle" id="podcast-language-toggle" onclick="event.stopPropagation();" aria-label="Change language">
-                            <span class="fla" id="current-lang-flag"stylel="padding=4px;">🇬🇧</span>
+                            <span class="flag" id="current-lang-flag">🇬🇧</span>
                             <i class="fas fa-chevron-down" style="font-size: 0.7rem;"></i>
                         </button>
                         <div class="podcast-language-dropdown" id="podcast-language-dropdown" onclick="event.stopPropagation();">
@@ -2859,17 +2894,18 @@
                     </button>
                 </div>
                 
-                <!-- Hidden Audio Element -->
-                <audio id="podcast-audio" preload="metadata">
-                    <source id="podcast-source" src="assets/Story/Code_Wizard_Java_and_Clean_Architecture.m4a" type="audio/mp4">
-                </audio>
-            </div>
+               
             
             <!-- Scroll Down Button - Centered at Bottom -->
             <div class="scroll-down-wrapper">
                 <a href="#about" class="scroll-down-btn" aria-label="Scroll to About section">
                     <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
                 </a>
+            </div>
+             <!-- Hidden Audio Element -->
+                <audio id="podcast-audio" preload="metadata">
+                    <source id="podcast-source" src="assets/Story/Code_Wizard_Java_and_Clean_Architecture.m4a" type="audio/mp4">
+                </audio>
             </div>
         </section>
 

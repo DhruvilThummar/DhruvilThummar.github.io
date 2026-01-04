@@ -160,6 +160,7 @@ async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMes
       subject: `New Contact: ${cleanSubject} — from ${cleanName}`,
       html: buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage }),
       apiKey: RESEND_API_KEY,
+      replyTo: cleanEmail,
     });
 
     if (!ownerResult.ok) {
@@ -190,9 +191,21 @@ async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMes
 }
 
 // Helper: Send email via Resend API
-async function sendResendEmail({ to, from, subject, html, apiKey }) {
+async function sendResendEmail({ to, from, subject, html, apiKey, replyTo }) {
   try {
     console.log(`Attempting Resend: ${to} from ${from}`);
+    
+    const payload = {
+      from,
+      to,
+      subject,
+      html,
+    };
+    
+    // Add reply-to if provided
+    if (replyTo) {
+      payload.reply_to = replyTo;
+    }
     
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -200,12 +213,7 @@ async function sendResendEmail({ to, from, subject, html, apiKey }) {
         "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        from,
-        to,
-        subject,
-        html,
-      }),
+      body: JSON.stringify(payload),
     });
 
     const data = await res.json().catch(() => ({}));

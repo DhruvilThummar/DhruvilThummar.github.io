@@ -2,12 +2,12 @@
 
 Live site: https://drthummar.me/
 
-Minimal, fast personal site for showcasing work and sharing a quick contact channel. Built with semantic HTML and Tailwind CSS, with a lightweight serverless contact endpoint for form submissions.
+Minimal, fast personal site for showcasing work and sharing a quick contact channel. Built with semantic HTML and Tailwind CSS, with a lightweight serverless contact endpoint for form submissions via Cloudflare Pages Functions and MailChannels.
 
 ## Features
 - Responsive, single-page layout optimized for fast static hosting (GitHub Pages friendly)
 - Tailwind CSS pipeline (PostCSS + autoprefixer + cssnano) for a small production stylesheet
-- Contact form backed by `/api/contact` using Nodemailer with SMTP credentials supplied via environment variables
+- Contact form backed by Cloudflare Pages Functions (`/api/contact`) using MailChannels for free email delivery
 
 ## Getting started
 Prerequisites: Node.js 18+ and npm.
@@ -21,30 +21,43 @@ Prerequisites: Node.js 18+ and npm.
 - The compiled CSS is written to `assets/tailwind.css`. Commit this file when deploying static hosting so the site works without the build step.
 
 ## Contact form backend
-The serverless function in `api/contact.js` accepts POSTed JSON with `name`, `email`, `subject` (optional), and `message`. It sends two beautifully formatted emails:
+
+The Cloudflare Pages Function in `functions/api/contact.js` accepts POSTed JSON with `name`, `email`, `subject` (optional), and `message`. It sends two beautifully formatted emails using MailChannels:
 
 1. **Owner notification** — All submission details to you
 2. **Confirmation email** — Thank you message to the visitor
 
-Configure via environment variables:
+### Configuration
 
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE` — SMTP server details
-- `SMTP_USER`, `SMTP_PASS` — SMTP credentials
-- `SMTP_FROM` — sender address (defaults to `official@dhruvilthummar.me`)
-- `NOTIFY_EMAIL` — where owner notifications are sent (defaults to `official@dhruvilthummar.me`)
+Set these environment variables in Cloudflare Pages (Settings → Environment Variables):
+
+- `CONTACT_FROM` — sender email (must match your verified domain)
+- `CONTACT_TO` — where owner notifications are sent
+- `CONTACT_CC` (optional) — additional recipients (comma-separated)
+
+### DNS Setup for MailChannels
+
+MailChannels requires SPF verification. Add this TXT record to your domain's DNS:
+
+```
+Name: @ (or your subdomain)
+Type: TXT
+Value: v=spf1 a mx include:relay.mailchannels.net ~all
+```
+
+For best results, add your domain to Cloudflare's free DNS service.
 
 **Input validation:**
 - `name`: 2–100 characters
 - `email`: valid email format
 - `message`: 10–5000 characters
 
-If SMTP variables are missing, submissions are logged instead of sent to avoid silent failures. Always use environment variables for production credentials—never hardcode them.
-
 ## Project structure
 - `index.html` — main static page
 - `assets/tailwind-input.css` — source Tailwind entry
 - `assets/tailwind.css` — generated, minified CSS artifact
-- `api/contact.js` — serverless handler for contact form delivery
+- `functions/api/contact.js` — Cloudflare Pages Function for contact form
+- `_routes.json` — routing configuration for Cloudflare Pages
 - `tailwind.config.js`, `postcss.config.js` — build configuration
 
 ## Deployment

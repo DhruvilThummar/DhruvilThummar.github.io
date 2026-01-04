@@ -4,9 +4,11 @@
 // - CONTACT_TO   (where owner notifications are sent)
 // - CONTACT_CC   (optional, comma-separated list)
 // 
-// MailChannels requires:
-// 1. Your domain to be verified in Cloudflare (add SPF/DKIM/DMARC records)
-// 2. Proper from email matching your domain
+// MailChannels setup required:
+// 1. Add SPF record to your domain DNS: v=spf1 a mx include:relay.mailchannels.net ~all
+// 2. Your domain must be verified in Cloudflare
+// 3. Ensure CONTACT_FROM email uses your verified domain
+// For testing: Use a MailChannels test endpoint or Resend/SendGrid as alternative
 
 const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
@@ -110,7 +112,7 @@ export async function onRequestPost(context) {
     if (!ownerResult.ok) {
       console.error(`Owner email failed: ${ownerResult.status} ${ownerResult.statusText}`, ownerResult.error);
       return json({ 
-        error: `Failed to send notification: ${ownerResult.statusText}. Please verify your email domain is configured with MailChannels.`,
+        error: `Failed to send email: ${ownerResult.statusText}. Please contact the site administrator or try again later.`,
         details: ownerResult.error 
       }, 502);
     }
@@ -143,6 +145,9 @@ export async function onRequestPost(context) {
 async function sendMail({ to, cc = [], from, replyTo, subject, text, html }) {
   const recipients = [{ email: to }].concat(cc.map((c) => ({ email: c })));
 
+  // Extract domain from email for MailChannels dkim_domain
+  const fromDomain = from.split("@")[1];
+
   const payload = {
     personalizations: [
       {
@@ -159,17 +164,40 @@ async function sendMail({ to, cc = [], from, replyTo, subject, text, html }) {
   };
 
   try {
+    console.log(`Attempting to send email to ${to} from ${from}`);
+    
     const res = await fetch("https://api.mailchannels.net/tx/v1/send", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: {
+        "content-type": "application/json",
+        "X-Slack-No-Retry": "1",
+      },
       body: JSON.stringify(payload),
     });
 
-    const errorText = res.ok ? "" : await res.text().catch(() => "");
-    return { ok: res.ok, status: res.status, statusText: res.statusText, error: errorText };
+    const responseBody = await res.text().catch(() => "");
+    
+    if (!res.ok) {
+      console.error(`MailChannels error (${res.status} ${res.statusText}):`, responseBody);
+      return { 
+        ok: false, 
+        status: res.status, 
+        statusText: res.statusText, 
+        error: responseBody 
+      };
+    }
+
+    console.log(`Email sent successfully to ${to}`);
+    return { ok: true, status: res.status, statusText: res.statusText, error: "" };
+    
   } catch (err) {
     console.error("MailChannels fetch error:", err);
-    return { ok: false, status: 0, statusText: "Network error", error: err.message };
+    return { 
+      ok: false, 
+      status: 0, 
+      statusText: "Network error", 
+      error: err.message 
+    };
   }
 }
 

@@ -45,20 +45,29 @@ export async function onRequestGet() {
 export async function onRequestPost(context) {
   // Wrap everything in try-catch to ensure we always return JSON
   try {
-    const { request, env } = context;
-    
-    // Log that function was called
     console.log("=== CONTACT FORM FUNCTION CALLED ===");
+    
+    // Safely access request and env
+    const request = context?.request;
+    const env = context?.env || {};
+    
+    if (!request) {
+      console.error("Request object is undefined");
+      return json({ error: "Invalid request context" }, 500);
+    }
+    
     console.log("Request method:", request.method);
     console.log("Request URL:", request.url);
     
     // Parse request body
     let body;
     try {
-      body = await request.json();
+      const text = await request.text();
+      console.log("Request body (raw):", text);
+      body = JSON.parse(text);
     } catch (e) {
       console.error("Failed to parse JSON body:", e);
-      return json({ error: "Invalid request format" }, 400);
+      return json({ error: "Invalid request format. Please send valid JSON." }, 400);
     }
     
     const { name, email, subject, message } = body || {};
@@ -86,11 +95,13 @@ export async function onRequestPost(context) {
     const cleanMessage = message.trim().substring(0, 5000);
 
     // Check environment variables - support both MailChannels and Resend
-    const RESEND_API_KEY = env?.RESEND_API_KEY;
-    const FROM_EMAIL = env?.CONTACT_FROM || "onboarding@resend.dev";
-    const OWNER_EMAIL = env?.CONTACT_TO;
+    const RESEND_API_KEY = env.RESEND_API_KEY || env.resend_api_key;
+    const FROM_EMAIL = env.CONTACT_FROM || env.contact_from || "onboarding@resend.dev";
+    const OWNER_EMAIL = env.CONTACT_TO || env.contact_to;
     
     console.log("Environment check:");
+    console.log("- env object:", typeof env);
+    console.log("- env keys:", Object.keys(env).join(", "));
     console.log("- RESEND_API_KEY:", RESEND_API_KEY ? `set (${RESEND_API_KEY.substring(0, 8)}...)` : "missing");
     console.log("- CONTACT_FROM:", FROM_EMAIL);
     console.log("- CONTACT_TO:", OWNER_EMAIL);
@@ -99,7 +110,7 @@ export async function onRequestPost(context) {
     if (!OWNER_EMAIL) {
       console.error("CONTACT_TO (OWNER_EMAIL) is required but not set");
       return json({ 
-        error: "Contact service configuration error. CONTACT_TO environment variable is missing. Please contact the site administrator." 
+        error: "Contact service not configured. Environment variable CONTACT_TO is missing. Please add it in Cloudflare Pages settings." 
       }, 500);
     }
     

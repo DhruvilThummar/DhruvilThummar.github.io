@@ -152,11 +152,17 @@ export async function onRequestPost(context) {
 async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, RESEND_API_KEY, env }) {
   try {
     console.log(`Sending via Resend from ${FROM_EMAIL} to ${OWNER_EMAIL}`);
+    
+    // Resend requires format: "Name <email@domain.com>" or just domain verification
+    // For testing, use: onboarding@resend.dev
+    const fromAddress = FROM_EMAIL || "onboarding@resend.dev";
+    
+    console.log(`Using from address: ${fromAddress}`);
 
     // Send owner notification
     const ownerResult = await sendResendEmail({
       to: OWNER_EMAIL,
-      from: FROM_EMAIL,
+      from: fromAddress,
       subject: `New Contact: ${cleanSubject} — from ${cleanName}`,
       html: buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage }),
       apiKey: RESEND_API_KEY,
@@ -166,7 +172,7 @@ async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMes
     if (!ownerResult.ok) {
       console.error(`Resend owner email failed:`, ownerResult.error);
       return json({ 
-        error: `Failed to send email. Please try again later.`,
+        error: `Failed to send email: ${ownerResult.error || 'Unknown error'}`,
       }, 502);
     }
 
@@ -175,7 +181,7 @@ async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMes
     // Send confirmation to sender (best-effort)
     await sendResendEmail({
       to: cleanEmail,
-      from: FROM_EMAIL,
+      from: fromAddress,
       subject: `Thanks for connecting! — ${cleanSubject}`,
       html: buildSenderHtml({ cleanName, cleanSubject, cleanMessage }),
       apiKey: RESEND_API_KEY,
@@ -193,7 +199,7 @@ async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMes
 // Helper: Send email via Resend API
 async function sendResendEmail({ to, from, subject, html, apiKey, replyTo }) {
   try {
-    console.log(`Attempting Resend: ${to} from ${from}`);
+    console.log(`Attempting Resend: to=${to} from=${from} apiKey=${apiKey ? 'set' : 'missing'}`);
     
     const payload = {
       from,
@@ -207,6 +213,8 @@ async function sendResendEmail({ to, from, subject, html, apiKey, replyTo }) {
       payload.reply_to = replyTo;
     }
     
+    console.log(`Resend payload:`, JSON.stringify(payload, null, 2));
+    
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -216,14 +224,23 @@ async function sendResendEmail({ to, from, subject, html, apiKey, replyTo }) {
       body: JSON.stringify(payload),
     });
 
-    const data = await res.json().catch(() => ({}));
-
-    if (!res.ok) {
-      console.error(`Resend error (${res.status}):`, data);
-      return { ok: false, error: data.message || res.statusText };
+    const responseText = await res.text();
+    console.log(`Resend response (${res.status}):`, responseText);
+    
+    let data = {};
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      console.error("Failed to parse Resend response:", e);
     }
 
-    console.log(`Resend email sent successfully to ${to}`);
+    if (!res.ok) {
+      const errorMsg = data.message || data.error || responseText || res.statusText;
+      console.error(`Resend error (${res.status}):`, errorMsg);
+      return { ok: false, error: errorMsg };
+    }
+
+    console.log(`Resend email sent successfully to ${to}. ID:`, data.id);
     return { ok: true };
   } catch (err) {
     console.error("Resend fetch error:", err);

@@ -25,7 +25,16 @@ export async function onRequestOptions() {
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
-    const body = await request.json().catch(() => null);
+    
+    // Parse request body
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      console.error("Failed to parse JSON body:", e);
+      return json({ error: "Invalid request format" }, 400);
+    }
+    
     const { name, email, subject, message } = body || {};
 
     // Basic validation
@@ -44,24 +53,30 @@ export async function onRequestPost(context) {
     const cleanSubject = (subject || "Portfolio Contact Form").trim().substring(0, 200);
     const cleanMessage = message.trim().substring(0, 5000);
 
+    // Check environment variables
     const FROM_EMAIL = env.CONTACT_FROM;
     const OWNER_EMAIL = env.CONTACT_TO;
+    
+    console.log("Checking env vars - FROM_EMAIL:", FROM_EMAIL ? "set" : "missing", "OWNER_EMAIL:", OWNER_EMAIL ? "set" : "missing");
+    
+    if (!FROM_EMAIL || !OWNER_EMAIL) {
+      console.error("Missing required environment variables");
+      return json({ error: "Contact service configuration error. Please contact the site administrator." }, 500);
+    }
+
+    // Validate FROM_EMAIL domain
+    const fromDomain = FROM_EMAIL.split("@")[1];
+    if (!fromDomain || fromDomain === "localhost" || fromDomain.includes("127.0.0.1")) {
+      console.error(`Invalid FROM_EMAIL domain: ${FROM_EMAIL}`);
+      return json({ error: "Contact service domain configuration error." }, 500);
+    }
+
     const CC_EMAILS = (env.CONTACT_CC || "")
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean);
 
-    if (!FROM_EMAIL || !OWNER_EMAIL) {
-      console.error("Missing env vars: CONTACT_FROM or CONTACT_TO");
-      return json({ error: "Contact service is not configured" }, 500);
-    }
-
-    // Validate FROM_EMAIL matches a real domain (not localhost)
-    const fromDomain = FROM_EMAIL.split("@")[1];
-    if (!fromDomain || fromDomain === "localhost" || fromDomain.includes("127.0.0.1")) {
-      console.error(`Invalid FROM_EMAIL domain: ${FROM_EMAIL}`);
-      return json({ error: "Contact service domain is not properly configured" }, 500);
-    }
+    console.log(`Sending email from ${FROM_EMAIL} to ${OWNER_EMAIL} for ${cleanEmail}`);
 
     // Send owner notification
     const ownerResult = await sendMail({
@@ -76,10 +91,15 @@ export async function onRequestPost(context) {
 
     if (!ownerResult.ok) {
       console.error(`Owner email failed: ${ownerResult.status} ${ownerResult.statusText}`, ownerResult.error);
-      return json({ error: "Failed to send notification. Check your domain email configuration." }, 502);
+      return json({ 
+        error: `Failed to send notification: ${ownerResult.statusText}. Please verify your email domain is configured with MailChannels.`,
+        details: ownerResult.error 
+      }, 502);
     }
 
-    // Send confirmation to sender (best-effort, don't fail if this fails)
+    console.log("Owner notification sent successfully");
+
+    // Send confirmation to sender (best-effort)
     const senderResult = await sendMail({
       to: cleanEmail,
       from: FROM_EMAIL,
@@ -90,13 +110,14 @@ export async function onRequestPost(context) {
 
     if (!senderResult.ok) {
       console.warn(`Sender confirmation email failed: ${senderResult.status} ${senderResult.statusText}`);
-      // Don't fail the request, owner got the notification
+    } else {
+      console.log("Confirmation email sent to sender");
     }
 
     return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
   } catch (err) {
-    console.error("Contact form error:", err);
-    return json({ error: "Failed to send message. Please try again later." }, 500);
+    console.error("Contact form unexpected error:", err);
+    return json({ error: `Internal error: ${err.message}` }, 500);
   }
 }
 

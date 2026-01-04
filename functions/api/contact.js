@@ -75,20 +75,34 @@ export async function onRequestPost(context) {
 
     // Check environment variables - support both MailChannels and Resend
     const RESEND_API_KEY = env.RESEND_API_KEY;
-    const FROM_EMAIL = env.CONTACT_FROM;
+    const FROM_EMAIL = env.CONTACT_FROM || "onboarding@resend.dev";
     const OWNER_EMAIL = env.CONTACT_TO;
     
-    console.log("Checking env vars - RESEND_API_KEY:", RESEND_API_KEY ? "set" : "missing", "FROM_EMAIL:", FROM_EMAIL ? "set" : "missing", "OWNER_EMAIL:", OWNER_EMAIL ? "set" : "missing");
+    console.log("Environment check:");
+    console.log("- RESEND_API_KEY:", RESEND_API_KEY ? `set (${RESEND_API_KEY.substring(0, 8)}...)` : "missing");
+    console.log("- CONTACT_FROM:", FROM_EMAIL);
+    console.log("- CONTACT_TO:", OWNER_EMAIL);
+    
+    // Validate required fields
+    if (!OWNER_EMAIL) {
+      console.error("CONTACT_TO (OWNER_EMAIL) is required but not set");
+      return json({ 
+        error: "Contact service configuration error. CONTACT_TO environment variable is missing. Please contact the site administrator." 
+      }, 500);
+    }
     
     // If we have Resend API key, use Resend (recommended)
     if (RESEND_API_KEY) {
+      console.log("Using Resend email service");
       return await handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, RESEND_API_KEY, env });
     }
     
+    console.log("Resend API key not found, falling back to MailChannels");
+    
     // Fallback to MailChannels if no Resend key
-    if (!FROM_EMAIL || !OWNER_EMAIL) {
-      console.error("Missing required environment variables (CONTACT_FROM and CONTACT_TO)");
-      return json({ error: "Contact service not configured. Please contact the site administrator." }, 500);
+    if (!FROM_EMAIL) {
+      console.error("Missing CONTACT_FROM for MailChannels");
+      return json({ error: "Contact service not configured properly. Please contact the site administrator." }, 500);
     }
 
     // Validate FROM_EMAIL domain
@@ -151,7 +165,11 @@ export async function onRequestPost(context) {
 // Resend email handler (recommended - no DNS setup needed)
 async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, RESEND_API_KEY, env }) {
   try {
-    console.log(`Sending via Resend from ${FROM_EMAIL} to ${OWNER_EMAIL}`);
+    console.log("=== RESEND EMAIL HANDLER ===");
+    console.log("From:", FROM_EMAIL);
+    console.log("To:", OWNER_EMAIL);
+    console.log("Reply-To:", cleanEmail);
+    console.log("Subject:", cleanSubject);
     
     // Resend requires format: "Name <email@domain.com>" or just domain verification
     // For testing, use: onboarding@resend.dev
@@ -170,28 +188,34 @@ async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMes
     });
 
     if (!ownerResult.ok) {
-      console.error(`Resend owner email failed:`, ownerResult.error);
+      console.error("=== RESEND FAILED ===");
+      console.error("Error:", ownerResult.error);
       return json({ 
-        error: `Failed to send email: ${ownerResult.error || 'Unknown error'}`,
+        error: `Email service error: ${ownerResult.error}. Please check Cloudflare logs or contact the administrator.`,
       }, 502);
     }
 
-    console.log("Owner notification sent via Resend");
+    console.log("=== OWNER EMAIL SENT ===");
 
     // Send confirmation to sender (best-effort)
-    await sendResendEmail({
+    const senderResult = await sendResendEmail({
       to: cleanEmail,
       from: fromAddress,
       subject: `Thanks for connecting! — ${cleanSubject}`,
       html: buildSenderHtml({ cleanName, cleanSubject, cleanMessage }),
       apiKey: RESEND_API_KEY,
-    }).catch(err => {
-      console.warn("Sender confirmation email failed:", err);
     });
+
+    if (senderResult.ok) {
+      console.log("=== SENDER CONFIRMATION SENT ===");
+    } else {
+      console.warn("Sender confirmation failed (non-critical):", senderResult.error);
+    }
 
     return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
   } catch (err) {
-    console.error("Resend error:", err);
+    console.error("=== RESEND HANDLER ERROR ===");
+    console.error(err);
     return json({ error: `Internal error: ${err.message}` }, 500);
   }
 }

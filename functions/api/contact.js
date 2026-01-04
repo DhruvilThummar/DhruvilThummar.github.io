@@ -73,15 +73,22 @@ export async function onRequestPost(context) {
     const cleanSubject = (subject || "Portfolio Contact Form").trim().substring(0, 200);
     const cleanMessage = message.trim().substring(0, 5000);
 
-    // Check environment variables
+    // Check environment variables - support both MailChannels and Resend
+    const RESEND_API_KEY = env.RESEND_API_KEY;
     const FROM_EMAIL = env.CONTACT_FROM;
     const OWNER_EMAIL = env.CONTACT_TO;
     
-    console.log("Checking env vars - FROM_EMAIL:", FROM_EMAIL ? "set" : "missing", "OWNER_EMAIL:", OWNER_EMAIL ? "set" : "missing");
+    console.log("Checking env vars - RESEND_API_KEY:", RESEND_API_KEY ? "set" : "missing", "FROM_EMAIL:", FROM_EMAIL ? "set" : "missing", "OWNER_EMAIL:", OWNER_EMAIL ? "set" : "missing");
     
+    // If we have Resend API key, use Resend (recommended)
+    if (RESEND_API_KEY) {
+      return await handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, RESEND_API_KEY, env });
+    }
+    
+    // Fallback to MailChannels if no Resend key
     if (!FROM_EMAIL || !OWNER_EMAIL) {
-      console.error("Missing required environment variables");
-      return json({ error: "Contact service configuration error. Please contact the site administrator." }, 500);
+      console.error("Missing required environment variables (CONTACT_FROM and CONTACT_TO)");
+      return json({ error: "Contact service not configured. Please contact the site administrator." }, 500);
     }
 
     // Validate FROM_EMAIL domain

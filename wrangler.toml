@@ -1,8 +1,15 @@
 name = "dhruvilthummar-pages"
-compatibility_date = "2025-01-01"
+type = "javascript"
+compatibility_date = "2026-01-01"
 
-[vars]
-# Set these in the Cloudflare dashboard (Pages project -> Settings -> Environment Variables)
-# CONTACT_FROM = "no-reply@yourdomain.com"
-# CONTACT_TO   = "owner@yourdomain.com"
-# CONTACT_CC   = "optional,list@example.com"
+[build]
+command = "npm run build:css"
+cwd = "./"
+watch_paths = ["assets/tailwind-input.css"]
+
+[build.upload]
+format = "service-worker"
+
+[env.production.vars]
+CONTACT_FROM = "no-reply@yourdomain.com"
+CONTACT_TO = "owner@yourdomain.com"

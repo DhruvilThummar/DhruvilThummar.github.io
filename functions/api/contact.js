@@ -98,6 +98,7 @@ export async function onRequestPost(context) {
     const RESEND_API_KEY = env.RESEND_API_KEY || env.resend_api_key;
     const FROM_EMAIL = env.CONTACT_FROM || env.contact_from || "onboarding@resend.dev";
     const OWNER_EMAIL = env.CONTACT_TO || env.contact_to;
+    const clientIp = getClientIp(request);
     
     console.log("Environment check:");
     console.log("- env object:", typeof env);
@@ -105,6 +106,7 @@ export async function onRequestPost(context) {
     console.log("- RESEND_API_KEY:", RESEND_API_KEY ? `set (${RESEND_API_KEY.substring(0, 8)}...)` : "missing");
     console.log("- CONTACT_FROM:", FROM_EMAIL);
     console.log("- CONTACT_TO:", OWNER_EMAIL);
+    console.log("- Client IP:", clientIp);
     
     // Validate required fields
     if (!OWNER_EMAIL) {
@@ -114,68 +116,57 @@ export async function onRequestPost(context) {
       }, 500);
     }
     
-    // If we have Resend API key, use Resend (recommended)
+    // If we have Resend API key, use Resend (recommended) with MailChannels fallback when available
     if (RESEND_API_KEY) {
       console.log("Using Resend email service");
-      return await handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, RESEND_API_KEY, env });
+      const resendOutcome = await sendTransactionalViaResend({
+        cleanName,
+        cleanEmail,
+        cleanSubject,
+        cleanMessage,
+        FROM_EMAIL,
+        OWNER_EMAIL,
+        RESEND_API_KEY,
+      });
+
+      if (resendOutcome.ok) {
+        return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
+      }
+
+      console.warn("Resend failed, attempting MailChannels fallback", resendOutcome.error || "no error message");
+
+      // If we cannot fall back, surface the original error
+      const mailFallback = await sendTransactionalViaMailChannels({
+        cleanName,
+        cleanEmail,
+        cleanSubject,
+        cleanMessage,
+        FROM_EMAIL,
+        OWNER_EMAIL,
+        env,
+      });
+
+      if (mailFallback.ok) {
+        return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
+      }
+
+      return json({ error: resendOutcome.error || mailFallback.error || "Email delivery failed" }, 502);
     }
-    
-    console.log("Resend API key not found, falling back to MailChannels");
-    
-    // Fallback to MailChannels if no Resend key
-    if (!FROM_EMAIL) {
-      console.error("Missing CONTACT_FROM for MailChannels");
-      return json({ error: "Contact service not configured properly. Please contact the site administrator." }, 500);
-    }
 
-    // Validate FROM_EMAIL domain
-    const fromDomain = FROM_EMAIL.split("@")[1];
-    if (!fromDomain || fromDomain === "localhost" || fromDomain.includes("127.0.0.1")) {
-      console.error(`Invalid FROM_EMAIL domain: ${FROM_EMAIL}`);
-      return json({ error: "Contact service domain configuration error." }, 500);
-    }
+    console.log("Resend API key not found, using MailChannels");
 
-    const CC_EMAILS = (env.CONTACT_CC || "")
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    console.log(`Sending email from ${FROM_EMAIL} to ${OWNER_EMAIL} for ${cleanEmail}`);
-
-    // Send owner notification
-    const ownerResult = await sendMail({
-      to: OWNER_EMAIL,
-      cc: CC_EMAILS,
-      from: FROM_EMAIL,
-      replyTo: cleanEmail,
-      subject: `New Contact: ${cleanSubject} — from ${cleanName}`,
-      text: buildOwnerText({ cleanName, cleanEmail, cleanSubject, cleanMessage }),
-      html: buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage }),
+    const mailOutcome = await sendTransactionalViaMailChannels({
+      cleanName,
+      cleanEmail,
+      cleanSubject,
+      cleanMessage,
+      FROM_EMAIL,
+      OWNER_EMAIL,
+      env,
     });
 
-    if (!ownerResult.ok) {
-      console.error(`Owner email failed: ${ownerResult.status} ${ownerResult.statusText}`, ownerResult.error);
-      return json({ 
-        error: `Failed to send email: ${ownerResult.statusText}. Please contact the site administrator or try again later.`,
-        details: ownerResult.error 
-      }, 502);
-    }
-
-    console.log("Owner notification sent successfully");
-
-    // Send confirmation to sender (best-effort)
-    const senderResult = await sendMail({
-      to: cleanEmail,
-      from: FROM_EMAIL,
-      subject: `Thanks for connecting! — ${cleanSubject}`,
-      text: buildSenderText({ cleanName, cleanSubject, cleanMessage }),
-      html: buildSenderHtml({ cleanName, cleanSubject, cleanMessage }),
-    });
-
-    if (!senderResult.ok) {
-      console.warn(`Sender confirmation email failed: ${senderResult.status} ${senderResult.statusText}`);
-    } else {
-      console.log("Confirmation email sent to sender");
+    if (!mailOutcome.ok) {
+      return json({ error: mailOutcome.error || "Email delivery failed" }, 502);
     }
 
     return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
@@ -203,7 +194,7 @@ export async function onRequest(context) {
 }
 
 // Resend email handler (recommended - no DNS setup needed)
-async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, RESEND_API_KEY, env }) {
+async function sendTransactionalViaResend({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, RESEND_API_KEY }) {
   try {
     console.log("=== RESEND EMAIL HANDLER ===");
     console.log("From:", FROM_EMAIL);
@@ -230,9 +221,7 @@ async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMes
     if (!ownerResult.ok) {
       console.error("=== RESEND FAILED ===");
       console.error("Error:", ownerResult.error);
-      return json({ 
-        error: `Email service error: ${ownerResult.error}. Please check Cloudflare logs or contact the administrator.`,
-      }, 502);
+      return { ok: false, error: ownerResult.error };
     }
 
     console.log("=== OWNER EMAIL SENT ===");
@@ -252,12 +241,69 @@ async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMes
       console.warn("Sender confirmation failed (non-critical):", senderResult.error);
     }
 
-    return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
+    return { ok: true };
   } catch (err) {
     console.error("=== RESEND HANDLER ERROR ===");
     console.error(err);
-    return json({ error: `Internal error: ${err.message}` }, 500);
+    return { ok: false, error: err.message };
   }
+}
+
+async function sendTransactionalViaMailChannels({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, env }) {
+  if (!FROM_EMAIL) {
+    console.error("Missing CONTACT_FROM for MailChannels");
+    return { ok: false, error: "Contact service not configured properly. Please contact the site administrator." };
+  }
+
+  const fromDomain = FROM_EMAIL.split("@")[1];
+  if (!fromDomain || fromDomain === "localhost" || fromDomain.includes("127.0.0.1")) {
+    console.error(`Invalid FROM_EMAIL domain: ${FROM_EMAIL}`);
+    return { ok: false, error: "Contact service domain configuration error." };
+  }
+
+  const CC_EMAILS = (env.CONTACT_CC || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+
+  console.log(`Sending email from ${FROM_EMAIL} to ${OWNER_EMAIL} for ${cleanEmail}`);
+
+  const ownerResult = await sendMail({
+    to: OWNER_EMAIL,
+    cc: CC_EMAILS,
+    from: FROM_EMAIL,
+    replyTo: cleanEmail,
+    subject: `New Contact: ${cleanSubject} — from ${cleanName}`,
+    text: buildOwnerText({ cleanName, cleanEmail, cleanSubject, cleanMessage }),
+    html: buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage }),
+  });
+
+  if (!ownerResult.ok) {
+    console.error(`Owner email failed: ${ownerResult.status} ${ownerResult.statusText}`, ownerResult.error);
+    return {
+      ok: false,
+      error: `Failed to send email: ${ownerResult.statusText}. Please contact the site administrator or try again later.`,
+      details: ownerResult.error,
+    };
+  }
+
+  console.log("Owner notification sent successfully");
+
+  const senderResult = await sendMail({
+    to: cleanEmail,
+    from: FROM_EMAIL,
+    subject: `Thanks for connecting! — ${cleanSubject}`,
+    text: buildSenderText({ cleanName, cleanSubject, cleanMessage }),
+    html: buildSenderHtml({ cleanName, cleanSubject, cleanMessage }),
+  });
+
+  if (!senderResult.ok) {
+    console.warn(`Sender confirmation email failed: ${senderResult.status} ${senderResult.statusText}`);
+  } else {
+    console.log("Confirmation email sent to sender");
+  }
+
+  return { ok: true };
 }
 
 // Helper: Send email via Resend API
@@ -575,4 +621,10 @@ function escapeHtml(text) {
     '"': "&quot;",
     "'": "&#039;",
   }[c]));
+}
+
+function getClientIp(request) {
+  return request?.headers?.get("cf-connecting-ip")
+    || request?.headers?.get("x-forwarded-for")?.split(",")[0]?.trim()
+    || "unknown";
 }

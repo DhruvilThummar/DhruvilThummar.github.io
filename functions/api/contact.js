@@ -148,7 +148,80 @@ export async function onRequestPost(context) {
   }
 }
 
-// Helpers
+// Resend email handler (recommended - no DNS setup needed)
+async function handleResendEmail({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, RESEND_API_KEY, env }) {
+  try {
+    console.log(`Sending via Resend from ${FROM_EMAIL} to ${OWNER_EMAIL}`);
+
+    // Send owner notification
+    const ownerResult = await sendResendEmail({
+      to: OWNER_EMAIL,
+      from: FROM_EMAIL,
+      subject: `New Contact: ${cleanSubject} — from ${cleanName}`,
+      html: buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage }),
+      apiKey: RESEND_API_KEY,
+    });
+
+    if (!ownerResult.ok) {
+      console.error(`Resend owner email failed:`, ownerResult.error);
+      return json({ 
+        error: `Failed to send email. Please try again later.`,
+      }, 502);
+    }
+
+    console.log("Owner notification sent via Resend");
+
+    // Send confirmation to sender (best-effort)
+    await sendResendEmail({
+      to: cleanEmail,
+      from: FROM_EMAIL,
+      subject: `Thanks for connecting! — ${cleanSubject}`,
+      html: buildSenderHtml({ cleanName, cleanSubject, cleanMessage }),
+      apiKey: RESEND_API_KEY,
+    }).catch(err => {
+      console.warn("Sender confirmation email failed:", err);
+    });
+
+    return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
+  } catch (err) {
+    console.error("Resend error:", err);
+    return json({ error: `Internal error: ${err.message}` }, 500);
+  }
+}
+
+// Helper: Send email via Resend API
+async function sendResendEmail({ to, from, subject, html, apiKey }) {
+  try {
+    console.log(`Attempting Resend: ${to} from ${from}`);
+    
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from,
+        to,
+        subject,
+        html,
+      }),
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      console.error(`Resend error (${res.status}):`, data);
+      return { ok: false, error: data.message || res.statusText };
+    }
+
+    console.log(`Resend email sent successfully to ${to}`);
+    return { ok: true };
+  } catch (err) {
+    console.error("Resend fetch error:", err);
+    return { ok: false, error: err.message };
+  }
+}
 async function sendMail({ to, cc = [], from, replyTo, subject, text, html }) {
   const recipients = [{ email: to }].concat(cc.map((c) => ({ email: c })));
 

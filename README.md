@@ -22,12 +22,25 @@ Prerequisites: Node.js 18+ and npm.
 
 ## Contact form backend
 
-The Cloudflare Pages Function in `functions/api/contact.js` accepts POSTed JSON with `name`, `email`, `subject` (optional), and `message`. It sends two beautifully formatted emails using MailChannels:
+The Cloudflare Pages Function in `functions/api/contact.js` accepts POSTed JSON with `name`, `email`, `subject` (optional), and `message`. It sends two beautifully formatted emails using either **Resend** (recommended) or **MailChannels**:
 
 1. **Owner notification** — All submission details to you
 2. **Confirmation email** — Thank you message to the visitor
 
-### Configuration
+### Configuration (Choose One)
+
+#### Option 1: Resend (Recommended - Easiest Setup)
+
+1. Sign up for free at [resend.com](https://resend.com)
+2. Get your API key from the dashboard
+3. Set in Cloudflare Pages (Settings → Environment Variables):
+   - `RESEND_API_KEY=your_api_key_here`
+   - `CONTACT_FROM=noreply@your-domain.com` (can be any domain)
+   - `CONTACT_TO=your-email@your-domain.com`
+
+**No DNS setup needed!** Resend handles everything.
+
+#### Option 2: MailChannels (Free but Requires DNS Setup)
 
 Set these environment variables in Cloudflare Pages (Settings → Environment Variables):
 
@@ -35,17 +48,13 @@ Set these environment variables in Cloudflare Pages (Settings → Environment Va
 - `CONTACT_TO` — where owner notifications are sent
 - `CONTACT_CC` (optional) — additional recipients (comma-separated)
 
-### DNS Setup for MailChannels
-
-MailChannels requires SPF verification. Add this TXT record to your domain's DNS:
+Then add this SPF record to your domain's DNS:
 
 ```
 Name: @ (or your subdomain)
 Type: TXT
 Value: v=spf1 a mx include:relay.mailchannels.net ~all
 ```
-
-For best results, add your domain to Cloudflare's free DNS service.
 
 **Input validation:**
 - `name`: 2–100 characters

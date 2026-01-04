@@ -43,8 +43,14 @@ export async function onRequestGet() {
 }
 
 export async function onRequestPost(context) {
+  // Wrap everything in try-catch to ensure we always return JSON
   try {
     const { request, env } = context;
+    
+    // Log that function was called
+    console.log("=== CONTACT FORM FUNCTION CALLED ===");
+    console.log("Request method:", request.method);
+    console.log("Request URL:", request.url);
     
     // Parse request body
     let body;
@@ -56,6 +62,12 @@ export async function onRequestPost(context) {
     }
     
     const { name, email, subject, message } = body || {};
+    
+    console.log("Form data received:");
+    console.log("- Name:", name);
+    console.log("- Email:", email);
+    console.log("- Subject:", subject);
+    console.log("- Message length:", message?.length);
 
     // Basic validation
     if (!name || typeof name !== "string" || name.trim().length < 2) {
@@ -74,9 +86,9 @@ export async function onRequestPost(context) {
     const cleanMessage = message.trim().substring(0, 5000);
 
     // Check environment variables - support both MailChannels and Resend
-    const RESEND_API_KEY = env.RESEND_API_KEY;
-    const FROM_EMAIL = env.CONTACT_FROM || "onboarding@resend.dev";
-    const OWNER_EMAIL = env.CONTACT_TO;
+    const RESEND_API_KEY = env?.RESEND_API_KEY;
+    const FROM_EMAIL = env?.CONTACT_FROM || "onboarding@resend.dev";
+    const OWNER_EMAIL = env?.CONTACT_TO;
     
     console.log("Environment check:");
     console.log("- RESEND_API_KEY:", RESEND_API_KEY ? `set (${RESEND_API_KEY.substring(0, 8)}...)` : "missing");
@@ -157,8 +169,25 @@ export async function onRequestPost(context) {
 
     return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
   } catch (err) {
-    console.error("Contact form unexpected error:", err);
+    console.error("=== FUNCTION ERROR (CAUGHT) ===");
+    console.error("Error message:", err.message);
+    console.error("Error stack:", err.stack);
     return json({ error: `Internal error: ${err.message}` }, 500);
+  }
+}
+
+// Fallback handler for any HTTP method
+export async function onRequest(context) {
+  const method = context.request.method;
+  
+  if (method === "POST") {
+    return onRequestPost(context);
+  } else if (method === "OPTIONS") {
+    return onRequestOptions();
+  } else if (method === "GET") {
+    return onRequestGet();
+  } else {
+    return json({ error: `Method ${method} not allowed` }, 405);
   }
 }
 

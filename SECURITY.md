@@ -1,21 +1,31 @@
 # Security Policy
 
-## Supported Versions
+## Supported versions
+Security fixes are issued for the live site (the `main` branch). Archived tags or forks are not maintained.
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+| Version / branch | Supported |
+| ---------------- | --------- |
+| main (live site) | ✅        |
+| older tags       | ❌        |
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+## Reporting a vulnerability
+- Email: official@gujwear.live (preferred)
+- Alternative: open a private GitHub Security Advisory for this repository.
 
-## Reporting a Vulnerability
+When you report, please include:
+- A clear description of the issue and its potential impact
+- Steps to reproduce or a minimal proof of concept
+- Affected URL(s), payloads, and any relevant request/response samples
+- Optional: suggested remediation or references
 
-Use this section to tell people how to report a vulnerability.
+Response expectations:
+- Acknowledgment within 3 business days
+- Status update within 7 business days after acknowledgment
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+## Handling process
+1) Triage and reproduce; 2) Assess impact and scope; 3) Develop and test a fix; 4) Deploy and notify reporters; 5) Credit provided on request (unless anonymity is preferred).
+
+## Scope and testing guidelines
+- In scope: the public site, static assets, and `/api/contact` mailer function.
+- Out of scope: denial-of-service tests, automated spam against the form, or attacks against third-party infrastructure.
+- Please avoid accessing data that is not yours; stop testing and report immediately if you encounter sensitive information.

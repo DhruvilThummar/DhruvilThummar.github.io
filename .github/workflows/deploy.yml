@@ -1,0 +1,90 @@
+name: Deploy Portfolio to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages-${{ github.ref }}
+      cancel-in-progress: false
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm install
+    
+    - name: Build CSS with Tailwind
+      run: npm run build:css
+      env:
+        TAILWIND_MODE: build
+
+    - name: Remove node_modules to shrink artifact
+      run: rm -rf node_modules
+    
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
+    
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.'
+    
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
+
+  # Optional: Test email configuration
+  test-smtp:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Install nodemailer
+      run: npm install nodemailer --save-dev
+    
+    - name: Verify SMTP Configuration
+      run: |
+        if [ -z "${{ secrets.SMTP_HOST }}" ]; then
+          echo "❌ SMTP_HOST secret not set"
+          exit 1
+        fi
+        if [ -z "${{ secrets.SMTP_USER }}" ]; then
+          echo "❌ SMTP_USER secret not set"
+          exit 1
+        fi
+        if [ -z "${{ secrets.SMTP_PASS }}" ]; then
+          echo "❌ SMTP_PASS secret not set"
+          exit 1
+        fi
+        echo "✅ All SMTP secrets are configured"
+      env:
+        SMTP_HOST: ${{ secrets.SMTP_HOST }}
+        SMTP_USER: ${{ secrets.SMTP_USER }}
+        SMTP_PASS: ${{ secrets.SMTP_PASS }}

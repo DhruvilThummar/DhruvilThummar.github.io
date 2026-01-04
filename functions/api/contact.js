@@ -99,6 +99,8 @@ export async function onRequestPost(context) {
     const FROM_EMAIL = env.CONTACT_FROM || env.contact_from || "onboarding@resend.dev";
     const OWNER_EMAIL = env.CONTACT_TO || env.contact_to;
     const clientIp = getClientIp(request);
+    const userAgent = request.headers.get("user-agent") || "unknown";
+    const referer = request.headers.get("referer") || request.headers.get("origin") || "unknown";
     
     console.log("Environment check:");
     console.log("- env object:", typeof env);
@@ -107,6 +109,8 @@ export async function onRequestPost(context) {
     console.log("- CONTACT_FROM:", FROM_EMAIL);
     console.log("- CONTACT_TO:", OWNER_EMAIL);
     console.log("- Client IP:", clientIp);
+    console.log("- User-Agent:", userAgent);
+    console.log("- Referer:", referer);
     
     // Validate required fields
     if (!OWNER_EMAIL) {
@@ -127,6 +131,7 @@ export async function onRequestPost(context) {
         FROM_EMAIL,
         OWNER_EMAIL,
         RESEND_API_KEY,
+        meta: { clientIp, userAgent, referer },
       });
 
       if (resendOutcome.ok) {
@@ -144,6 +149,7 @@ export async function onRequestPost(context) {
         FROM_EMAIL,
         OWNER_EMAIL,
         env,
+        meta: { clientIp, userAgent, referer },
       });
 
       if (mailFallback.ok) {
@@ -163,6 +169,7 @@ export async function onRequestPost(context) {
       FROM_EMAIL,
       OWNER_EMAIL,
       env,
+      meta: { clientIp, userAgent, referer },
     });
 
     if (!mailOutcome.ok) {
@@ -194,7 +201,7 @@ export async function onRequest(context) {
 }
 
 // Resend email handler (recommended - no DNS setup needed)
-async function sendTransactionalViaResend({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, RESEND_API_KEY }) {
+async function sendTransactionalViaResend({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, RESEND_API_KEY, meta = {} }) {
   try {
     console.log("=== RESEND EMAIL HANDLER ===");
     console.log("From:", FROM_EMAIL);
@@ -213,7 +220,8 @@ async function sendTransactionalViaResend({ cleanName, cleanEmail, cleanSubject,
       to: OWNER_EMAIL,
       from: fromAddress,
       subject: `New Contact: ${cleanSubject} — from ${cleanName}`,
-      html: buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage }),
+      html: buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage, meta }),
+      text: buildOwnerText({ cleanName, cleanEmail, cleanSubject, cleanMessage, meta }),
       apiKey: RESEND_API_KEY,
       replyTo: cleanEmail,
     });
@@ -249,7 +257,7 @@ async function sendTransactionalViaResend({ cleanName, cleanEmail, cleanSubject,
   }
 }
 
-async function sendTransactionalViaMailChannels({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, env }) {
+async function sendTransactionalViaMailChannels({ cleanName, cleanEmail, cleanSubject, cleanMessage, FROM_EMAIL, OWNER_EMAIL, env, meta = {} }) {
   if (!FROM_EMAIL) {
     console.error("Missing CONTACT_FROM for MailChannels");
     return { ok: false, error: "Contact service not configured properly. Please contact the site administrator." };
@@ -274,8 +282,8 @@ async function sendTransactionalViaMailChannels({ cleanName, cleanEmail, cleanSu
     from: FROM_EMAIL,
     replyTo: cleanEmail,
     subject: `New Contact: ${cleanSubject} — from ${cleanName}`,
-    text: buildOwnerText({ cleanName, cleanEmail, cleanSubject, cleanMessage }),
-    html: buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage }),
+    text: buildOwnerText({ cleanName, cleanEmail, cleanSubject, cleanMessage, meta }),
+    html: buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage, meta }),
   });
 
   if (!ownerResult.ok) {
@@ -416,7 +424,8 @@ async function sendMail({ to, cc = [], from, replyTo, subject, text, html }) {
   }
 }
 
-function buildOwnerText({ cleanName, cleanEmail, cleanSubject, cleanMessage }) {
+function buildOwnerText({ cleanName, cleanEmail, cleanSubject, cleanMessage, meta = {} }) {
+  const { clientIp = "unknown", userAgent = "unknown", referer = "unknown" } = meta;
   return [
     "New Contact Submission",
     "",
@@ -424,6 +433,11 @@ function buildOwnerText({ cleanName, cleanEmail, cleanSubject, cleanMessage }) {
     `Email: ${cleanEmail}`,
     `Subject: ${cleanSubject}`,
     `Received: ${new Date().toISOString()}`,
+    "",
+    "Request Meta:",
+    `IP: ${clientIp}`,
+    `User-Agent: ${userAgent}`,
+    `Referer: ${referer}`,
     "",
     "Message:",
     cleanMessage,
@@ -449,7 +463,8 @@ function buildSenderText({ cleanName, cleanSubject, cleanMessage }) {
   ].join("\n");
 }
 
-function buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage }) {
+function buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage, meta = {} }) {
+  const { clientIp = "unknown", userAgent = "unknown", referer = "unknown" } = meta;
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -500,6 +515,18 @@ function buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage }) {
           <div class="info-row">
             <div class="info-label">Received:</div>
             <div class="info-value">${new Date().toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })} UTC</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">IP:</div>
+            <div class="info-value">${escapeHtml(clientIp)}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">User-Agent:</div>
+            <div class="info-value" style="font-size: 12px; color: #555;">${escapeHtml(userAgent)}</div>
+          </div>
+          <div class="info-row">
+            <div class="info-label">Referer:</div>
+            <div class="info-value">${escapeHtml(referer)}</div>
           </div>
         </div>
       </div>

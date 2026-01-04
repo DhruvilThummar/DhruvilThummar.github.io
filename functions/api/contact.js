@@ -10,6 +10,19 @@
 
 const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
+// Helper function to create JSON responses
+function json(obj, status = 200) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: {
+      "content-type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+}
+
 // Handle CORS preflight
 export async function onRequestOptions() {
   return new Response(null, {
@@ -20,6 +33,11 @@ export async function onRequestOptions() {
       "Access-Control-Allow-Headers": "Content-Type",
     },
   });
+}
+
+// Handle GET requests (not supported)
+export async function onRequestGet() {
+  return json({ error: "Method not allowed. Please use POST to submit the contact form." }, 405);
 }
 
 export async function onRequestPost(context) {
@@ -346,6 +364,8 @@ function buildSenderHtml({ cleanName, cleanSubject, cleanMessage }) {
 </html>`;
 }
 
+
+
 function firstWord(text) {
   return (text || "").split(/\s+/)[0] || "there";
 }
@@ -358,16 +378,4 @@ function escapeHtml(text) {
     '"': "&quot;",
     "'": "&#039;",
   }[c]));
-}
-
-function json(obj, status = 200) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: {
-      "content-type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    },
-  });
 }

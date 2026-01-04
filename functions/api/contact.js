@@ -116,7 +116,8 @@ export async function onRequestPost(context) {
     if (!OWNER_EMAIL) {
       console.error("CONTACT_TO (OWNER_EMAIL) is required but not set");
       return json({ 
-        error: "Contact service not configured. Environment variable CONTACT_TO is missing. Please add it in Cloudflare Pages settings." 
+        error: "Contact service not configured. Environment variable CONTACT_TO is missing. Please add it in Cloudflare Pages settings.",
+        delivery: buildDeliveryDebug(FROM_EMAIL, OWNER_EMAIL, "config", { hasResend: !!RESEND_API_KEY })
       }, 500);
     }
     
@@ -156,7 +157,13 @@ export async function onRequestPost(context) {
         return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
       }
 
-      return json({ error: resendOutcome.error || mailFallback.error || "Email delivery failed" }, 502);
+      return json({ 
+        error: resendOutcome.error || mailFallback.error || "Email delivery failed",
+        delivery: buildDeliveryDebug(FROM_EMAIL, OWNER_EMAIL, "resend+mailchannels", {
+          resendError: resendOutcome.error,
+          mailError: mailFallback.error,
+        }),
+      }, 502);
     }
 
     console.log("Resend API key not found, using MailChannels");
@@ -173,7 +180,10 @@ export async function onRequestPost(context) {
     });
 
     if (!mailOutcome.ok) {
-      return json({ error: mailOutcome.error || "Email delivery failed" }, 502);
+      return json({ 
+        error: mailOutcome.error || "Email delivery failed",
+        delivery: buildDeliveryDebug(FROM_EMAIL, OWNER_EMAIL, "mailchannels", { mailError: mailOutcome.error })
+      }, 502);
     }
 
     return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
@@ -654,4 +664,15 @@ function getClientIp(request) {
   return request?.headers?.get("cf-connecting-ip")
     || request?.headers?.get("x-forwarded-for")?.split(",")[0]?.trim()
     || "unknown";
+}
+
+function buildDeliveryDebug(from, to, service, extra = {}) {
+  return {
+    service,
+    from,
+    to,
+    hasFrom: !!from,
+    hasTo: !!to,
+    ...extra,
+  };
 }

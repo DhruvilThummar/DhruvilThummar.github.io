@@ -4048,26 +4048,31 @@
                     body: JSON.stringify(formData)
                 })
                     .then(async (res) => {
-                        // Check if response is JSON
-                        const contentType = res.headers.get("content-type");
-                        if (!contentType || !contentType.includes("application/json")) {
-                            console.error(`Non-JSON response: ${res.status} ${res.statusText}`);
+                        const contentType = res.headers.get("content-type") || "";
+                        let payload = null;
+
+                        if (contentType.includes("application/json")) {
+                            payload = await res.json().catch(() => null);
+                        } else {
+                            const text = await res.text().catch(() => "");
+                            console.error(`Non-JSON response: ${res.status} ${res.statusText} body=${text}`);
                             if (res.status === 403) {
                                 showToast("Request blocked by security. Contact admin to whitelist /api/contact", false);
                             } else if (res.status === 405) {
                                 showToast("Contact API not deployed properly. Check Cloudflare Pages Functions.", false);
                             } else {
-                                showToast("Contact service error. Please try again later.", false);
+                                showToast(`Contact service error (${res.status}). Please try again later.`, false);
                             }
                             return;
                         }
                         
-                        const jsonRes = await res.json();
                         if (res.ok) {
                             showToast("Thanks for connecting! Check your email for confirmation. 🙏", true);
                             form.reset();
                         } else {
-                            const msg = jsonRes.error || "Failed to send message";
+                            const delivery = payload?.delivery;
+                            const detail = delivery?.service ? ` [${delivery.service}${delivery?.mailError ? ": " + delivery.mailError : ""}]` : "";
+                            const msg = payload?.error || `Failed to send message${detail}`;
                             showToast(msg, false);
                         }
                     })

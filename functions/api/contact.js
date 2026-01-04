@@ -1,11 +1,26 @@
 // Cloudflare Pages Function: Contact form handler using MailChannels
 // Expects environment variables configured in the Pages project:
-// - CONTACT_FROM (the from/sender address, e.g., no-reply@yourdomain)
+// - CONTACT_FROM (the from/sender address, e.g., no-reply@yourdomain.com)
 // - CONTACT_TO   (where owner notifications are sent)
 // - CONTACT_CC   (optional, comma-separated list)
-// This function does not support SMTP; it uses MailChannels HTTP API which works on Cloudflare Workers.
+// 
+// MailChannels requires:
+// 1. Your domain to be verified in Cloudflare (add SPF/DKIM/DMARC records)
+// 2. Proper from email matching your domain
 
 const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+// Handle CORS preflight
+export async function onRequestOptions() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+}
 
 export async function onRequestPost(context) {
   try {
@@ -37,7 +52,15 @@ export async function onRequestPost(context) {
       .filter(Boolean);
 
     if (!FROM_EMAIL || !OWNER_EMAIL) {
+      console.error("Missing env vars: CONTACT_FROM or CONTACT_TO");
       return json({ error: "Contact service is not configured" }, 500);
+    }
+
+    // Validate FROM_EMAIL matches a real domain (not localhost)
+    const fromDomain = FROM_EMAIL.split("@")[1];
+    if (!fromDomain || fromDomain === "localhost" || fromDomain.includes("127.0.0.1")) {
+      console.error(`Invalid FROM_EMAIL domain: ${FROM_EMAIL}`);
+      return json({ error: "Contact service domain is not properly configured" }, 500);
     }
 
     // Send owner notification
@@ -52,11 +75,12 @@ export async function onRequestPost(context) {
     });
 
     if (!ownerResult.ok) {
-      return json({ error: "Failed to send notification" }, 502);
+      console.error(`Owner email failed: ${ownerResult.status} ${ownerResult.statusText}`, ownerResult.error);
+      return json({ error: "Failed to send notification. Check your domain email configuration." }, 502);
     }
 
-    // Send confirmation to sender (best-effort)
-    await sendMail({
+    // Send confirmation to sender (best-effort, don't fail if this fails)
+    const senderResult = await sendMail({
       to: cleanEmail,
       from: FROM_EMAIL,
       subject: `Thanks for connecting! — ${cleanSubject}`,
@@ -64,7 +88,12 @@ export async function onRequestPost(context) {
       html: buildSenderHtml({ cleanName, cleanSubject, cleanMessage }),
     });
 
-    return json({ ok: true, message: "Emails sent successfully" }, 200);
+    if (!senderResult.ok) {
+      console.warn(`Sender confirmation email failed: ${senderResult.status} ${senderResult.statusText}`);
+      // Don't fail the request, owner got the notification
+    }
+
+    return json({ ok: true, message: "Message received! Check your email for confirmation." }, 200);
   } catch (err) {
     console.error("Contact form error:", err);
     return json({ error: "Failed to send message. Please try again later." }, 500);
@@ -82,7 +111,7 @@ async function sendMail({ to, cc = [], from, replyTo, subject, text, html }) {
         ...(replyTo ? { reply_to: { email: replyTo } } : {}),
       },
     ],
-    from: { email: from, name: "Contact Form" },
+    from: { email: from, name: "Dhruvil Thummar" },
     subject,
     content: [
       { type: "text/plain", value: text },
@@ -90,13 +119,19 @@ async function sendMail({ to, cc = [], from, replyTo, subject, text, html }) {
     ],
   };
 
-  const res = await fetch("https://api.mailchannels.net/tx/v1/send", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  try {
+    const res = await fetch("https://api.mailchannels.net/tx/v1/send", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-  return { ok: res.ok, status: res.status, statusText: res.statusText };
+    const errorText = res.ok ? "" : await res.text().catch(() => "");
+    return { ok: res.ok, status: res.status, statusText: res.statusText, error: errorText };
+  } catch (err) {
+    console.error("MailChannels fetch error:", err);
+    return { ok: false, status: 0, statusText: "Network error", error: err.message };
+  }
 }
 
 function buildOwnerText({ cleanName, cleanEmail, cleanSubject, cleanMessage }) {
@@ -175,6 +210,11 @@ function escapeHtml(text) {
 function json(obj, status = 200) {
   return new Response(JSON.stringify(obj), {
     status,
-    headers: { "content-type": "application/json" },
+    headers: {
+      "content-type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
   });
 }

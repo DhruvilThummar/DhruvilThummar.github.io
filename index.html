@@ -4042,20 +4042,32 @@
                     body: JSON.stringify(formData)
                 })
                     .then(async (res) => {
+                        // Check if response is JSON
+                        const contentType = res.headers.get("content-type");
+                        if (!contentType || !contentType.includes("application/json")) {
+                            console.error(`Non-JSON response: ${res.status} ${res.statusText}`);
+                            if (res.status === 403) {
+                                showToast("Request blocked by security. Contact admin to whitelist /api/contact", false);
+                            } else if (res.status === 405) {
+                                showToast("Contact API not deployed properly. Check Cloudflare Pages Functions.", false);
+                            } else {
+                                showToast("Contact service error. Please try again later.", false);
+                            }
+                            return;
+                        }
+                        
                         const jsonRes = await res.json();
                         if (res.ok) {
                             showToast("Thanks for connecting! Check your email for confirmation. 🙏", true);
                             form.reset();
                         } else {
-                            const msg = jsonRes.error || (res.status === 404
-                                ? "Contact service is unreachable. Configure a serverless endpoint and set data-endpoint on the form."
-                                : "Failed to send message");
+                            const msg = jsonRes.error || "Failed to send message";
                             showToast(msg, false);
                         }
                     })
                     .catch((err) => {
                         console.error("Contact form error:", err);
-                        showToast("An error occurred. Please try again.", false);
+                        showToast("Network error. Please check your connection.", false);
                     })
                     .finally(() => {
                         button.classList.remove("loading");

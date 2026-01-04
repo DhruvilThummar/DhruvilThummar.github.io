@@ -1,0 +1,8 @@
+name = "dhruvilthummar-pages"
+compatibility_date = "2025-01-01"
+
+[vars]
+# Set these in the Cloudflare dashboard (Pages project -> Settings -> Environment Variables)
+# CONTACT_FROM = "no-reply@yourdomain.com"
+# CONTACT_TO   = "owner@yourdomain.com"
+# CONTACT_CC   = "optional,list@example.com"

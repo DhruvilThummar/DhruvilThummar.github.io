@@ -4013,6 +4013,8 @@
                 return null;
             };
 
+            const endpoint = (form.dataset.endpoint || window.CONTACT_API_URL || "/api/contact").trim();
+
             form.addEventListener("submit", function (e) {
                 e.preventDefault();
                 
@@ -4032,7 +4034,7 @@
                     message: form.message?.value?.trim()
                 };
 
-                fetch("/api/contact", {
+                fetch(endpoint, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -4045,7 +4047,10 @@
                             showToast("Thanks for connecting! Check your email for confirmation. 🙏", true);
                             form.reset();
                         } else {
-                            showToast(jsonRes.error || "Failed to send message", false);
+                            const msg = jsonRes.error || (res.status === 404
+                                ? "Contact service is unreachable. Configure a serverless endpoint and set data-endpoint on the form."
+                                : "Failed to send message");
+                            showToast(msg, false);
                         }
                     })
                     .catch((err) => {

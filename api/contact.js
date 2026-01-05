@@ -76,6 +76,7 @@ module.exports = async (req, res) => {
     const ownerMailOptions = {
       from: FROM_EMAIL,
       to: OWNER_EMAIL,
+      replyTo: cleanEmail,
       subject: `New Contact: ${cleanSubject} — from ${cleanName}`,
       html: `
         <!DOCTYPE html>
@@ -153,7 +154,6 @@ module.exports = async (req, res) => {
 
             <div class="footer">
               <p>This email was sent from your portfolio contact form at <a href="https://drthummar.me/">drthummar.me</a></p>
-              <p style="margin-top: 10px; color: #ccc;">Never share your response emails publicly | Keep contact info private</p>
             </div>
           </div>
         </body>
@@ -162,108 +162,14 @@ module.exports = async (req, res) => {
       text: `New Contact Submission\n\nName: ${cleanName}\nEmail: ${cleanEmail}\nSubject: ${cleanSubject}\nReceived: ${new Date().toISOString()}\n\nMessage:\n${cleanMessage}\n\n---\nReply to: ${cleanEmail}`,
     };
 
-    // Confirmation email to the person who submitted the form
-    const senderMailOptions = {
-      from: FROM_EMAIL,
-      to: cleanEmail,
-      subject: `Thanks for connecting! — ${cleanSubject}`,
-      html: `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Thanks for Connecting</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
-            .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            .header { background: linear-gradient(135deg, #00bfff 0%, #0099cc 100%); padding: 40px 20px; text-align: center; color: white; }
-            .header h1 { font-size: 28px; margin-bottom: 10px; }
-            .header p { font-size: 15px; opacity: 0.95; }
-            .content { padding: 30px 20px; }
-            .section { margin-bottom: 25px; }
-            .section-title { font-size: 13px; font-weight: bold; color: #00bfff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-            .message-box { background: #f9f9f9; border-left: 4px solid #00bfff; padding: 15px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.6; }
-            .cta-box { background: linear-gradient(135deg, rgba(0, 191, 255, 0.1) 0%, rgba(0, 153, 204, 0.1) 100%); border: 1px solid #00bfff; padding: 20px; border-radius: 8px; margin: 20px 0; }
-            .cta-box h3 { color: #00bfff; margin-bottom: 12px; font-size: 15px; }
-            .cta-links { display: flex; gap: 10px; flex-wrap: wrap; }
-            .cta-links a { display: inline-block; padding: 10px 16px; background: #00bfff; color: white; text-decoration: none; border-radius: 4px; font-weight: 500; font-size: 13px; transition: background 0.3s; }
-            .cta-links a:hover { background: #0099cc; }
-            .info-box { background: #f9f9f9; padding: 12px 15px; border-radius: 4px; font-size: 13px; color: #666; margin-bottom: 10px; }
-            .info-box strong { color: #333; }
-            .footer { background: #f5f5f5; padding: 25px 20px; text-align: center; font-size: 12px; color: #999; border-top: 1px solid #e0e0e0; }
-            .footer a { color: #00bfff; text-decoration: none; }
-            .footer a:hover { text-decoration: underline; }
-            .social-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
-            .social-links a { color: #00bfff; text-decoration: none; font-weight: 500; }
-            .status-badge { display: inline-block; background: #00bfff; color: white; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-bottom: 15px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🙏 Thanks for Connecting!</h1>
-              <p>Your message has been received</p>
-            </div>
-            
-            <div class="content">
-              <div class="section">
-                <div class="status-badge">✓ Received & Confirmed</div>
-                <p style="font-size: 15px; color: #555;">Hi <strong>${escapeHtml(cleanName.split(' ')[0])}</strong>,</p>
-                <p style="margin-top: 10px; color: #666;">Thank you for reaching out! Your message has been successfully received and I'll review it shortly. I appreciate you taking the time to connect.</p>
-              </div>
-
-              <div class="section">
-                <div class="section-title">Your Submission Summary</div>
-                <div class="info-box">
-                  <div style="margin-bottom: 8px;"><strong>Subject:</strong> ${escapeHtml(cleanSubject)}</div>
-                  <div><strong>Received:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })} IST</div>
-                </div>
-                <div class="message-box" style="margin-top: 12px;">${escapeHtml(cleanMessage)}</div>
-              </div>
-
-              <div class="cta-box">
-                <h3>What happens next?</h3>
-                <p style="font-size: 13px; color: #666; margin-bottom: 10px;">I'll get back to you within 1-2 business days. In the meantime, feel free to explore my work or reach out on social media.</p>
-                <div class="cta-links">
-                  <a href="https://drthummar.me/">View Portfolio</a>
-                  <a href="https://github.com/DhruvilThummar">GitHub</a>
-                  <a href="https://www.linkedin.com/in/dhruvil-thummar-54422731a">LinkedIn</a>
-                </div>
-              </div>
-
-              <div class="section">
-                <div class="section-title">Quick Links</div>
-                <div class="social-links">
-                  <a href="https://github.com/DhruvilThummar" target="_blank">GitHub</a>
-                  <a href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" target="_blank">LinkedIn</a>
-                  <a href="https://www.instagram.com/dhruvil_thummar_" target="_blank">Instagram</a>
-                </div>
-              </div>
-            </div>
-
-            <div class="footer">
-              <p><strong>Need an immediate response?</strong> Reply to this email directly.</p>
-              <p style="margin-top: 12px;">This is an automated confirmation from <a href="https://drthummar.me/">drthummar.me</a></p>
-              <p style="margin-top: 8px; color: #ccc;">Please do not reply with sensitive information</p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `,
-      text: `Hi ${cleanName},\n\nThanks for reaching out! Your message has been received successfully.\n\nSubject: ${cleanSubject}\n\nMessage:\n${cleanMessage}\n\n---\n\nI'll get back to you within 1-2 business days.\n\nBest regards,\nDhruvil Thummar\nhttps://drthummar.me\n\nGitHub: https://github.com/DhruvilThummar\nLinkedIn: https://www.linkedin.com/in/dhruvil-thummar-54422731a`,
-    };
-
-    // Send both emails
+    // Send email only to site owner
     await transporter.sendMail(ownerMailOptions);
-    await transporter.sendMail(senderMailOptions);
 
     console.log(`Contact form submission processed: ${cleanEmail}`);
 
     return res.status(200).json({
       ok: true,
-      message: 'Emails sent successfully! Check your inbox for confirmation.',
+      message: 'Message sent successfully!',
     });
   } catch (error) {
     console.error('Contact form error:', error?.message || error);

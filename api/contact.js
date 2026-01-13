@@ -5,13 +5,47 @@ const nodemailer = require('nodemailer');
  * Sends emails to both the site owner and the person who submitted the form
  */
 const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+const MAX_NAME_LEN = 100;
+const MAX_EMAIL_LEN = 254;
+const MAX_SUBJECT_LEN = 200;
+const MAX_MESSAGE_LEN = 5000;
+
+function stripNewlines(value) {
+  return String(value || '').replace(/[\r\n]+/g, ' ').trim();
+}
+
+function getClientIp(req) {
+  const xf = req.headers['x-forwarded-for'];
+  if (typeof xf === 'string' && xf.length > 0) return xf.split(',')[0].trim();
+  return req.socket?.remoteAddress || 'unknown';
+}
+
+function escapeHtml(text) {
+  const map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  };
+  return String(text || '').replace(/[&<>"']/g, (m) => map[m]);
+}
+
 module.exports = async (req, res) => {
   // Only accept POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed. Use POST.' });
   }
 
-  const { name, email, subject, message } = req.body || {};
+  const { name, email, subject, message, company, website } = req.body || {};
+
+  // Honeypot (anti-spam): if filled, pretend success and do nothing.
+  const trapValue = typeof company === 'string' ? company : (typeof website === 'string' ? website : '');
+  if (trapValue && trapValue.trim().length > 0) {
+    console.warn('Honeypot triggered; dropping submission', { ip: getClientIp(req) });
+    return res.status(200).json({ ok: true, message: 'Message received.' });
+  }
 
   // Validate required fields
   if (!name || typeof name !== 'string' || name.trim().length < 2) {
@@ -26,13 +60,13 @@ module.exports = async (req, res) => {
     return res.status(400).json({ error: 'Message must be at least 10 characters' });
   }
 
-  const cleanName = name.trim().substring(0, 100);
+  const cleanName = name.trim().substring(0, MAX_NAME_LEN);
   const cleanEmail = email.trim().toLowerCase();
-  if (cleanEmail.length > 254 || !EMAIL_REGEX.test(cleanEmail)) {
+  if (cleanEmail.length > MAX_EMAIL_LEN || !EMAIL_REGEX.test(cleanEmail)) {
     return res.status(400).json({ error: 'Invalid email address' });
   }
-  const cleanSubject = (subject || 'Portfolio Contact Form').trim().substring(0, 200);
-  const cleanMessage = message.trim().substring(0, 5000);
+  const cleanSubject = stripNewlines(subject || 'Portfolio Contact Form').substring(0, MAX_SUBJECT_LEN);
+  const cleanMessage = String(message).trim().substring(0, MAX_MESSAGE_LEN);
 
   // Configuration - prefer environment variables
   const SMTP_HOST = process.env.SMTP_HOST;
@@ -70,13 +104,25 @@ module.exports = async (req, res) => {
         user: SMTP_USER,
         pass: SMTP_PASS,
       },
+      // Sensible defaults for serverless environments
+      connectionTimeout: parseInt(process.env.SMTP_CONNECTION_TIMEOUT || '10000', 10),
+      greetingTimeout: parseInt(process.env.SMTP_GREETING_TIMEOUT || '10000', 10),
+      socketTimeout: parseInt(process.env.SMTP_SOCKET_TIMEOUT || '20000', 10),
     });
+
+    if (process.env.SMTP_VERIFY === 'true') {
+      await transporter.verify();
+    }
+
+    const fromHeader = process.env.SMTP_FROM_NAME
+      ? `${stripNewlines(process.env.SMTP_FROM_NAME)} <${FROM_EMAIL}>`
+      : `Dhruvil Thummar <${FROM_EMAIL}>`;
 
     // Email to site owner with all submission details
     const ownerMailOptions = {
-      from: FROM_EMAIL,
+      from: fromHeader,
       to: OWNER_EMAIL,
-      replyTo: cleanEmail,
+      replyTo: { name: cleanName, address: cleanEmail },
       subject: `New Contact: ${cleanSubject} — from ${cleanName}`,
       html: `
         <!DOCTYPE html>
@@ -164,106 +210,120 @@ module.exports = async (req, res) => {
 
     // Confirmation email to the person who submitted the form
     const senderMailOptions = {
-      from: FROM_EMAIL,
+      from: fromHeader,
       to: cleanEmail,
-      subject: `Thanks for connecting! — ${cleanSubject}`,
+      replyTo: OWNER_EMAIL,
+      subject: `Got your message — ${cleanSubject}`,
       html: `
-        <!DOCTYPE html>
+        <!doctype html>
         <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Thanks for Connecting</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
-            .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            .header { background: linear-gradient(135deg, #00bfff 0%, #0099cc 100%); padding: 40px 20px; text-align: center; color: white; }
-            .header h1 { font-size: 28px; margin-bottom: 10px; }
-            .header p { font-size: 15px; opacity: 0.95; }
-            .content { padding: 30px 20px; }
-            .section { margin-bottom: 25px; }
-            .section-title { font-size: 13px; font-weight: bold; color: #00bfff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-            .message-box { background: #f9f9f9; border-left: 4px solid #00bfff; padding: 15px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.6; }
-            .cta-box { background: linear-gradient(135deg, rgba(0, 191, 255, 0.1) 0%, rgba(0, 153, 204, 0.1) 100%); border: 1px solid #00bfff; padding: 20px; border-radius: 8px; margin: 20px 0; }
-            .cta-box h3 { color: #00bfff; margin-bottom: 12px; font-size: 15px; }
-            .cta-links { display: flex; gap: 10px; flex-wrap: wrap; }
-            .cta-links a { display: inline-block; padding: 10px 16px; background: #00bfff; color: white; text-decoration: none; border-radius: 4px; font-weight: 500; font-size: 13px; transition: background 0.3s; }
-            .cta-links a:hover { background: #0099cc; }
-            .info-box { background: #f9f9f9; padding: 12px 15px; border-radius: 4px; font-size: 13px; color: #666; margin-bottom: 10px; }
-            .info-box strong { color: #333; }
-            .footer { background: #f5f5f5; padding: 25px 20px; text-align: center; font-size: 12px; color: #999; border-top: 1px solid #e0e0e0; }
-            .footer a { color: #00bfff; text-decoration: none; }
-            .footer a:hover { text-decoration: underline; }
-            .social-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
-            .social-links a { color: #00bfff; text-decoration: none; font-weight: 500; }
-            .status-badge { display: inline-block; background: #00bfff; color: white; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-bottom: 15px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🙏 Thanks for Connecting!</h1>
-              <p>Your message has been received</p>
-            </div>
-            
-            <div class="content">
-              <div class="section">
-                <div class="status-badge">✓ Received & Confirmed</div>
-                <p style="font-size: 15px; color: #555;">Hi <strong>${escapeHtml(cleanName.split(' ')[0])}</strong>,</p>
-                <p style="margin-top: 10px; color: #666;">Thank you for reaching out! Your message has been successfully received and I'll review it shortly. I appreciate you taking the time to connect.</p>
-              </div>
+          <head>
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <meta name="x-apple-disable-message-reformatting" />
+            <title>Got your message</title>
+            <style>
+              body { margin: 0; padding: 0; background: #0b1220; }
+              table { border-collapse: collapse; }
+              img { border: 0; outline: none; text-decoration: none; }
+              a { color: #00bfff; text-decoration: none; }
+              .container { width: 100%; background: #0b1220; padding: 28px 12px; }
+              .card { width: 100%; max-width: 600px; background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 26px rgba(0,0,0,0.35); }
+              .topbar { height: 6px; background: #00bfff; }
+              .header { background: #0b1220; padding: 26px 20px; color: #ffffff; text-align: left; }
+              .h1 { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 26px; line-height: 1.2; margin: 0; }
+              .sub { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.5; margin: 10px 0 0; opacity: 0.95; }
+              .content { padding: 18px 20px 8px; }
+              .p { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.7; color: #333333; margin: 0 0 12px; }
+              .muted { color: #666666; }
+              .badge { display: inline-block; background: #0b1220; color: #ffffff; border: 1px solid #00bfff; padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
+              .sectionTitle { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; font-weight: 700; color: #00bfff; text-transform: uppercase; letter-spacing: 0.6px; margin: 18px 0 10px; }
+              .box { background: #f7fbff; border: 1px solid #d7eef9; border-left: 4px solid #00bfff; border-radius: 10px; padding: 12px 14px; }
+              .row { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; line-height: 1.6; color: #333333; margin: 0; }
+              .btn { display: inline-block; background: #00bfff; color: #001018 !important; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; }
+              .btnOutline { display: inline-block; border: 1px solid #00bfff; color: #00bfff !important; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; }
+              .footer { padding: 14px 20px 22px; }
+              .foot { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; line-height: 1.6; color: #888888; margin: 0; text-align: center; }
+              .preheader { display: none !important; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0; overflow: hidden; mso-hide: all; }
+            </style>
+          </head>
+          <body>
+            <div class="preheader">Got it — thanks for reaching out. I’ll reply soon.</div>
+            <table role="presentation" width="100%" class="container">
+              <tr>
+                <td align="center">
+                  <table role="presentation" class="card" width="600">
+                    <tr>
+                      <td class="topbar"></td>
+                    </tr>
+                    <tr>
+                      <td class="header">
+                        <div class="h1">Got your message</div>
+                        <div class="sub">Thanks for reaching out — I’ll get back to you soon.</div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="content">
+                        <div class="badge">Received</div>
+                        <p class="p" style="margin-top: 12px;">Hey <strong>${escapeHtml(cleanName.split(' ')[0])}</strong>,</p>
+                        <p class="p muted">Just confirming I received your note. I usually reply within 1–2 business days.</p>
 
-              <div class="section">
-                <div class="section-title">Your Submission Summary</div>
-                <div class="info-box">
-                  <div style="margin-bottom: 8px;"><strong>Subject:</strong> ${escapeHtml(cleanSubject)}</div>
-                  <div><strong>Received:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })} IST</div>
-                </div>
-                <div class="message-box" style="margin-top: 12px;">${escapeHtml(cleanMessage)}</div>
-              </div>
+                        <div class="sectionTitle">Your submission</div>
+                        <div class="box">
+                          <p class="row"><strong>Subject:</strong> ${escapeHtml(cleanSubject)}</p>
+                          <p class="row"><strong>Received:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })} IST</p>
+                        </div>
 
-              <div class="cta-box">
-                <h3>What happens next?</h3>
-                <p style="font-size: 13px; color: #666; margin-bottom: 10px;">I'll get back to you within 1-2 business days. In the meantime, feel free to explore my work or reach out on social media.</p>
-                <div class="cta-links">
-                  <a href="https://drthummar.me/">View Portfolio</a>
-                  <a href="https://github.com/DhruvilThummar">GitHub</a>
-                  <a href="https://www.linkedin.com/in/dhruvil-thummar-54422731a">LinkedIn</a>
-                </div>
-              </div>
+                        <div class="sectionTitle">Message</div>
+                        <div class="box" style="white-space: pre-wrap; word-break: break-word;">${escapeHtml(cleanMessage)}</div>
 
-              <div class="section">
-                <div class="section-title">Quick Links</div>
-                <div class="social-links">
-                  <a href="https://github.com/DhruvilThummar" target="_blank">GitHub</a>
-                  <a href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" target="_blank">LinkedIn</a>
-                  <a href="https://www.instagram.com/dhruvil_thummar_" target="_blank">Instagram</a>
-                </div>
-              </div>
-            </div>
+                        <div class="sectionTitle">Quick links</div>
+                        <table role="presentation" width="100%" style="margin: 6px 0 0;">
+                          <tr>
+                            <td align="left" style="padding: 4px 0;">
+                              <a class="btn" href="https://drthummar.me/" target="_blank" rel="noopener">Portfolio</a>
+                            </td>
+                            <td align="left" style="padding: 4px 0;">
+                              <a class="btnOutline" href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" target="_blank" rel="noopener">LinkedIn</a>
+                            </td>
+                            <td align="left" style="padding: 4px 0;">
+                              <a class="btnOutline" href="https://github.com/DhruvilThummar" target="_blank" rel="noopener">GitHub</a>
+                            </td>
+                          </tr>
+                        </table>
 
-            <div class="footer">
-              <p><strong>Need an immediate response?</strong> Reply to this email directly.</p>
-              <p style="margin-top: 12px;">This is an automated confirmation from <a href="https://drthummar.me/">drthummar.me</a></p>
-              <p style="margin-top: 8px; color: #ccc;">Please do not reply with sensitive information</p>
-            </div>
-          </div>
-        </body>
+                        <p class="p muted" style="margin-top: 16px;">If it’s urgent, just reply to this email and include a quick note in the subject.</p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td class="footer">
+                        <p class="foot">This is an automated confirmation from <a href="https://drthummar.me/" target="_blank" rel="noopener">drthummar.me</a>.</p>
+                        <p class="foot">Please don’t share sensitive information over email.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </body>
         </html>
       `,
-      text: `Hi ${cleanName},\n\nThanks for reaching out! Your message has been received successfully.\n\nSubject: ${cleanSubject}\n\nMessage:\n${cleanMessage}\n\n---\n\nI'll get back to you within 1-2 business days.\n\nBest regards,\nDhruvil Thummar\nhttps://drthummar.me\n\nGitHub: https://github.com/DhruvilThummar\nLinkedIn: https://www.linkedin.com/in/dhruvil-thummar-54422731a`,
+      text: `Hey ${cleanName},\n\nGot your message — thanks for reaching out. I usually reply within 1-2 business days.\n\nSubject: ${cleanSubject}\nReceived: ${new Date().toISOString()}\n\nYour message:\n${cleanMessage}\n\n---\n\nPortfolio: https://drthummar.me\nLinkedIn: https://www.linkedin.com/in/dhruvil-thummar-54422731a\nGitHub: https://github.com/DhruvilThummar`,
     };
 
     // Send both emails
-    await transporter.sendMail(ownerMailOptions);
-    await transporter.sendMail(senderMailOptions);
+  const ownerInfo = await transporter.sendMail(ownerMailOptions);
+  const senderInfo = await transporter.sendMail(senderMailOptions);
 
     console.log(`Contact form submission processed: ${cleanEmail}`);
 
     return res.status(200).json({
       ok: true,
       message: 'Emails sent successfully! Check your inbox for confirmation.',
+      delivery: {
+        ownerMessageId: ownerInfo?.messageId,
+        senderMessageId: senderInfo?.messageId,
+      },
     });
   } catch (error) {
     console.error('Contact form error:', error?.message || error);
@@ -272,17 +332,3 @@ module.exports = async (req, res) => {
     });
   }
 };
-
-/**
- * Escape HTML special characters to prevent XSS
- */
-function escapeHtml(text) {
-  const map = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-  };
-  return text.replace(/[&<>"']/g, (m) => map[m]);
-}

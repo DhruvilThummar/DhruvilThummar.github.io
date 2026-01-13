@@ -135,24 +135,31 @@ module.exports = async (req, res) => {
           <title>New Contact Submission</title>
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #111827; background: #f6f7fb; }
             .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-            .header { background: linear-gradient(135deg, #00bfff 0%, #0099cc 100%); padding: 30px 20px; text-align: center; color: white; }
+            .header { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); padding: 30px 20px; text-align: center; color: white; }
             .header h1 { font-size: 24px; margin-bottom: 5px; }
             .header p { font-size: 14px; opacity: 0.9; }
             .content { padding: 30px 20px; }
             .section { margin-bottom: 25px; }
-            .section-title { font-size: 14px; font-weight: bold; color: #00bfff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-            .info-box { background: #f9f9f9; border-left: 4px solid #00bfff; padding: 15px; border-radius: 4px; }
+            .section-title { font-size: 14px; font-weight: bold; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+            .info-box { background: #f4f5ff; border-left: 4px solid #6366f1; padding: 15px; border-radius: 4px; }
             .info-row { display: flex; margin-bottom: 10px; }
             .info-row:last-child { margin-bottom: 0; }
             .info-label { font-weight: 600; color: #555; width: 100px; }
             .info-value { color: #333; word-break: break-word; flex: 1; }
-            .message-box { background: #ffffff; border: 1px solid #e0e0e0; border-left: 4px solid #00bfff; padding: 15px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.6; }
-            .footer { background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #999; border-top: 1px solid #e0e0e0; }
-            .footer a { color: #00bfff; text-decoration: none; }
+            .message-box { background: #ffffff; border: 1px solid #e6e8f5; border-left: 4px solid #6366f1; padding: 15px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; line-height: 1.6; }
+            .footer { background: #f6f7fb; padding: 20px; text-align: center; font-size: 12px; color: #6b7280; border-top: 1px solid #e6e8f5; }
+            .footer a { color: #4f46e5; text-decoration: none; }
             .footer a:hover { text-decoration: underline; }
-            .badge { display: inline-block; background: #00bfff; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-right: 8px; }
+            .badge { display: inline-block; background: #6366f1; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; margin-right: 8px; }
+            .socials { margin-top: 10px; }
+            .social-link { display: inline-block; text-decoration: none; margin: 0 6px; }
+            .social-badge { display: inline-block; min-width: 34px; height: 34px; line-height: 34px; text-align: center; border-radius: 999px; background: #ffffff; border: 1px solid #e6e8f5; color: #111827; font-weight: 800; font-size: 13px; box-shadow: 0 1px 6px rgba(17, 24, 39, 0.06); }
+            .social-badge--li { color: #0a66c2; }
+            .social-badge--gh { color: #111827; }
+            .social-badge--ig { color: #d946ef; }
+            .social-logo { width: 34px; height: 34px; border-radius: 999px; vertical-align: middle; border: 1px solid #e6e8f5; background: #ffffff; box-shadow: 0 1px 6px rgba(17, 24, 39, 0.06); }
           </style>
         </head>
         <body>
@@ -202,6 +209,20 @@ module.exports = async (req, res) => {
 
             <div class="footer">
               <p>This email was sent from your portfolio contact form at <a href="https://drthummar.me/">drthummar.me</a></p>
+              <div class="socials">
+                <a class="social-link" href="https://drthummar.me/" aria-label="Open portfolio">
+                  <img class="social-logo" src="https://drthummar.me/assets/dt-logo-circle.svg" alt="Portfolio" />
+                </a>
+                <a class="social-link" href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" aria-label="Open LinkedIn">
+                  <span class="social-badge social-badge--li">in</span>
+                </a>
+                <a class="social-link" href="https://github.com/DhruvilThummar" aria-label="Open GitHub">
+                  <span class="social-badge social-badge--gh">GH</span>
+                </a>
+                <a class="social-link" href="https://www.instagram.com/dhruvil_thummar_" aria-label="Open Instagram">
+                  <span class="social-badge social-badge--ig">IG</span>
+                </a>
+              </div>
             </div>
           </div>
         </body>
@@ -217,93 +238,92 @@ module.exports = async (req, res) => {
       replyTo: OWNER_EMAIL,
       subject: `Got your message — ${cleanSubject}`,
       html: `
-        <!doctype html>
+        <!DOCTYPE html>
         <html lang="en">
-          <head>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <meta name="x-apple-disable-message-reformatting" />
-            <title>Got your message</title>
-            <style>
-              body { margin: 0; padding: 0; background: #0b0a12; }
-              table { border-collapse: collapse; }
-              img { border: 0; outline: none; text-decoration: none; }
-              a { color: #a78bfa; text-decoration: none; }
-              .container { width: 100%; background: #0b0a12; padding: 28px 12px; }
-              .card { width: 100%; max-width: 600px; background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 26px rgba(0,0,0,0.35); }
-              .header { background: #1b1033; background: linear-gradient(135deg, #1b1033 0%, #2a1450 60%, #1b1033 100%); padding: 26px 20px; color: #ffffff; text-align: left; }
-              .h1 { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 26px; line-height: 1.2; margin: 0; }
-              .sub { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.5; margin: 10px 0 0; opacity: 0.95; }
-              .content { padding: 18px 20px 8px; }
-              .p { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.7; color: #333333; margin: 0 0 12px; }
-              .muted { color: #666666; }
-              .badge { display: inline-block; background: #1b1033; color: #ffffff; border: 1px solid #a78bfa; padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
-              .sectionTitle { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.6px; margin: 18px 0 10px; }
-              .box { background: #fbfaff; border: 1px solid #eee9ff; border-left: 4px solid #7c3aed; border-radius: 10px; padding: 12px 14px; }
-              .row { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; line-height: 1.6; color: #333333; margin: 0; }
-              .btn { display: inline-block; background: #7c3aed; color: #ffffff !important; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; }
-              .btnOutline { display: inline-block; border: 1px solid #7c3aed; color: #7c3aed !important; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; }
-              .footer { padding: 14px 20px 22px; }
-              .foot { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; line-height: 1.6; color: #888888; margin: 0; text-align: center; }
-              .preheader { display: none !important; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0; overflow: hidden; mso-hide: all; }
-            </style>
-          </head>
-          <body>
-            <div class="preheader">Got it — thanks for reaching out. I’ll reply soon.</div>
-            <table role="presentation" width="100%" class="container">
-              <tr>
-                <td align="center">
-                  <table role="presentation" class="card" width="600">
-                    <tr>
-                      <td class="header">
-                        <div class="h1">Got your message</div>
-                        <div class="sub">Thanks for reaching out — I’ll get back to you soon.</div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="content">
-                        <div class="badge">Received</div>
-                        <p class="p" style="margin-top: 12px;">Hey <strong>${escapeHtml(cleanName.split(' ')[0])}</strong>,</p>
-                        <p class="p muted">Just confirming I received your note. I usually reply within 1–2 business days.</p>
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <title>Message received</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #111827; background: #f6f7fb; }
+            .container { max-width: 640px; margin: 0 auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+            .header { background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); padding: 28px 20px; color: #fff; text-align: center; }
+            .header h1 { font-size: 20px; margin-bottom: 6px; }
+            .socials { margin-top: 10px; }
+            .social-link { display: inline-block; text-decoration: none; margin: 0 6px; }
+            .social-badge { display: inline-block; min-width: 34px; height: 34px; line-height: 34px; text-align: center; border-radius: 999px; background: #ffffff; border: 1px solid #e6e8f5; color: #111827; font-weight: 800; font-size: 13px; box-shadow: 0 1px 6px rgba(17, 24, 39, 0.06); }
+            .social-badge--li { color: #0a66c2; }
+            .social-badge--gh { color: #111827; }
+            .social-badge--ig { color: #d946ef; }
+            .social-logo { width: 34px; height: 34px; border-radius: 999px; vertical-align: middle; border: 1px solid #e6e8f5; background: #ffffff; box-shadow: 0 1px 6px rgba(17, 24, 39, 0.06); }
+            .header p { font-size: 13px; opacity: 0.95; }
+            .content { padding: 26px 20px; }
+            .greeting { font-size: 15px; margin-bottom: 14px; }
+            .card { background: #f4f5ff; border: 1px solid #e6e8f5; border-left: 4px solid #6366f1; border-radius: 8px; padding: 14px 14px; margin: 14px 0; }
+            .label { font-size: 12px; letter-spacing: 0.4px; text-transform: uppercase; color: #4f46e5; font-weight: 700; margin-bottom: 10px; }
+            .row { margin-bottom: 8px; }
+            .row:last-child { margin-bottom: 0; }
+            .k { font-weight: 700; color: #374151; display: inline-block; min-width: 84px; }
+            .v { color: #222; word-break: break-word; }
+            .v { color: #111827; word-break: break-word; }
+            .message { background: #fff; border: 1px solid #e6e8f5; border-left: 4px solid #6366f1; border-radius: 8px; padding: 14px; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; }
+            .cta { margin-top: 16px; font-size: 13px; color: #4b5563; }
+            .footer { padding: 18px 20px; background: #f6f7fb; border-top: 1px solid #e6e8f5; text-align: center; font-size: 12px; color: #6b7280; }
+            .footer a { color: #4f46e5; text-decoration: none; }
+            .footer a:hover { text-decoration: underline; }
+            .muted { color: #6b7280; }
+          </style>
+        </head>
+        <body>
+          <div style="display:none; max-height:0; overflow:hidden; opacity:0; color:transparent;">
+            Thanks for reaching out — I got your message.
+          </div>
 
-                        <div class="sectionTitle">Your submission</div>
-                        <div class="box">
-                          <p class="row"><strong>Subject:</strong> ${escapeHtml(cleanSubject)}</p>
-                          <p class="row"><strong>Received:</strong> ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })} IST</p>
-                        </div>
+          <div class="container">
+            <div class="header">
+              <h1>✅ Got it!</h1>
+              <p>Thanks for reaching out — I’ll get back soon.</p>
+            </div>
 
-                        <div class="sectionTitle">Message</div>
-                        <div class="box" style="white-space: pre-wrap; word-break: break-word;">${escapeHtml(cleanMessage)}</div>
+            <div class="content">
+              <p class="greeting">Hey <strong>${escapeHtml(cleanName)}</strong>,</p>
+              <p class="muted">Just a quick note to say I got your message. I usually reply within <strong>1–2 business days</strong>.</p>
 
-                        <div class="sectionTitle">Quick links</div>
-                        <table role="presentation" width="100%" style="margin: 6px 0 0;">
-                          <tr>
-                            <td align="left" style="padding: 4px 0;">
-                              <a class="btn" href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" target="_blank" rel="noopener">LinkedIn</a>
-                            </td>
-                            <td align="left" style="padding: 4px 0;">
-                              <a class="btnOutline" href="https://github.com/DhruvilThummar" target="_blank" rel="noopener">GitHub</a>
-                            </td>
-                          </tr>
-                        </table>
+              <div class="card">
+                <div class="label">Submission details</div>
+                <div class="row"><span class="k">Subject:</span> <span class="v">${escapeHtml(cleanSubject)}</span></div>
+                <div class="row"><span class="k">Received:</span> <span class="v">${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })} IST</span></div>
+              </div>
 
-                        <p class="p muted" style="margin-top: 16px;">If it’s urgent, just reply to this email and include a quick note in the subject.</p>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="footer">
-                        <p class="foot">This is an automated confirmation.</p>
-                        <p class="foot">Please don’t share sensitive information over email.</p>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            </table>
-          </body>
+              <div class="label" style="margin-top:16px;">Your message</div>
+              <div class="message">${escapeHtml(cleanMessage)}</div>
+
+              <p class="cta"><strong>Forgot something?</strong> Just reply to this email (it comes straight to me), or send another message via the contact form.</p>
+            </div>
+
+            <div class="footer">
+              <p>Sent from the contact form on <a href="https://drthummar.me/">drthummar.me</a></p>
+              <div class="socials">
+                <a class="social-link" href="https://drthummar.me/" aria-label="Open portfolio">
+                  <img class="social-logo" src="https://drthummar.me/assets/dt-logo-circle.svg" alt="Portfolio" />
+                </a>
+                <a class="social-link" href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" aria-label="Open LinkedIn">
+                  <span class="social-badge social-badge--li">in</span>
+                </a>
+                <a class="social-link" href="https://github.com/DhruvilThummar" aria-label="Open GitHub">
+                  <span class="social-badge social-badge--gh">GH</span>
+                </a>
+                <a class="social-link" href="https://www.instagram.com/dhruvil_thummar_" aria-label="Open Instagram">
+                  <span class="social-badge social-badge--ig">IG</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </body>
         </html>
       `,
-      text: `Hey ${cleanName},\n\nGot your message — thanks for reaching out. I usually reply within 1-2 business days.\n\nSubject: ${cleanSubject}\nReceived: ${new Date().toISOString()}\n\nYour message:\n${cleanMessage}\n\n---\n\nLinkedIn: https://www.linkedin.com/in/dhruvil-thummar-54422731a\nGitHub: https://github.com/DhruvilThummar`,
+      text: `Hey ${cleanName},\n\nJust letting you know I got your message — thanks for reaching out! I usually reply within 1-2 business days.\n\nSubject: ${cleanSubject}\nReceived: ${new Date().toISOString()}\n\nYour message:\n${cleanMessage}\n\n---\n\nLinkedIn: https://www.linkedin.com/in/dhruvil-thummar-54422731a\nGitHub: https://github.com/DhruvilThummar\nInstagram: https://www.instagram.com/dhruvil_thummar_`,
     };
 
     // Send owner email (critical)

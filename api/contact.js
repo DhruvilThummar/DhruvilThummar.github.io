@@ -223,25 +223,24 @@ module.exports = async (req, res) => {
             <meta name="x-apple-disable-message-reformatting" />
             <title>Got your message</title>
             <style>
-              body { margin: 0; padding: 0; background: #0b1220; }
+              body { margin: 0; padding: 0; background: #0b0a12; }
               table { border-collapse: collapse; }
               img { border: 0; outline: none; text-decoration: none; }
-              a { color: #00bfff; text-decoration: none; }
-              .container { width: 100%; background: #0b1220; padding: 28px 12px; }
+              a { color: #a78bfa; text-decoration: none; }
+              .container { width: 100%; background: #0b0a12; padding: 28px 12px; }
               .card { width: 100%; max-width: 600px; background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 26px rgba(0,0,0,0.35); }
-              .topbar { height: 6px; background: #00bfff; }
-              .header { background: #0b1220; padding: 26px 20px; color: #ffffff; text-align: left; }
+              .header { background: #1b1033; background: linear-gradient(135deg, #1b1033 0%, #2a1450 60%, #1b1033 100%); padding: 26px 20px; color: #ffffff; text-align: left; }
               .h1 { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 26px; line-height: 1.2; margin: 0; }
               .sub { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.5; margin: 10px 0 0; opacity: 0.95; }
               .content { padding: 18px 20px 8px; }
               .p { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 14px; line-height: 1.7; color: #333333; margin: 0 0 12px; }
               .muted { color: #666666; }
-              .badge { display: inline-block; background: #0b1220; color: #ffffff; border: 1px solid #00bfff; padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
-              .sectionTitle { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; font-weight: 700; color: #00bfff; text-transform: uppercase; letter-spacing: 0.6px; margin: 18px 0 10px; }
-              .box { background: #f7fbff; border: 1px solid #d7eef9; border-left: 4px solid #00bfff; border-radius: 10px; padding: 12px 14px; }
+              .badge { display: inline-block; background: #1b1033; color: #ffffff; border: 1px solid #a78bfa; padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; }
+              .sectionTitle { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.6px; margin: 18px 0 10px; }
+              .box { background: #fbfaff; border: 1px solid #eee9ff; border-left: 4px solid #7c3aed; border-radius: 10px; padding: 12px 14px; }
               .row { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; line-height: 1.6; color: #333333; margin: 0; }
-              .btn { display: inline-block; background: #00bfff; color: #001018 !important; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; }
-              .btnOutline { display: inline-block; border: 1px solid #00bfff; color: #00bfff !important; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; }
+              .btn { display: inline-block; background: #7c3aed; color: #ffffff !important; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; }
+              .btnOutline { display: inline-block; border: 1px solid #7c3aed; color: #7c3aed !important; padding: 10px 14px; border-radius: 10px; font-size: 13px; font-weight: 700; }
               .footer { padding: 14px 20px 22px; }
               .foot { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 12px; line-height: 1.6; color: #888888; margin: 0; text-align: center; }
               .preheader { display: none !important; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0; overflow: hidden; mso-hide: all; }
@@ -253,9 +252,6 @@ module.exports = async (req, res) => {
               <tr>
                 <td align="center">
                   <table role="presentation" class="card" width="600">
-                    <tr>
-                      <td class="topbar"></td>
-                    </tr>
                     <tr>
                       <td class="header">
                         <div class="h1">Got your message</div>
@@ -281,10 +277,7 @@ module.exports = async (req, res) => {
                         <table role="presentation" width="100%" style="margin: 6px 0 0;">
                           <tr>
                             <td align="left" style="padding: 4px 0;">
-                              <a class="btn" href="https://drthummar.me/" target="_blank" rel="noopener">Portfolio</a>
-                            </td>
-                            <td align="left" style="padding: 4px 0;">
-                              <a class="btnOutline" href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" target="_blank" rel="noopener">LinkedIn</a>
+                              <a class="btn" href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" target="_blank" rel="noopener">LinkedIn</a>
                             </td>
                             <td align="left" style="padding: 4px 0;">
                               <a class="btnOutline" href="https://github.com/DhruvilThummar" target="_blank" rel="noopener">GitHub</a>
@@ -297,7 +290,7 @@ module.exports = async (req, res) => {
                     </tr>
                     <tr>
                       <td class="footer">
-                        <p class="foot">This is an automated confirmation from <a href="https://drthummar.me/" target="_blank" rel="noopener">drthummar.me</a>.</p>
+                        <p class="foot">This is an automated confirmation.</p>
                         <p class="foot">Please don’t share sensitive information over email.</p>
                       </td>
                     </tr>

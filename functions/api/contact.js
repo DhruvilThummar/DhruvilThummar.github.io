@@ -123,7 +123,8 @@ export async function onRequestPost(context) {
     // ============================================
     const RESEND_API_KEY = env.RESEND_API_KEY || env.resend_api_key;
     const FROM_EMAIL = env.CONTACT_FROM || env.contact_from || "onboarding@resend.dev";
-    const OWNER_EMAIL = env.CONTACT_TO || env.contact_to;
+    // Admin/owner recipient (fallback to your Gmail so contact still works if env is missing)
+    const OWNER_EMAIL = env.CONTACT_TO || env.contact_to || env.NOTIFY_EMAIL || env.notify_email || "dhruvilthummar1303@gmail.com";
     
     // Collect metadata for logging
     const clientIp = getClientIp(request);
@@ -141,7 +142,7 @@ export async function onRequestPost(context) {
     // STEP 5: Validate required environment variables
     // ============================================
     if (!OWNER_EMAIL) {
-      console.error("❌ CONTACT_TO environment variable is not configured");
+      console.error("❌ CONTACT_TO/NOTIFY_EMAIL environment variable is not configured");
       return json({ 
         error: "Contact service is not properly configured. Please contact the site administrator.",
         service: "contact_form_misconfiguration"

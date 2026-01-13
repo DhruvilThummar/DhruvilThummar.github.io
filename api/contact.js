@@ -74,8 +74,10 @@ module.exports = async (req, res) => {
   const SMTP_SECURE = process.env.SMTP_SECURE === 'true';
   const SMTP_USER = process.env.SMTP_USER;
   const SMTP_PASS = process.env.SMTP_PASS;
-  const FROM_EMAIL = process.env.SMTP_FROM || 'official@dhruvilthummar.me';
-  const OWNER_EMAIL = process.env.NOTIFY_EMAIL || 'official@dhruvilthummar.me';
+  // IMPORTANT (deliverability): when using Gmail SMTP, FROM should typically match SMTP_USER.
+  const FROM_EMAIL = process.env.SMTP_FROM || SMTP_USER || 'dhruvilthummar1303@gmail.com';
+  // Admin/owner recipient (fallback to your Gmail so it works even if env is missing)
+  const OWNER_EMAIL = process.env.NOTIFY_EMAIL || process.env.CONTACT_TO || 'dhruvilthummar1303@gmail.com';
 
   const hasSmtp = SMTP_HOST && SMTP_USER && SMTP_PASS;
 
@@ -301,12 +303,19 @@ module.exports = async (req, res) => {
           </body>
         </html>
       `,
-      text: `Hey ${cleanName},\n\nGot your message — thanks for reaching out. I usually reply within 1-2 business days.\n\nSubject: ${cleanSubject}\nReceived: ${new Date().toISOString()}\n\nYour message:\n${cleanMessage}\n\n---\n\nPortfolio: https://drthummar.me\nLinkedIn: https://www.linkedin.com/in/dhruvil-thummar-54422731a\nGitHub: https://github.com/DhruvilThummar`,
+      text: `Hey ${cleanName},\n\nGot your message — thanks for reaching out. I usually reply within 1-2 business days.\n\nSubject: ${cleanSubject}\nReceived: ${new Date().toISOString()}\n\nYour message:\n${cleanMessage}\n\n---\n\nLinkedIn: https://www.linkedin.com/in/dhruvil-thummar-54422731a\nGitHub: https://github.com/DhruvilThummar`,
     };
 
-    // Send both emails
-  const ownerInfo = await transporter.sendMail(ownerMailOptions);
-  const senderInfo = await transporter.sendMail(senderMailOptions);
+    // Send owner email (critical)
+    const ownerInfo = await transporter.sendMail(ownerMailOptions);
+
+    // Send confirmation email (best-effort)
+    let senderInfo = null;
+    try {
+      senderInfo = await transporter.sendMail(senderMailOptions);
+    } catch (sendErr) {
+      console.warn('Sender confirmation failed (non-critical):', sendErr?.message || sendErr);
+    }
 
     console.log(`Contact form submission processed: ${cleanEmail}`);
 

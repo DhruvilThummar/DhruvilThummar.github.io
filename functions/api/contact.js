@@ -735,7 +735,7 @@ function buildSenderHtml({ cleanName, cleanSubject, cleanMessage }) {
           <div class="header">
             <!-- Logo with Image -->
             <div class="logo-container">
-              <img src="https://drthummar.me/assets/images/avatar.jpg" alt="Dhruvil Thummar" class="logo-image" width="100" height="100" style="width: 100px; height: 100px; border-radius: 50%; display: block; margin: 0 auto;">
+              <img src="https://github.com/DhruvilThummar/DhruvilThummar.github.io/blob/main/assets%2Fdt-logo-circle.svg" alt="Dhruvil Thummar" class="logo-image" width="100" height="100" style="width: 100px; height: 100px; border-radius: 50%; display: block; margin: 0 auto;">
             </div>
             
             <h1>🙏 Thanks for Connecting!</h1>

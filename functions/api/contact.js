@@ -547,117 +547,148 @@ function buildSenderText({ cleanName, cleanSubject, cleanMessage }) {
 function buildOwnerHtml({ cleanName, cleanEmail, cleanSubject, cleanMessage, meta = {} }) {
   const { clientIp = "unknown", userAgent = "unknown", referer = "unknown" } = meta;
   const currentYear = new Date().getFullYear();
+  const receivedTime = new Date().toLocaleString('en-US', { 
+    weekday: 'short', 
+    year: 'numeric', 
+    month: 'short', 
+    day: 'numeric', 
+    hour: '2-digit', 
+    minute: '2-digit',
+    second: '2-digit', 
+    timeZoneName: 'short' 
+  });
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>New Contact Submission - Dhruvil Thummar</title>
+  <title>New Message - Dhruvil Thummar</title>
   <!--[if mso]>
   <style type="text/css">
-    body, table, td { font-family: Arial, Helvetica, sans-serif !important; }
+    body, table, td { font-family: 'Inter', Arial, sans-serif !important; }
   </style>
   <![endif]-->
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #0a1628; background: linear-gradient(135deg, #e8f9ff 0%, #f3eeff 50%, #e6f6ff 100%); -webkit-font-smoothing: antialiased; }
     img { border: 0; display: block; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
-    table { border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-    .container { max-width: 600px; width: 100%; margin: 0 auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .header { background: linear-gradient(135deg, #00bfff 0%, #0099cc 100%); padding: 30px 20px; text-align: center; color: #ffffff; }
-    .header h1 { font-size: 24px; margin-bottom: 5px; font-weight: 700; line-height: 1.2; }
-    .header p { font-size: 14px; opacity: 0.95; line-height: 1.4; }
-    .content { padding: 30px 20px; }
-    .section { margin-bottom: 25px; }
-    .section-title { font-size: 13px; font-weight: 700; color: #00bfff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-    .info-box { background: #f9f9f9; border-left: 4px solid #00bfff; padding: 15px; border-radius: 4px; }
-    .info-row { margin-bottom: 10px; }
-    .info-row:last-child { margin-bottom: 0; }
-    .info-label { font-weight: 600; color: #555; font-size: 13px; }
-    .info-value { color: #333; word-break: break-word; word-wrap: break-word; margin-top: 3px; font-size: 14px; }
-    .message-box { background: #f9f9f9; border-left: 4px solid #00bfff; padding: 15px; border-radius: 4px; white-space: pre-wrap; word-wrap: break-word; word-break: break-word; font-size: 14px; line-height: 1.6; color: #333; }
-    .footer { background: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #999; border-top: 1px solid #e0e0e0; }
-    .footer p { margin: 5px 0; }
-    .cta-link { color: #00bfff; text-decoration: none; font-weight: 600; }
-    .cta-link:hover { text-decoration: underline; }
-    .quick-actions { background: #f0f9ff; border: 1px solid #00bfff; padding: 15px; border-radius: 6px; font-size: 13px; color: #555; line-height: 1.8; }
-    .quick-actions strong { color: #00bfff; }
+    table { border-collapse: collapse; mso-table-lspace: 0; mso-table-rspace: 0; }
+    a { color: #00d4ff; text-decoration: none; font-weight: 500; }
+    a:hover { opacity: 0.85; }
     
-    /* Responsive */
-    @media only screen and (max-width: 600px) {
-      .container { border-radius: 0 !important; }
-      .header h1 { font-size: 20px !important; }
-      .content { padding: 20px 15px !important; }
-      .info-value { font-size: 13px !important; }
+    .wrapper { width: 100%; background: linear-gradient(135deg, #e8f9ff 0%, #f3eeff 50%, #e6f6ff 100%); padding: 20px; }
+    .container { max-width: 700px; margin: 0 auto; background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(240,248,255,0.95) 100%); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 180, 230, 0.15), 0 2px 8px rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 212, 255, 0.15); }
+    
+    .header { background: linear-gradient(135deg, #00d4ff 0%, #a78bfa 100%); padding: 48px 32px; text-align: center; color: #fff; position: relative; overflow: hidden; }
+    .header h1 { font-size: 36px; font-weight: 700; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.5px; }
+    .header p { font-size: 15px; opacity: 0.95; margin: 0; font-weight: 500; }
+    
+    .content { padding: 40px 32px; }
+    .section { margin-bottom: 32px; }
+    .section:last-child { margin-bottom: 0; }
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #00bfff; text-transform: uppercase; margin-bottom: 12px; display: block; }
+    
+    .visitor-card { background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(167, 139, 250, 0.05) 100%); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 8px; padding: 24px; }
+    .visitor-name { font-size: 20px; font-weight: 700; color: #0a1628; margin: 0 0 6px 0; letter-spacing: -0.3px; }
+    .visitor-email { font-size: 14px; color: #00d4ff; margin: 0; font-weight: 500; }
+    
+    .subject-section { margin: 28px 0; }
+    .subject-value { font-size: 18px; font-weight: 600; color: #0a1628; margin: 0; }
+    
+    .message-section { margin-top: 28px; }
+    .message-label { font-size: 12px; font-weight: 700; color: #00bfff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .message-box { background: rgba(167, 139, 250, 0.08); border-left: 3px solid #a78bfa; border-radius: 6px; padding: 14px; white-space: pre-wrap; word-wrap: break-word; word-break: break-word; font-size: 13px; line-height: 1.6; color: #2d3748; font-family: 'Roboto Mono', monospace; }
+    
+    .meta-section { background: linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(167, 139, 250, 0.08) 100%); border: 1px solid rgba(0, 212, 255, 0.15); padding: 18px; border-radius: 8px; margin-top: 28px; }
+    .meta-label { font-size: 11px; font-weight: 700; color: #00bfff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 14px; }
+    .meta-item { font-size: 12px; color: #4a5568; margin-bottom: 10px; word-break: break-word; }
+    .meta-item strong { color: #0a1628; }
+    .meta-item:last-child { margin-bottom: 0; }
+    
+    .action-section { background: linear-gradient(135deg, #00d4ff 0%, #a78bfa 100%); color: #fff; padding: 24px; border-radius: 8px; margin-top: 28px; text-align: center; }
+    .action-title { font-weight: 700; font-size: 15px; margin-bottom: 16px; }
+    .action-link { display: inline-block; background: rgba(255, 255, 255, 0.15); color: #fff !important; padding: 12px 22px; border-radius: 6px; text-decoration: none !important; font-size: 13px; font-weight: 500; margin: 8px 6px 0 6px; transition: all 0.2s ease; }
+    .action-link:hover { background: rgba(255, 255, 255, 0.25); }
+    
+    .footer { background: linear-gradient(180deg, rgba(0, 212, 255, 0.05) 0%, rgba(167, 139, 250, 0.05) 100%); padding: 24px 32px; text-align: center; border-top: 1px solid rgba(0, 212, 255, 0.15); }
+    .footer-text { font-size: 12px; color: #4a5568; margin: 0 0 6px 0; }
+    .footer-link { color: #00d4ff; font-weight: 600; }
+    .footer-link:hover { opacity: 0.85; }
+    .copyright { font-size: 11px; color: #cbd5e0; margin-top: 8px; }
+    
+    @media only screen and (max-width: 640px) {
+      .container { border-radius: 0; }
+      .header { padding: 36px 20px; }
+      .header h1 { font-size: 28px; }
+      .content { padding: 24px 20px; }
+      .footer { padding: 20px; }
+      .action-link { display: block; width: calc(100% - 12px); margin: 8px 0; }
     }
   </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f5f5;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f5f5f5;">
+<body>
+  <table class="wrapper" width="100%" cellspacing="0" cellpadding="0" border="0">
     <tr>
-      <td align="center" style="padding: 20px 0;">
-        <div class="container">
-          <div class="header">
-            <h1>📩 New Contact Submission</h1>
-            <p>Someone reached out through your portfolio</p>
-          </div>
+      <td align="center">
+        <table class="container" width="100%" cellspacing="0" cellpadding="0" border="0">
+          <!-- Header -->
+          <tr>
+            <td class="header">
+              <h1>💬 New Message</h1>
+              <p>Someone reached out through your contact form</p>
+            </td>
+          </tr>
           
-          <div class="content">
-            <div class="section">
-              <div class="section-title">Visitor Details</div>
-              <div class="info-box">
-                <div class="info-row">
-                  <div class="info-label">Name:</div>
-                  <div class="info-value"><strong>${escapeHtml(cleanName)}</strong></div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Email:</div>
-                  <div class="info-value"><a href="mailto:${escapeHtml(cleanEmail)}" class="cta-link" style="color: #00bfff;">${escapeHtml(cleanEmail)}</a></div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Subject:</div>
-                  <div class="info-value">${escapeHtml(cleanSubject)}</div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Received:</div>
-                  <div class="info-value">${new Date().toLocaleString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' })}</div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">IP Address:</div>
-                  <div class="info-value">${escapeHtml(clientIp)}</div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">User-Agent:</div>
-                  <div class="info-value" style="font-size: 12px; color: #666;">${escapeHtml(userAgent)}</div>
-                </div>
-                <div class="info-row">
-                  <div class="info-label">Referer:</div>
-                  <div class="info-value">${escapeHtml(referer)}</div>
+          <!-- Content -->
+          <tr>
+            <td class="content">
+              <!-- Visitor Card -->
+              <div class="section">
+                <div class="visitor-card">
+                  <p class="visitor-name">${escapeHtml(cleanName)}</p>
+                  <p class="visitor-email"><a href="mailto:${escapeHtml(cleanEmail)}">${escapeHtml(cleanEmail)}</a></p>
                 </div>
               </div>
-            </div>
-
-            <div class="section">
-              <div class="section-title">Message Content</div>
-              <div class="message-box">${escapeHtml(cleanMessage)}</div>
-            </div>
-
-            <div class="section">
-              <div class="quick-actions">
-                <strong>💡 Quick Actions:</strong><br>
-                • Reply directly to <strong>${escapeHtml(cleanEmail)}</strong><br>
-                • <a href="https://drthummar.me/" class="cta-link" style="color: #00bfff;">Visit your portfolio</a>
+              
+              <!-- Subject -->
+              <div class="subject-section">
+                <span class="section-label">Subject</span>
+                <p class="subject-value">${escapeHtml(cleanSubject)}</p>
               </div>
-            </div>
-          </div>
-
-          <div class="footer">
-            <p><strong>Automated Notification</strong></p>
-            <p>This email was sent from your portfolio contact form at <a href="https://drthummar.me/" class="cta-link" style="color: #00bfff;">drthummar.me</a></p>
-            <p style="color: #ccc; margin-top: 10px;">&copy; ${currentYear} Dhruvil Thummar</p>
-          </div>
-        </div>
+              
+              <!-- Message -->
+              <div class="message-section">
+                <div class="message-label">Message</div>
+                <div class="message-box">${escapeHtml(cleanMessage)}</div>
+              </div>
+              
+              <!-- Submission Meta -->
+              <div class="meta-section">
+                <div class="meta-label">Submission Details</div>
+                <div class="meta-item"><strong>Received:</strong> ${receivedTime}</div>
+                <div class="meta-item"><strong>IP Address:</strong> ${escapeHtml(clientIp)}</div>
+                <div class="meta-item"><strong>Source:</strong> ${escapeHtml(referer || 'direct')}</div>
+                <div class="meta-item"><strong>User Agent:</strong> ${escapeHtml(userAgent)}</div>
+              </div>
+              
+              <!-- Actions -->
+              <div class="action-section">
+                <div class="action-title">Quick Actions</div>
+                <a href="mailto:${escapeHtml(cleanEmail)}?subject=Re: ${encodeURIComponent(cleanSubject)}" class="action-link">Reply to Email</a>
+                <a href="https://drthummar.me/" class="action-link">View Portfolio</a>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td class="footer">
+              <p class="footer-text">Automated notification from <a href="https://drthummar.me/" class="footer-link">drthummar.me</a></p>
+              <p class="copyright">&copy; ${currentYear} Dhruvil Thummar. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>
@@ -674,115 +705,142 @@ function buildSenderHtml({ cleanName, cleanSubject, cleanMessage }) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Thanks for Connecting - Dhruvil Thummar</title>
+  <title>Message Received - Dhruvil Thummar</title>
   <!--[if mso]>
   <style type="text/css">
-    body, table, td { font-family: Arial, Helvetica, sans-serif !important; }
+    body, table, td { font-family: 'Inter', Arial, sans-serif !important; }
   </style>
   <![endif]-->
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif; line-height: 1.6; color: #333; background: #faf8fb; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #0a1628; background: linear-gradient(135deg, #e8f9ff 0%, #f3eeff 50%, #e6f6ff 100%); -webkit-font-smoothing: antialiased; }
     img { border: 0; display: block; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; }
-    table { border-collapse: collapse; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
-    .container { max-width: 600px; width: 100%; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(236, 168, 205, 0.15); }
-    .header { background: linear-gradient(135deg, #f4a4c4 0%, #ec98b8 100%); padding: 40px 20px; text-align: center; color: #ffffff; }
-    .header h1 { font-size: 28px; margin-bottom: 10px; font-weight: 700; line-height: 1.2; }
-    .header p { font-size: 15px; opacity: 0.95; line-height: 1.4; }
+    table { border-collapse: collapse; mso-table-lspace: 0; mso-table-rspace: 0; }
+    a { color: #00d4ff; text-decoration: none; font-weight: 500; }
+    a:hover { opacity: 0.85; }
     
-    /* Logo with Image */
-    .logo-container { position: relative; width: 100px; height: 100px; margin: 0 auto 20px; }
-    .logo-image { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; box-shadow: 0 6px 16px rgba(236, 168, 205, 0.3); border: 4px solid #ffffff; }
+    .wrapper { width: 100%; background: linear-gradient(135deg, #e8f9ff 0%, #f3eeff 50%, #e6f6ff 100%); padding: 20px; }
+    .container { max-width: 640px; margin: 0 auto; background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(240,248,255,0.95) 100%); border-radius: 12px; overflow: hidden; box-shadow: 0 10px 40px rgba(0, 180, 230, 0.15), 0 2px 8px rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 212, 255, 0.15); }
     
-    .content { padding: 35px 25px; }
-    .section { margin-bottom: 28px; }
-    .section-title { font-size: 12px; font-weight: 700; color: #ec5fa8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
-    .message-box { background: #fff5fa; border-left: 4px solid #f4a4c4; padding: 16px; border-radius: 6px; white-space: pre-wrap; word-wrap: break-word; word-break: break-word; font-size: 14px; line-height: 1.7; color: #555; }
-    .cta-box { background: linear-gradient(135deg, rgba(244, 164, 196, 0.08) 0%, rgba(236, 152, 184, 0.08) 100%); border: 1.5px solid #f4a4c4; padding: 22px; border-radius: 10px; margin: 20px 0; text-align: center; }
-    .cta-box h3 { color: #ec5fa8; margin-bottom: 12px; font-size: 15px; font-weight: 700; }
-    .cta-box p { color: #666; font-size: 13px; line-height: 1.6; }
-    .cta-links { margin-top: 16px; }
-    .cta-btn { display: inline-block; padding: 11px 18px; margin: 5px; background: linear-gradient(135deg, #f4a4c4 0%, #ec98b8 100%); color: #ffffff !important; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 13px; box-shadow: 0 3px 10px rgba(236, 168, 205, 0.2); }
-    .cta-btn:hover { background: linear-gradient(135deg, #ec98b8 0%, #e788a8 100%); }
+    .header { background: linear-gradient(135deg, #00d4ff 0%, #a78bfa 100%); padding: 48px 32px; text-align: center; color: #fff; position: relative; overflow: hidden; }
+    .header h1 { font-size: 36px; font-weight: 700; margin: 0 0 8px 0; line-height: 1.1; letter-spacing: -0.5px; }
+    .header p { font-size: 15px; opacity: 0.95; margin: 0; font-weight: 500; }
     
-    /* Social Media Icons - Using Unicode symbols as fallback */
-    .social-links { text-align: center; margin: 20px 0; }
-    .social-icon { display: inline-block; width: 44px; height: 44px; margin: 5px; border-radius: 50%; text-decoration: none; font-weight: 600; background: #f8e9f3; border: 2px solid #ec5fa8; line-height: 40px; text-align: center; font-size: 18px; color: #ec5fa8; }
-    .social-icon:hover { background: #f4a4c4; color: #ffffff; transform: scale(1.1); }
+    .content { padding: 40px 32px; }
+    .greeting { margin-bottom: 28px; }
+    .greeting p { font-size: 15px; line-height: 1.7; color: #4a5568; margin: 0 0 12px 0; }
+    .greeting strong { color: #0a1628; font-weight: 600; }
     
-    .footer { background: #faf8fb; padding: 28px 20px; text-align: center; font-size: 12px; color: #aaa; border-top: 1px solid #f0e0eb; }
-    .footer a { color: #ec5fa8; text-decoration: none; font-weight: 600; }
-    .footer a:hover { text-decoration: underline; }
-    .badge { display: inline-block; background: linear-gradient(135deg, #f4a4c4 0%, #ec98b8 100%); color: #ffffff; padding: 9px 18px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-bottom: 16px; box-shadow: 0 3px 10px rgba(236, 168, 205, 0.25); letter-spacing: 0.5px; }
-    .checkmark { display: inline-block; width: 18px; height: 18px; background: #4CAF50; border-radius: 50%; color: #ffffff; line-height: 18px; margin-right: 6px; font-weight: bold; font-size: 12px; }
-    .intro-text { color: #666; font-size: 15px; line-height: 1.7; }
-    .intro-text strong { color: #333; font-weight: 700; }
+    .section { margin-bottom: 32px; }
+    .section:last-child { margin-bottom: 0; }
+    .section-label { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: #00bfff; text-transform: uppercase; margin-bottom: 12px; display: block; }
     
-    /* Responsive */
-    @media only screen and (max-width: 600px) {
-      .container { border-radius: 0 !important; }
-      .header h1 { font-size: 24px !important; }
-      .content { padding: 25px 20px !important; }
-      .cta-btn { display: block !important; margin: 8px auto !important; }
+    .submission-box { background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(167, 139, 250, 0.05) 100%); border-left: 3px solid #00d4ff; border-radius: 6px; padding: 16px; }
+    .submission-field { margin-bottom: 14px; }
+    .submission-field:last-child { margin-bottom: 0; }
+    .submission-label { font-size: 12px; font-weight: 700; color: #00bfff; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .submission-value { font-size: 14px; color: #0a1628; word-break: break-word; line-height: 1.6; }
+    
+    .message-box { background: rgba(167, 139, 250, 0.08); border-left: 3px solid #a78bfa; border-radius: 4px; padding: 14px; white-space: pre-wrap; word-wrap: break-word; word-break: break-word; font-size: 13px; line-height: 1.6; color: #2d3748; font-family: 'Roboto Mono', monospace; }
+    
+    .timeline { background: linear-gradient(135deg, rgba(0, 212, 255, 0.08) 0%, rgba(167, 139, 250, 0.08) 100%); border: 1px solid rgba(0, 212, 255, 0.15); padding: 20px; border-radius: 8px; margin: 28px 0; }
+    .timeline-title { font-weight: 700; color: #0a1628; font-size: 14px; margin-bottom: 14px; letter-spacing: -0.3px; }
+    .timeline-item { font-size: 13px; color: #4a5568; margin-bottom: 8px; display: flex; }
+    .timeline-icon { margin-right: 12px; min-width: 16px; color: #00d4ff; font-weight: bold; }
+    
+    .cta-section { margin: 32px 0; text-align: center; }
+    .cta-btn { display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #00d4ff 0%, #a78bfa 100%); color: #fff !important; text-decoration: none !important; border-radius: 8px; font-weight: 600; font-size: 14px; border: 0; cursor: pointer; box-shadow: 0 4px 16px rgba(0, 212, 255, 0.25); transition: all 0.2s ease; }
+    .cta-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0, 212, 255, 0.35); }
+    
+    .social-section { text-align: center; margin-top: 28px; padding-top: 28px; border-top: 1px solid rgba(0, 212, 255, 0.15); }
+    .social-title { font-size: 11px; font-weight: 700; color: #00bfff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+    .social-links { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .social-link { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%); border: 1px solid rgba(0, 212, 255, 0.2); border-radius: 8px; text-decoration: none; font-size: 16px; transition: all 0.2s ease; }
+    .social-link:hover { background: linear-gradient(135deg, #00d4ff 0%, #a78bfa 100%); border-color: transparent; transform: translateY(-2px); color: #fff; }
+    
+    .footer { background: linear-gradient(180deg, rgba(0, 212, 255, 0.05) 0%, rgba(167, 139, 250, 0.05) 100%); padding: 24px 32px; text-align: center; border-top: 1px solid rgba(0, 212, 255, 0.15); }
+    .footer-text { font-size: 12px; color: #4a5568; margin: 0 0 6px 0; }
+    .footer-link { color: #00d4ff; font-weight: 600; }
+    .footer-link:hover { opacity: 0.85; }
+    .copyright { font-size: 11px; color: #cbd5e0; margin-top: 8px; }
+    
+    @media only screen and (max-width: 640px) {
+      .container { border-radius: 0; }
+      .header { padding: 36px 20px; }
+      .header h1 { font-size: 28px; }
+      .content { padding: 24px 20px; }
+      .footer { padding: 20px; }
+      .cta-btn { display: block; width: 100%; margin: 0; }
+      .social-links { gap: 8px; }
     }
   </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #faf8fb;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #faf8fb;">
+<body>
+  <table class="wrapper" width="100%" cellspacing="0" cellpadding="0" border="0">
     <tr>
-      <td align="center" style="padding: 20px 0;">
-        <div class="container">
-          <div class="header">
-            <!-- Logo with Image -->
-            <div class="logo-container">
-              <img src="https://drthummar.me/assets/images/avatar.jpg" alt="Dhruvil Thummar" class="logo-image" width="100" height="100" style="width: 100px; height: 100px; border-radius: 50%; display: block; margin: 0 auto;">
-            </div>
-            
-            <h1>🙏 Thanks for Connecting!</h1>
-            <p>Your message has been received and I'm excited to hear from you</p>
-          </div>
+      <td align="center">
+        <table class="container" width="100%" cellspacing="0" cellpadding="0" border="0">
+          <!-- Header -->
+          <tr>
+            <td class="header">
+              <h1>✓ Message Received</h1>
+              <p>I'll be in touch shortly</p>
+            </td>
+          </tr>
           
-          <div class="content">
-            <div class="section">
-              <div class="badge"><span class="checkmark">✓</span>Message Received &amp; Confirmed</div>
-              <p class="intro-text">Hi <strong>${escapeHtml(firstName)}</strong>,</p>
-              <p style="margin-top: 14px; color: #666; line-height: 1.7;">Thank you so much for reaching out! Your message has been successfully received and I'll review it shortly. I truly appreciate you taking the time to connect with me.</p>
-            </div>
-
-            <div class="section">
-              <div class="section-title">Your Submission</div>
-              <p style="color: #777; font-size: 13px; margin-bottom: 10px; font-weight: 600;"><strong>Subject:</strong> ${escapeHtml(cleanSubject)}</p>
-              <div class="message-box">${escapeHtml(cleanMessage)}</div>
-            </div>
-
-            <div class="cta-box">
-              <h3>What happens next?</h3>
-              <p>I'll get back to you within 1-2 business days. In the meantime, feel free to explore my work or reach out on social media for more updates.</p>
-              <div class="cta-links">
-                <a href="https://drthummar.me/" class="cta-btn" style="color: #ffffff;">🌐 View Portfolio</a>
-                <a href="https://github.com/DhruvilThummar" class="cta-btn" style="color: #ffffff;">💻 GitHub</a>
-                <a href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" class="cta-btn" style="color: #ffffff;">💼 LinkedIn</a>
+          <!-- Content -->
+          <tr>
+            <td class="content">
+              <div class="greeting">
+                <p>Hi <strong>${escapeHtml(firstName)}</strong>,</p>
+                <p>Thank you for reaching out! Your message has been successfully received and I appreciate you taking the time to connect with me.</p>
               </div>
-            </div>
-
-            <div class="section">
-              <div class="section-title">Connect With Me</div>
-              <div class="social-links">
-                <a href="https://github.com/DhruvilThummar" class="social-icon" title="GitHub" target="_blank" style="color: #ec5fa8;">⚡</a>
-                <a href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" class="social-icon" title="LinkedIn" target="_blank" style="color: #ec5fa8;">💼</a>
-                <a href="https://www.instagram.com/dhruvil_thummar_" class="social-icon" title="Instagram" target="_blank" style="color: #ec5fa8;">📷</a>
-                <a href="mailto:official@dhruvilthummar.me" class="social-icon" title="Email" target="_blank" style="color: #ec5fa8;">✉️</a>
-                <a href="https://drthummar.me/" class="social-icon" title="Portfolio" target="_blank" style="color: #ec5fa8;">🌐</a>
+              
+              <div class="section">
+                <span class="section-label">Your Message</span>
+                <div class="submission-box">
+                  <div class="submission-field">
+                    <div class="submission-label">Subject</div>
+                    <div class="submission-value">${escapeHtml(cleanSubject)}</div>
+                  </div>
+                  <div class="submission-field">
+                    <div class="submission-label">Message</div>
+                    <div class="message-box">${escapeHtml(cleanMessage)}</div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-
-          <div class="footer">
-            <p><strong>Need an immediate response?</strong> Reply to this email directly.</p>
-            <p style="margin-top: 14px;">This is an automated confirmation from <a href="https://drthummar.me/" style="color: #ec5fa8;">drthummar.me</a></p>
-            <p style="margin-top: 10px; color: #bbb;">&copy; ${currentYear} Dhruvil Thummar. All rights reserved.</p>
-          </div>
-        </div>
+              
+              <div class="timeline">
+                <div class="timeline-title">What Happens Next</div>
+                <div class="timeline-item"><span class="timeline-icon">→</span> <span>I'll review your message within 1-2 business days</span></div>
+                <div class="timeline-item"><span class="timeline-icon">→</span> <span>You'll receive my response at this email address</span></div>
+                <div class="timeline-item"><span class="timeline-icon">→</span> <span>Questions? Reply directly to this message</span></div>
+              </div>
+              
+              <div class="cta-section">
+                <a href="https://drthummar.me/" class="cta-btn">View My Portfolio</a>
+              </div>
+              
+              <div class="social-section">
+                <div class="social-title">Connect</div>
+                <div class="social-links">
+                  <a href="https://github.com/DhruvilThummar" class="social-link" title="GitHub">💻</a>
+                  <a href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" class="social-link" title="LinkedIn">💼</a>
+                  <a href="https://www.instagram.com/dhruvil_thummar_" class="social-link" title="Instagram">📷</a>
+                  <a href="https://drthummar.me/" class="social-link" title="Portfolio">🌐</a>
+                </div>
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td class="footer">
+              <p class="footer-text">Sent from <a href="https://drthummar.me/" class="footer-link">drthummar.me</a></p>
+              <p class="copyright">&copy; ${currentYear} Dhruvil Thummar. All rights reserved.</p>
+            </td>
+          </tr>
+        </table>
       </td>
     </tr>
   </table>

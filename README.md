@@ -62,10 +62,10 @@ Value: v=spf1 a mx include:relay.mailchannels.net ~all
 - `message`: 10–5000 characters
 
 ## Project structure
-- `index.html` — main static page
+- `index.html` — main static page with contact form
 - `assets/tailwind-input.css` — source Tailwind entry
 - `assets/tailwind.css` — generated, minified CSS artifact
-- `functions/api/contact.js` — Cloudflare Pages Function for contact form
+- `functions/api/contact.js` — Cloudflare Pages Function for contact form (primary endpoint)
 - `_routes.json` — routing configuration for Cloudflare Pages
 - `tailwind.config.js`, `postcss.config.js` — build configuration
 

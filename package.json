@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build:css": "npx tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --minify",
-    "watch:css": "npx tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --watch"
+    "watch:css": "npx tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --watch",
+    "serve": "npx http-server . -p 3000 -c-1 --cors -o",
+    "dev": "npx http-server . -p 3000 -c-1 --cors -o"
   },
   "keywords": [],
   "author": "",

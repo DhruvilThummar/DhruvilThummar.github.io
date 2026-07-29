@@ -1,0 +1,117 @@
+/* ============================================================
+   Service: base.css
+   Variables, reset, typography, preloader, cursor
+   ============================================================ */
+
+/* ── Google Fonts ─────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@400;600;700&family=Roboto+Mono:wght@400&family=Montserrat:wght@700&display=swap');
+
+/* ── Design Tokens ───────────────────────────────────────── */
+:root {
+    --bg-color: #000;
+    --text-primary: #fff;
+    --text-secondary: #b0b0b0;
+    --accent-color: #00bfff;
+    --accent-secondary-color: #00f5d4;
+    --accent-dark-color: #0077b6;
+    --card-bg: rgba(20, 20, 20, 0.5);
+    --navbar-bg: rgba(10, 10, 10, 0.2);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --skill-bg: #1a1a1a;
+    --skill-track: #2a2a2a;
+    --scrollbar-track: #111;
+    --footer-bg: #050505;
+    --form-bg: rgba(20, 20, 20, 0.7);
+    --highlight-primary: var(--accent-color);
+    --highlight-secondary: var(--accent-secondary-color);
+    --radius-card: 0.75rem;
+    --shadow-glow: 0 0 40px rgba(0, 191, 255, 0.15);
+}
+
+body.light-mode {
+    --bg-color: linear-gradient(135deg, #e8f9ff 0%, #f3eeff 50%, #e6f6ff 100%);
+    --text-primary: #0a1628;
+    --text-secondary: #4a5d73;
+    --accent-color: #00d4ff;
+    --accent-secondary-color: #a78bfa;
+    --accent-dark-color: #00b4e6;
+    --card-bg: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(240,248,255,0.92));
+    --navbar-bg: rgba(240, 250, 255, 0.7);
+    --border-color: rgba(0, 180, 230, 0.12);
+    --skill-bg: #f0f8ff;
+    --skill-track: #e6f4fa;
+    --scrollbar-track: #d0eaff;
+    --footer-bg: #e8f4fc;
+    --form-bg: rgba(240, 250, 255, 0.92);
+    --highlight-primary: #00d4ff;
+    --highlight-secondary: #a78bfa;
+}
+
+/* ── Reset & Base ───────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    background: var(--bg-color);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    color: var(--text-primary);
+    font-family: "Inter", sans-serif;
+    overflow-x: hidden;
+    cursor: default;
+    transition: background-color 0.4s ease, color 0.4s ease;
+    -webkit-font-smoothing: antialiased;
+}
+
+body.no-scroll { overflow: hidden; }
+
+.hidden { display: none !important; }
+
+/* ── Typography Helpers ─────────────────────────────────────── */
+.font-display { font-family: "Poppins", sans-serif; }
+.font-mono    { font-family: "Roboto Mono", monospace; }
+.font-logo    { font-family: "Montserrat", sans-serif; }
+
+.text-highlight-primary   { color: var(--highlight-primary); }
+.text-highlight-secondary { color: var(--highlight-secondary); }
+
+/* ── Will-change hints ──────────────────────────────────────── */
+.project-card, .skill-button, .about-shape, #navbar { will-change: transform, opacity; }
+
+/* ── Preloader ──────────────────────────────────────────────── */
+#preloader {
+    position: fixed; inset: 0;
+    background-color: #000;
+    z-index: 2000;
+    display: flex; justify-content: center; align-items: center;
+    color: #00bfff;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+}
+.preloader-wrapper { width: 300px; text-align: center; }
+#preloader-logo { position: relative; width: 250px; height: 150px; margin: 0 auto 20px; }
+#preloader-logo svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke-width: 2; transform-origin: center center; }
+.logo-path { stroke: var(--accent-color); stroke-dasharray: 3000; stroke-dashoffset: 3000; }
+.progress-bar-container { width: 100%; height: 4px; background-color: rgba(0, 191, 255, 0.2); border-radius: 2px; margin-top: 1rem; }
+#progress-bar { width: 0%; height: 100%; background-color: var(--accent-color); border-radius: 2px; transition: width 0.3s ease; }
+#status-text { margin-top: 1rem; font-family: "Roboto Mono", monospace; color: var(--text-secondary); }
+
+/* ── Custom Cursor ──────────────────────────────────────────── */
+.cursor-dot, .cursor-ring {
+    position: fixed; top: 0; left: 0;
+    z-index: 1100; pointer-events: none; border-radius: 50%;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference; display: none;
+}
+@media (hover: hover) and (pointer: fine) { .cursor-dot, .cursor-ring { display: block; } }
+.cursor-dot  { width: 10px; height: 10px; background-color: var(--text-primary); transition: transform 0.3s ease; }
+.cursor-ring { width: 30px; height: 30px; border: 2px solid var(--text-primary); transition: width 0.3s ease, height 0.3s ease, border-width 0.3s ease, opacity 0.3s ease; }
+body.link-hover .cursor-ring { width: 50px; height: 50px; border-width: 1px; opacity: 0.5; }
+body.link-hover .cursor-dot  { transform: translate(-50%, -50%) scale(0.7); }
+
+/* ── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--accent-color); border-radius: 3px; }

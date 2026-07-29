@@ -30,7 +30,7 @@ export const projectsData = [
             "High-performance in-browser JSON/TOON transformation engine with real-time client-side AST parsing. Monaco Editor with live syntax highlighting, error detection, and dynamic formatting.",
         tags: ["React", "TypeScript", "Monaco Editor", "Vite", "AST"],
         githubUrl: "https://github.com/DhruvilThummar/Script-Converter-Studio",
-        liveUrl: "https://drthummar.me/Script-Converter-Studio",
+        liveUrl: "https://dhruvilthummar.github.io/What-s-In-My-Fridge/",
         imageUrl: "https://placehold.co/600x400/000000/00BFFF?text=Script+Converter+Studio",
         featured: true,
     },
@@ -58,7 +58,7 @@ export const projectsData = [
             "A web app that suggests recipes based on ingredients you have, helping to reduce food waste.",
         tags: ["HTML", "CSS", "JavaScript", "Local Storage"],
         githubUrl: "https://github.com/DhruvilThummar/What-s-in-my-fridge",
-        liveUrl: "https://drthummar.me/What-s-In-My-Fridge/",
+        liveUrl: "https://dhruvilthummar.github.io/What-s-In-My-Fridge/",
         imageUrl: "https://placehold.co/600x400/000000/00BFFF?text=FridgeApp",
     },
     {

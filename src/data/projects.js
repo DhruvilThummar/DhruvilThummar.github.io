@@ -30,7 +30,7 @@ export const projectsData = [
             "High-performance in-browser JSON/TOON transformation engine with real-time client-side AST parsing. Monaco Editor with live syntax highlighting, error detection, and dynamic formatting.",
         tags: ["React", "TypeScript", "Monaco Editor", "Vite", "AST"],
         githubUrl: "https://github.com/DhruvilThummar/Script-Converter-Studio",
-        liveUrl: "https://dhruvilthummar.github.io/Script-Converter-Studio//",
+        liveUrl: "https://dhruvilthummar.github.io/Script-Converter-Studio/",
         imageUrl: "https://placehold.co/600x400/000000/00BFFF?text=Script+Converter+Studio",
         featured: true,
     },

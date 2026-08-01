@@ -10,30 +10,27 @@ export function renderSkills() {
     if (!container) return;
 
     container.innerHTML = Object.entries(skillsData).map(([category, skills]) => `
-        <div class="skills-category mb-12">
-            <h3 class="font-display text-2xl text-accent-secondary mb-8 text-center">${category}</h3>
+        <div class="skills-category-card glass-card mb-8">
+            <h3 class="font-display text-xl md:text-2xl text-accent-secondary mb-6 font-bold border-b border-border-color/20 pb-3 flex items-center gap-2">
+                <i class="fa-regular fa-folder-open text-accent"></i> ${category}
+            </h3>
             <div class="skills-grid">
                 ${skills.map(s => `
-                    <div class="skill-button" data-level="${s.level}">
-                        <svg class="skill-button-progress" viewBox="0 0 100 100">
-                            <circle class="progress-ring-bg" cx="50" cy="50" r="45" stroke-width="6" fill="transparent"/>
-                            <circle cx="50" cy="50" r="45" stroke="var(--accent-color)" stroke-width="6" fill="transparent" class="progress-ring"/>
-                        </svg>
-                        <div class="skill-content">
+                    <div class="skill-card" data-name="${s.name}" data-level="${s.level}">
+                        <div class="skill-icon-wrap">
                             <i class="${s.icon}" aria-hidden="true"></i>
-                            <span class="skill-percentage">0%</span>
                         </div>
-                        <span class="tooltip">${s.name}</span>
+                        <div class="skill-info">
+                            <div class="skill-header-row">
+                                <span class="skill-name">${s.name}</span>
+                                <span class="skill-percentage">0%</span>
+                            </div>
+                            <div class="skill-progress-container">
+                                <div class="skill-progress-bar" style="width: 0%;"></div>
+                            </div>
+                        </div>
                     </div>`).join('')}
             </div>
         </div>`
     ).join('');
-
-    // Initialize progress ring circumferences
-    document.querySelectorAll(".progress-ring").forEach(ring => {
-        const r = ring.r.baseVal.value;
-        const c = 2 * Math.PI * r;
-        ring.style.setProperty("--circumference", c);
-        ring.style.strokeDasharray = `0 ${c}`;
-    });
 }

@@ -8,43 +8,51 @@
 
 /* ── Design Tokens ───────────────────────────────────────── */
 :root {
-    --bg-color: #000;
-    --text-primary: #fff;
-    --text-secondary: #b0b0b0;
-    --accent-color: #00bfff;
-    --accent-secondary-color: #00f5d4;
-    --accent-dark-color: #0077b6;
-    --card-bg: rgba(20, 20, 20, 0.5);
-    --navbar-bg: rgba(10, 10, 10, 0.2);
-    --border-color: rgba(255, 255, 255, 0.1);
-    --skill-bg: #1a1a1a;
-    --skill-track: #2a2a2a;
-    --scrollbar-track: #111;
-    --footer-bg: #050505;
-    --form-bg: rgba(20, 20, 20, 0.7);
+    --bg-color: #05050e;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --accent-color: #00d2ff;
+    --accent-secondary-color: #a78bfa;
+    --accent-dark-color: #0d9488;
+    --card-bg: rgba(10, 10, 25, 0.45);
+    --navbar-bg: rgba(5, 5, 14, 0.4);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --skill-bg: #0f1026;
+    --skill-track: #1b1c3a;
+    --scrollbar-track: #05050f;
+    --footer-bg: #030309;
+    --form-bg: rgba(12, 12, 30, 0.7);
     --highlight-primary: var(--accent-color);
     --highlight-secondary: var(--accent-secondary-color);
-    --radius-card: 0.75rem;
-    --shadow-glow: 0 0 40px rgba(0, 191, 255, 0.15);
+    --radius-card: 1rem;
+    --shadow-glow: 0 0 50px rgba(0, 210, 255, 0.12);
+    
+    /* Background Glow Blobs */
+    --glow-blob-1: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 60%);
+    --glow-blob-2: radial-gradient(circle, rgba(20, 184, 166, 0.12) 0%, transparent 60%);
 }
 
 body.light-mode {
-    --bg-color: linear-gradient(135deg, #e8f9ff 0%, #f3eeff 50%, #e6f6ff 100%);
-    --text-primary: #0a1628;
-    --text-secondary: #4a5d73;
-    --accent-color: #00d4ff;
-    --accent-secondary-color: #a78bfa;
-    --accent-dark-color: #00b4e6;
-    --card-bg: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(240,248,255,0.92));
-    --navbar-bg: rgba(240, 250, 255, 0.7);
-    --border-color: rgba(0, 180, 230, 0.12);
-    --skill-bg: #f0f8ff;
-    --skill-track: #e6f4fa;
-    --scrollbar-track: #d0eaff;
-    --footer-bg: #e8f4fc;
-    --form-bg: rgba(240, 250, 255, 0.92);
-    --highlight-primary: #00d4ff;
-    --highlight-secondary: #a78bfa;
+    --bg-color: linear-gradient(135deg, #f0f7ff 0%, #faf5ff 50%, #f0fdfa 100%);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --accent-color: #0284c7;
+    --accent-secondary-color: #7c3aed;
+    --accent-dark-color: #0d9488;
+    --card-bg: rgba(255, 255, 255, 0.7);
+    --navbar-bg: rgba(240, 247, 255, 0.75);
+    --border-color: rgba(15, 23, 42, 0.08);
+    --skill-bg: #f1f5f9;
+    --skill-track: #e2e8f0;
+    --scrollbar-track: #f1f5f9;
+    --footer-bg: #e2e8f0;
+    --form-bg: rgba(255, 255, 255, 0.85);
+    --highlight-primary: #0284c7;
+    --highlight-secondary: #7c3aed;
+    
+    /* Background Glow Blobs for Light Mode */
+    --glow-blob-1: radial-gradient(circle, rgba(167, 139, 250, 0.15) 0%, transparent 60%);
+    --glow-blob-2: radial-gradient(circle, rgba(45, 212, 191, 0.1) 0%, transparent 60%);
 }
 
 /* ── Reset & Base ───────────────────────────────────────────── */

@@ -350,18 +350,16 @@ function initMainAnimations() {
         onEnter: b => gsap.from(b, { opacity: 0, y: 40, stagger: 0.1, ease: "power3.out", duration: 0.7 })
     });
 
-    ScrollTrigger.batch(".skill-button", {
-        start: "top 85%",
+    ScrollTrigger.batch(".skill-card", {
+        start: "top 88%",
         onEnter: b => {
-            gsap.to(b, { opacity: 1, y: 0, stagger: 0.1, duration: 0.6, ease: "power2.out", onComplete: () => b.forEach(btn => btn.classList.add("visible")) });
-            b.forEach(btn => {
-                const level = parseInt(btn.dataset.level);
-                const ring = btn.querySelector(".progress-ring");
-                const percent = btn.querySelector(".skill-percentage");
-                const c = parseFloat(ring.style.getPropertyValue("--circumference"));
-                const offset = c * (1 - level / 100);
-                gsap.to(ring, { strokeDasharray: `${c - offset} ${c}`, duration: 1.5, ease: "power3.out", delay: 0.5 });
-                gsap.to({ v: 0 }, { v: level, duration: 1.5, delay: 0.5, ease: "power3.out", onUpdate() { percent.textContent = `${Math.round(this.targets()[0].v)}%`; } });
+            gsap.fromTo(b, { opacity: 0, y: 15 }, { opacity: 1, y: 0, stagger: 0.04, duration: 0.5, ease: "power2.out" });
+            b.forEach(card => {
+                const level = parseInt(card.dataset.level);
+                const progressBar = card.querySelector(".skill-progress-bar");
+                const percent = card.querySelector(".skill-percentage");
+                gsap.to(progressBar, { width: `${level}%`, duration: 1.5, ease: "power3.out", delay: 0.1 });
+                gsap.to({ v: 0 }, { v: level, duration: 1.5, delay: 0.1, ease: "power3.out", onUpdate() { percent.textContent = `${Math.round(this.targets()[0].v)}%`; } });
             });
         }
     });

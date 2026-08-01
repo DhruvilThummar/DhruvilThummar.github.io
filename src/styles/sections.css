@@ -10,6 +10,40 @@
     z-index: -1; pointer-events: none;
 }
 
+/* ── Ambient Glow Blobs ──────────────────────────────────────── */
+.glow-blob {
+    position: fixed;
+    width: min(80vw, 600px);
+    height: min(80vw, 600px);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -2;
+    filter: blur(100px);
+    opacity: 0.85;
+    transition: background 0.4s ease;
+}
+.glow-blob-1 {
+    top: -10%;
+    left: -10%;
+    background: var(--glow-blob-1);
+    animation: blob-float-1 25s infinite ease-in-out alternate;
+}
+.glow-blob-2 {
+    bottom: -10%;
+    right: -10%;
+    background: var(--glow-blob-2);
+    animation: blob-float-2 25s infinite ease-in-out alternate;
+}
+
+@keyframes blob-float-1 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(100px, 50px) scale(1.1); }
+}
+@keyframes blob-float-2 {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(-100px, -50px) scale(1.1); }
+}
+
 /* ── Hero Section ───────────────────────────────────────────── */
 #home {
     position: relative; width: 100%; min-height: 100svh;
@@ -20,8 +54,8 @@
 /* ── Projects Section ───────────────────────────────────────── */
 #projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
-    gap: 1.75rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr));
+    gap: 2rem;
 }
 
 /* ── Project Modal ──────────────────────────────────────────── */

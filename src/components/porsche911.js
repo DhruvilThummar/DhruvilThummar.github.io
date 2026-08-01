@@ -1,6 +1,7 @@
 // ============================================================
 // Component: porsche911.js
-// Procedural 3D Model & Visualizer for Porsche 911 GT3 RS in Three.js
+// Photorealistic 3D Car Model Visualizer with Environment Map Reflections,
+// PBR Clearcoat Shading, GLTFLoader Support & High-Detail Curved Geometry
 // ============================================================
 
 export class Porsche911Visualizer {
@@ -13,12 +14,17 @@ export class Porsche911Visualizer {
         this.wireframeMode = false;
         this.isPaused = false;
         this.animFrameId = null;
+        this.gltfLoaded = false;
 
         this.initThree();
-        this.buildPorscheModel();
+        this.setupEnvironmentMap();
         this.setupLights();
         this.setupFloor();
         this.setupAudio();
+
+        // Attempt loading high-detail GLTF model, fallback to detailed procedural model
+        this.loadCarModel();
+
         this.addEventListeners();
         this.animate();
     }
@@ -29,12 +35,12 @@ export class Porsche911Visualizer {
 
         // Scene
         this.scene = new THREE.Scene();
-        this.scene.background = new THREE.Color(0x0a0c10);
-        this.scene.fog = new THREE.FogExp2(0x0a0c10, 0.035);
+        this.scene.background = new THREE.Color(0x06070a);
+        this.scene.fog = new THREE.FogExp2(0x06070a, 0.03);
 
         // Camera
-        this.camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-        this.camera.position.set(4.5, 2.2, 5.5);
+        this.camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
+        this.camera.position.set(4.8, 2.1, 5.8);
 
         // Renderer
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
@@ -43,7 +49,8 @@ export class Porsche911Visualizer {
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        this.renderer.toneMappingExposure = 1.1;
+        this.renderer.toneMappingExposure = 1.2;
+        this.renderer.outputEncoding = THREE.sRGBEncoding;
 
         // Clear container and append canvas
         this.container.innerHTML = '';
@@ -54,63 +61,195 @@ export class Porsche911Visualizer {
             this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
             this.controls.enableDamping = true;
             this.controls.dampingFactor = 0.05;
-            this.controls.maxPolarAngle = Math.PI / 2 - 0.02; // Don't go under floor
-            this.controls.minDistance = 2.5;
+            this.controls.maxPolarAngle = Math.PI / 2 - 0.01;
+            this.controls.minDistance = 2.0;
             this.controls.maxDistance = 12;
-            this.controls.target.set(0, 0.6, 0);
+            this.controls.target.set(0, 0.62, 0);
         }
     }
 
-    buildPorscheModel() {
-        this.carGroup = new THREE.Group();
+    setupEnvironmentMap() {
+        // Procedural High-Dynamic Studio Environment Cube/Equirectangular Texture Map
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
 
-        // Material Definitions
+        // Studio Environment Gradient with Top Soft Light Box Highlights
+        const grad = ctx.createLinearGradient(0, 0, 0, 256);
+        grad.addColorStop(0, '#1e293b');
+        grad.addColorStop(0.3, '#0f172a');
+        grad.addColorStop(0.7, '#080c14');
+        grad.addColorStop(1, '#020408');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 512, 256);
+
+        // Bright Soft Studio Ceiling Light Boxes for Realistic Metallic Sheen
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#00d4ff';
+        ctx.shadowBlur = 30;
+        ctx.fillRect(120, 20, 270, 45);
+        ctx.fillRect(40, 90, 100, 30);
+        ctx.fillRect(370, 90, 100, 30);
+
+        const envTexture = new THREE.CanvasTexture(canvas);
+        envTexture.mapping = THREE.EquirectangularReflectionMapping;
+        envTexture.encoding = THREE.sRGBEncoding;
+        this.envMap = envTexture;
+        this.scene.environment = envTexture;
+    }
+
+    loadCarModel() {
+        this.carGroup = new THREE.Group();
+        this.scene.add(this.carGroup);
+
+        // Create PBR Materials with Environment Map Reflections
+        this.createMaterials();
+
+        // Local Authentic 19.2MB Porsche 911 GT3 RS GLTF model
+        const gltfUrl = './assets/porsche_gt3_rs.glb';
+        this.paintMeshes = [];
+
+        if (typeof THREE.GLTFLoader !== 'undefined') {
+            const loader = new THREE.GLTFLoader();
+            
+            // Setup DRACOLoader decoder
+            if (typeof THREE.DRACOLoader !== 'undefined') {
+                const dracoLoader = new THREE.DRACOLoader();
+                dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/gltf/');
+                loader.setDRACOLoader(dracoLoader);
+            }
+
+            loader.load(
+                gltfUrl,
+                (gltf) => {
+                    this.gltfLoaded = true;
+                    const model = gltf.scene;
+
+                    // Compute Bounding Box for Auto-Centering and Optimal Scale
+                    const box = new THREE.Box3().setFromObject(model);
+                    const center = box.getCenter(new THREE.Vector3());
+                    const size = box.getSize(new THREE.Vector3());
+
+                    const maxDim = Math.max(size.x, size.y, size.z);
+                    const targetSize = 4.4;
+                    const scale = targetSize / maxDim;
+
+                    model.scale.set(scale, scale, scale);
+                    model.position.x = -center.x * scale;
+                    model.position.y = -box.min.y * scale + 0.01; // Rest wheel contact points directly on studio floor
+                    model.position.z = -center.z * scale;
+
+                    // Apply studio reflections and identify paint meshes
+                    model.traverse((child) => {
+                        if (child.isMesh) {
+                            child.castShadow = true;
+                            child.receiveShadow = true;
+                            
+                            if (child.material) {
+                                const applyEnv = (mat) => {
+                                    if (!mat) return;
+                                    mat.envMap = this.envMap;
+                                    mat.envMapIntensity = 2.0;
+                                    mat.needsUpdate = true;
+                                };
+
+                                if (Array.isArray(child.material)) {
+                                    child.material.forEach(applyEnv);
+                                } else {
+                                    applyEnv(child.material);
+                                }
+
+                                const name = (child.name || '').toLowerCase();
+                                const matName = (child.material.name || '').toLowerCase();
+
+                                if (name.includes('body') || name.includes('paint') || name.includes('car_body') || 
+                                    name.includes('primary') || name.includes('exterior') || 
+                                    matName.includes('body') || matName.includes('paint') || matName.includes('car_body')) {
+                                    this.paintMeshes.push(child);
+                                }
+                            }
+                        }
+                    });
+
+                    this.carGroup.add(model);
+                },
+                undefined,
+                (error) => {
+                    console.warn("Error loading local GLTF model, rendering procedural fallback:", error);
+                    this.buildProceduralPorsche();
+                }
+            );
+        } else {
+            this.buildProceduralPorsche();
+        }
+    }
+
+    createMaterials() {
         this.bodyMaterial = new THREE.MeshPhysicalMaterial({
             color: this.currentColor,
-            metalness: 0.7,
-            roughness: 0.2,
+            metalness: 0.75,
+            roughness: 0.12,
             clearcoat: 1.0,
-            clearcoatRoughness: 0.08,
-            reflectivity: 0.9
+            clearcoatRoughness: 0.02,
+            reflectivity: 0.98,
+            envMap: this.envMap,
+            envMapIntensity: 2.2
         });
 
         this.carbonMaterial = new THREE.MeshStandardMaterial({
-            color: 0x181818,
-            metalness: 0.3,
-            roughness: 0.5
+            color: 0x121214,
+            metalness: 0.45,
+            roughness: 0.4,
+            envMap: this.envMap,
+            envMapIntensity: 1.0
         });
 
         this.glassMaterial = new THREE.MeshPhysicalMaterial({
-            color: 0x111115,
+            color: 0x080b12,
             metalness: 0.1,
-            roughness: 0.1,
-            transmission: 0.8,
+            roughness: 0.04,
+            transmission: 0.88,
             transparent: true,
-            opacity: 0.85
+            opacity: 0.8,
+            envMap: this.envMap,
+            envMapIntensity: 2.5
         });
 
         this.chromeMaterial = new THREE.MeshStandardMaterial({
-            color: 0xdddddd,
-            metalness: 0.95,
-            roughness: 0.1
+            color: 0xeeeeee,
+            metalness: 0.98,
+            roughness: 0.05,
+            envMap: this.envMap,
+            envMapIntensity: 2.5
+        });
+
+        this.titaniumMaterial = new THREE.MeshStandardMaterial({
+            color: 0x778899,
+            metalness: 0.9,
+            roughness: 0.18,
+            envMap: this.envMap,
+            envMapIntensity: 2.0
         });
 
         this.rubberMaterial = new THREE.MeshStandardMaterial({
-            color: 0x1a1a1a,
+            color: 0x161616,
             metalness: 0.05,
-            roughness: 0.9
+            roughness: 0.92
         });
 
         this.brakeCaliperMat = new THREE.MeshStandardMaterial({
-            color: 0xffcc00, // Porsche Yellow Brake Calipers
-            metalness: 0.5,
-            roughness: 0.3
+            color: 0xffcc00, // Porsche Yellow Calipers
+            metalness: 0.6,
+            roughness: 0.2,
+            envMap: this.envMap,
+            envMapIntensity: 1.5
         });
 
         this.lightGlowMat = new THREE.MeshBasicMaterial({
             color: 0xffffff,
             transparent: true,
-            opacity: 0.9
+            opacity: 0.95
         });
 
         this.tailLightMat = new THREE.MeshBasicMaterial({
@@ -118,298 +257,301 @@ export class Porsche911Visualizer {
             transparent: true,
             opacity: 0.95
         });
+    }
 
-        // 1. MAIN BODY COCKPIT & CHASSIS (Curved Low Silhouette)
-        // Lower Main Chassis
-        const chassisMesh = new THREE.Mesh(
-            new THREE.BoxGeometry(1.8, 0.55, 3.9, 10, 5, 10),
-            this.bodyMaterial
-        );
-        chassisMesh.position.y = 0.55;
-        chassisMesh.castShadow = true;
-        chassisMesh.receiveShadow = true;
-        this.carGroup.add(chassisMesh);
+    buildProceduralPorsche() {
+        if (this.carGroup.children.length > 0) return; // Already loaded
 
-        // Sloping Roof & Cabin
-        const cabinMesh = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.68, 0.85, 0.65, 8),
-            this.bodyMaterial
-        );
-        cabinMesh.scale.set(1.1, 1, 2.0);
-        cabinMesh.position.set(0, 0.95, -0.1);
-        cabinMesh.castShadow = true;
-        this.carGroup.add(cabinMesh);
+        const carContainer = new THREE.Group();
 
-        // Windshield & Windows
-        const windshield = new THREE.Mesh(
-            new THREE.BoxGeometry(1.35, 0.5, 0.9),
-            this.glassMaterial
-        );
-        windshield.position.set(0, 0.96, 0.35);
-        windshield.rotation.x = -0.45;
-        this.carGroup.add(windshield);
+        // 1. Aerodynamic Curved Floor & Main Shell
+        const floorGeo = new THREE.BoxGeometry(1.84, 0.12, 4.15);
+        const floorMesh = new THREE.Mesh(floorGeo, this.carbonMaterial);
+        floorMesh.position.y = 0.28;
+        carContainer.add(floorMesh);
 
-        const rearGlass = new THREE.Mesh(
-            new THREE.BoxGeometry(1.3, 0.45, 1.1),
-            this.glassMaterial
-        );
-        rearGlass.position.set(0, 0.92, -0.65);
-        rearGlass.rotation.x = 0.35;
-        this.carGroup.add(rearGlass);
+        // Curved Body Shell with Smooth Vertices
+        const mainBodyGeo = new THREE.CylinderGeometry(0.94, 0.96, 3.95, 24);
+        mainBodyGeo.scale(1.0, 0.38, 1.0);
+        mainBodyGeo.computeVertexNormals();
+        const mainBodyMesh = new THREE.Mesh(mainBodyGeo, this.bodyMaterial);
+        mainBodyMesh.rotation.x = Math.PI / 2;
+        mainBodyMesh.position.set(0, 0.58, 0);
+        mainBodyMesh.castShadow = true;
+        mainBodyMesh.receiveShadow = true;
+        carContainer.add(mainBodyMesh);
 
-        // 2. GT3 RS AERODYNAMIC HOOD & NACA DUCTS
-        const hoodMesh = new THREE.Mesh(
-            new THREE.BoxGeometry(1.55, 0.12, 1.2),
-            this.bodyMaterial
-        );
-        hoodMesh.position.set(0, 0.65, 1.25);
-        hoodMesh.rotation.x = 0.12;
+        // Sloping Front Hood (Porsche 911 Contour)
+        const hoodGeo = new THREE.CylinderGeometry(0.8, 0.9, 1.48, 16, 1, false, -Math.PI / 2, Math.PI);
+        hoodGeo.scale(1.08, 0.28, 1.0);
+        hoodGeo.computeVertexNormals();
+        const hoodMesh = new THREE.Mesh(hoodGeo, this.bodyMaterial);
+        hoodMesh.rotation.z = Math.PI;
+        hoodMesh.rotation.x = 0.18;
+        hoodMesh.position.set(0, 0.74, 1.18);
         hoodMesh.castShadow = true;
-        this.carGroup.add(hoodMesh);
+        carContainer.add(hoodMesh);
 
-        // Hood Air Vents (NACA Ducts)
-        for (let side of [-0.35, 0.35]) {
-            const vent = new THREE.Mesh(
-                new THREE.BoxGeometry(0.22, 0.05, 0.4),
-                this.carbonMaterial
-            );
-            vent.position.set(side, 0.72, 1.25);
-            vent.rotation.x = 0.15;
-            this.carGroup.add(vent);
+        // Recessed Hood NACA Ducts
+        for (let side of [-0.32, 0.32]) {
+            const ventGeo = new THREE.BoxGeometry(0.18, 0.04, 0.38);
+            const vent = new THREE.Mesh(ventGeo, this.carbonMaterial);
+            vent.position.set(side, 0.8, 1.22);
+            vent.rotation.x = 0.2;
+            carContainer.add(vent);
         }
 
-        // 3. FRONT LIP SPLITTER & BUMPER INTAKES
-        const frontSplitter = new THREE.Mesh(
-            new THREE.BoxGeometry(1.85, 0.08, 0.4),
-            this.carbonMaterial
-        );
-        frontSplitter.position.set(0, 0.28, 1.95);
-        this.carGroup.add(frontSplitter);
+        // 2. Sloping 911 Roof & Teardrop Glass Cabin
+        const cabinGeo = new THREE.CylinderGeometry(0.66, 0.9, 1.98, 24);
+        cabinGeo.scale(1.12, 0.58, 1.0);
+        cabinGeo.computeVertexNormals();
+        const cabinMesh = new THREE.Mesh(cabinGeo, this.bodyMaterial);
+        cabinMesh.rotation.x = Math.PI / 2 + 0.12;
+        cabinMesh.position.set(0, 1.04, -0.15);
+        cabinMesh.castShadow = true;
+        carContainer.add(cabinMesh);
 
-        const frontGrille = new THREE.Mesh(
-            new THREE.BoxGeometry(1.5, 0.25, 0.1),
-            this.carbonMaterial
-        );
-        frontGrille.position.set(0, 0.42, 1.92);
-        this.carGroup.add(frontGrille);
+        // Tinted Glass Windshield & Rear Window
+        const windshield = new THREE.Mesh(new THREE.BoxGeometry(1.38, 0.54, 0.96), this.glassMaterial);
+        windshield.position.set(0, 1.04, 0.44);
+        windshield.rotation.x = -0.48;
+        carContainer.add(windshield);
 
-        // 4. SIGNATURE QUAD-POINT LED HEADLIGHTS
+        const rearWindow = new THREE.Mesh(new THREE.BoxGeometry(1.32, 0.48, 1.18), this.glassMaterial);
+        rearWindow.position.set(0, 0.99, -0.74);
+        rearWindow.rotation.x = 0.38;
+        carContainer.add(rearWindow);
+
+        // Roof Air Guide Fins
+        for (let side of [-0.42, 0.42]) {
+            const fin = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.12, 0.85), this.carbonMaterial);
+            fin.position.set(side, 1.36, -0.2);
+            carContainer.add(fin);
+        }
+
+        // 3. Front Fender Humps with Air Louvers
+        for (let side of [-0.86, 0.86]) {
+            const frontFenderGeo = new THREE.SphereGeometry(0.4, 20, 20);
+            frontFenderGeo.scale(0.52, 0.65, 1.8);
+            frontFenderGeo.computeVertexNormals();
+            const frontFender = new THREE.Mesh(frontFenderGeo, this.bodyMaterial);
+            frontFender.position.set(side, 0.7, 1.18);
+            frontFender.castShadow = true;
+            carContainer.add(frontFender);
+
+            // GT3 RS Top Fender Air Extractors (Louvers)
+            for (let l = -0.15; l <= 0.15; l += 0.08) {
+                const slat = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.02, 0.05), this.carbonMaterial);
+                slat.position.set(side * 0.95, 0.88, 1.22 + l);
+                carContainer.add(slat);
+            }
+        }
+
+        // Flared Rear Hips & Side Air Intakes
+        for (let side of [-0.98, 0.98]) {
+            const rearFenderGeo = new THREE.SphereGeometry(0.48, 20, 20);
+            rearFenderGeo.scale(0.58, 0.72, 1.75);
+            rearFenderGeo.computeVertexNormals();
+            const rearFender = new THREE.Mesh(rearFenderGeo, this.bodyMaterial);
+            rearFender.position.set(side, 0.68, -0.65);
+            rearFender.castShadow = true;
+            carContainer.add(rearFender);
+
+            const sideScoop = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.34, 0.44), this.carbonMaterial);
+            sideScoop.position.set(side * 0.96, 0.66, -0.32);
+            carContainer.add(sideScoop);
+
+            const sideSkirt = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.06, 2.25), this.carbonMaterial);
+            sideSkirt.position.set(side * 0.94, 0.28, 0);
+            carContainer.add(sideSkirt);
+
+            // Aero Side Mirrors
+            const mirrorStalk = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.04, 0.06), this.carbonMaterial);
+            mirrorStalk.position.set(side * 0.88, 0.94, 0.55);
+            carContainer.add(mirrorStalk);
+
+            const mirrorCap = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.14, 0.16), this.bodyMaterial);
+            mirrorCap.position.set(side * 1.02, 0.96, 0.55);
+            carContainer.add(mirrorCap);
+        }
+
+        // 4. Front Lip Splitter & Dive Planes (Canards)
+        const frontBumper = new THREE.Mesh(new THREE.BoxGeometry(1.86, 0.32, 0.45), this.bodyMaterial);
+        frontBumper.position.set(0, 0.45, 1.9);
+        carContainer.add(frontBumper);
+
+        const frontGrille = new THREE.Mesh(new THREE.BoxGeometry(1.58, 0.22, 0.1), this.carbonMaterial);
+        frontGrille.position.set(0, 0.43, 1.98);
+        carContainer.add(frontGrille);
+
+        const splitter = new THREE.Mesh(new THREE.BoxGeometry(1.94, 0.06, 0.45), this.carbonMaterial);
+        splitter.position.set(0, 0.27, 2.0);
+        carContainer.add(splitter);
+
+        for (let side of [-0.94, 0.94]) {
+            const canard = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.03, 0.25), this.carbonMaterial);
+            canard.position.set(side, 0.43, 1.97);
+            canard.rotation.z = side * -0.2;
+            carContainer.add(canard);
+        }
+
+        // 5. Signature Quad LED Headlights
         this.headlights = [];
-        for (let side of [-0.62, 0.62]) {
-            // Housing
-            const housing = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.16, 0.18, 0.2, 16),
-                this.chromeMaterial
-            );
-            housing.rotation.x = Math.PI / 2 - 0.2;
-            housing.position.set(side, 0.7, 1.65);
-            this.carGroup.add(housing);
+        for (let side of [-0.65, 0.65]) {
+            const housing = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.2, 0.22, 16), this.chromeMaterial);
+            housing.rotation.x = Math.PI / 2 - 0.22;
+            housing.position.set(side, 0.74, 1.7);
+            carContainer.add(housing);
 
-            // Quad LED Lens
-            const lens = new THREE.Mesh(
-                new THREE.SphereGeometry(0.13, 16, 16, 0, Math.PI * 2, 0, Math.PI / 2),
-                this.lightGlowMat
-            );
-            lens.rotation.x = Math.PI / 2 - 0.2;
-            lens.position.set(side, 0.71, 1.73);
-            this.carGroup.add(lens);
+            const haloRing = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.02, 8, 24), this.lightGlowMat);
+            haloRing.rotation.x = Math.PI / 2 - 0.22;
+            haloRing.position.set(side, 0.75, 1.78);
+            carContainer.add(haloRing);
 
-            // Light Beam Spot
-            const spot = new THREE.SpotLight(0xffffff, 2, 15, Math.PI / 6, 0.4);
-            spot.position.set(side, 0.7, 1.75);
-            spot.target.position.set(side, 0.2, 8);
-            this.carGroup.add(spot);
-            this.carGroup.add(spot.target);
+            for (let px of [-0.05, 0.05]) {
+                for (let py of [-0.05, 0.05]) {
+                    const ledPod = new THREE.Mesh(new THREE.SphereGeometry(0.035, 12, 12), this.lightGlowMat);
+                    ledPod.position.set(side + px, 0.75 + py, 1.79);
+                    carContainer.add(ledPod);
+                }
+            }
+
+            const spot = new THREE.SpotLight(0xffffff, 2.2, 18, Math.PI / 5, 0.4);
+            spot.position.set(side, 0.75, 1.8);
+            spot.target.position.set(side, 0.2, 9);
+            carContainer.add(spot);
+            carContainer.add(spot.target);
             this.headlights.push(spot);
         }
 
-        // 5. WIDE REAR FENDERS & SIDE AIR SCOOPS
-        for (let side of [-0.92, 0.92]) {
-            const fender = new THREE.Mesh(
-                new THREE.BoxGeometry(0.25, 0.45, 1.4),
-                this.bodyMaterial
-            );
-            fender.position.set(side, 0.58, -0.6);
-            this.carGroup.add(fender);
-
-            const sideScoop = new THREE.Mesh(
-                new THREE.BoxGeometry(0.08, 0.25, 0.35),
-                this.carbonMaterial
-            );
-            sideScoop.position.set(side * 0.98, 0.6, -0.3);
-            this.carGroup.add(sideScoop);
-        }
-
-        // 6. SWAN-NECK GT3 RS MASSIVE REAR WING (Signature Feature)
+        // 6. Massive Swan-Neck GT3 RS Rear Wing (Active Aero)
         const wingGroup = new THREE.Group();
-        
-        // Upper Wing Blade
-        const wingBlade = new THREE.Mesh(
-            new THREE.BoxGeometry(2.1, 0.05, 0.45),
-            this.carbonMaterial
-        );
-        wingBlade.position.set(0, 1.42, -1.75);
-        wingBlade.rotation.x = -0.05;
+        const wingBlade = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.05, 0.48), this.carbonMaterial);
+        wingBlade.position.set(0, 1.5, -1.8);
+        wingBlade.rotation.x = -0.06;
         wingBlade.castShadow = true;
         wingGroup.add(wingBlade);
 
-        // Side Endplates
-        for (let side of [-1.05, 1.05]) {
-            const endplate = new THREE.Mesh(
-                new THREE.BoxGeometry(0.03, 0.3, 0.5),
-                this.bodyMaterial
-            );
-            endplate.position.set(side, 1.42, -1.75);
+        for (let side of [-1.12, 1.12]) {
+            const endplate = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.38, 0.58), this.bodyMaterial);
+            endplate.position.set(side, 1.5, -1.8);
             wingGroup.add(endplate);
         }
 
-        // Swan Neck Upright Mounts
-        for (let side of [-0.45, 0.45]) {
-            const mount = new THREE.Mesh(
-                new THREE.BoxGeometry(0.04, 0.45, 0.15),
-                this.chromeMaterial
-            );
-            mount.position.set(side, 1.2, -1.65);
-            mount.rotation.x = 0.25;
+        for (let side of [-0.48, 0.48]) {
+            const mount = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.52, 0.16), this.chromeMaterial);
+            mount.position.set(side, 1.27, -1.7);
+            mount.rotation.x = 0.28;
             wingGroup.add(mount);
         }
-        this.carGroup.add(wingGroup);
+        carContainer.add(wingGroup);
 
-        // 7. REAR LIGHT BAR & DIFFUSER
-        const rearLightBar = new THREE.Mesh(
-            new THREE.BoxGeometry(1.7, 0.06, 0.05),
-            this.tailLightMat
-        );
-        rearLightBar.position.set(0, 0.72, -1.94);
-        this.carGroup.add(rearLightBar);
+        // 7. Rear Light Bar, Diffuser & Titanium Exhaust
+        const rearLightBar = new THREE.Mesh(new THREE.BoxGeometry(1.78, 0.05, 0.06), this.tailLightMat);
+        rearLightBar.position.set(0, 0.75, -1.98);
+        carContainer.add(rearLightBar);
 
-        // Dual Rear Exhaust Tips
-        for (let side of [-0.15, 0.15]) {
-            const exhaust = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.05, 0.05, 0.25, 12),
-                this.chromeMaterial
-            );
+        for (let side of [-0.12, 0.12]) {
+            const exhaust = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.28, 16), this.titaniumMaterial);
             exhaust.rotation.x = Math.PI / 2;
-            exhaust.position.set(side, 0.35, -1.95);
-            this.carGroup.add(exhaust);
+            exhaust.position.set(side, 0.38, -2.0);
+            carContainer.add(exhaust);
         }
 
-        // Rear Diffuser Fins
-        const rearDiffuser = new THREE.Mesh(
-            new THREE.BoxGeometry(1.6, 0.18, 0.35),
-            this.carbonMaterial
-        );
-        rearDiffuser.position.set(0, 0.3, -1.82);
-        this.carGroup.add(rearDiffuser);
+        const diffuserBase = new THREE.Mesh(new THREE.BoxGeometry(1.74, 0.16, 0.42), this.carbonMaterial);
+        diffuserBase.position.set(0, 0.32, -1.88);
+        carContainer.add(diffuserBase);
 
-        // 8. CENTER-LOCK RACING WHEELS & BREMBO BRAKES
+        // 8. Center-Lock Wheels & PCCB Brakes
         this.wheels = [];
         const wheelPositions = [
-            { x: -0.88, y: 0.38, z: 1.15 },  // Front Left
-            { x: 0.88, y: 0.38, z: 1.15 },   // Front Right
-            { x: -0.92, y: 0.38, z: -1.15 }, // Rear Left
-            { x: 0.92, y: 0.38, z: -1.15 }   // Rear Right
+            { x: -0.93, y: 0.38, z: 1.18 },  // Front Left
+            { x: 0.93, y: 0.38, z: 1.18 },   // Front Right
+            { x: -0.99, y: 0.38, z: -1.18 }, // Rear Left
+            { x: 0.99, y: 0.38, z: -1.18 }   // Rear Right
         ];
 
         wheelPositions.forEach((pos) => {
             const wheelGroup = new THREE.Group();
 
-            // Tire
-            const tire = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.38, 0.38, 0.28, 32),
-                this.rubberMaterial
-            );
+            const tire = new THREE.Mesh(new THREE.CylinderGeometry(0.38, 0.38, 0.32, 32), this.rubberMaterial);
             tire.rotation.z = Math.PI / 2;
             tire.castShadow = true;
             wheelGroup.add(tire);
 
-            // Rim / Wheel Hub
-            const rim = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.28, 0.28, 0.29, 16),
-                this.chromeMaterial
-            );
-            rim.rotation.z = Math.PI / 2;
-            wheelGroup.add(rim);
+            const rimBarrel = new THREE.Mesh(new THREE.CylinderGeometry(0.29, 0.29, 0.33, 24), this.chromeMaterial);
+            rimBarrel.rotation.z = Math.PI / 2;
+            wheelGroup.add(rimBarrel);
 
-            // 5 Double Spokes
+            const centerCap = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.34, 16), this.brakeCaliperMat);
+            centerCap.rotation.z = Math.PI / 2;
+            wheelGroup.add(centerCap);
+
             for (let i = 0; i < 5; i++) {
-                const spoke = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.04, 0.26, 0.05),
-                    this.carbonMaterial
-                );
-                spoke.rotation.x = (i * Math.PI * 2) / 5;
-                spoke.position.x = (pos.x > 0 ? 0.14 : -0.14);
-                wheelGroup.add(spoke);
+                const angle = (i * Math.PI * 2) / 5;
+                for (let offset of [-0.03, 0.03]) {
+                    const spoke = new THREE.Mesh(new THREE.BoxGeometry(0.03, 0.27, 0.04), this.carbonMaterial);
+                    spoke.rotation.x = angle + offset;
+                    spoke.position.x = (pos.x > 0 ? 0.16 : -0.16);
+                    wheelGroup.add(spoke);
+                }
             }
 
-            // Brake Disc & Caliper
-            const brakeDisc = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.24, 0.24, 0.04, 24),
-                this.chromeMaterial
-            );
+            const brakeDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.26, 0.04, 24), this.chromeMaterial);
             brakeDisc.rotation.z = Math.PI / 2;
             wheelGroup.add(brakeDisc);
 
-            const caliper = new THREE.Mesh(
-                new THREE.BoxGeometry(0.08, 0.14, 0.12),
-                this.brakeCaliperMat
-            );
-            caliper.position.set(0, 0.12, 0);
+            const caliper = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.16, 0.14), this.brakeCaliperMat);
+            caliper.position.set(0, 0.14, 0);
             wheelGroup.add(caliper);
 
             wheelGroup.position.set(pos.x, pos.y, pos.z);
-            this.carGroup.add(wheelGroup);
+            carContainer.add(wheelGroup);
             this.wheels.push(wheelGroup);
         });
 
-        this.scene.add(this.carGroup);
+        this.carGroup.add(carContainer);
     }
 
     setupLights() {
-        // Key Ambient Light
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        // Soft Studio Key & Bounce Lights
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
         this.scene.add(ambientLight);
 
-        // Directional Studio Sun Light with Soft Shadows
         const dirLight = new THREE.DirectionalLight(0xffffff, 1.8);
-        dirLight.position.set(8, 12, 10);
+        dirLight.position.set(8, 14, 10);
         dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 2048;
         dirLight.shadow.mapSize.height = 2048;
         dirLight.shadow.bias = -0.0001;
         this.scene.add(dirLight);
 
-        // Blue Rim Light for Cyber/Modern Aesthetic
-        const rimLight = new THREE.DirectionalLight(0x00d4ff, 1.2);
-        rimLight.position.set(-8, 6, -8);
+        const rimLight = new THREE.DirectionalLight(0x00d4ff, 1.3);
+        rimLight.position.set(-8, 7, -8);
         this.scene.add(rimLight);
 
-        // Warm Accent Light
-        const fillLight = new THREE.PointLight(0xff7700, 1.0, 15);
-        fillLight.position.set(0, 4, 3);
+        const fillLight = new THREE.PointLight(0xffaa44, 1.0, 15);
+        fillLight.position.set(0, 4, 4);
         this.scene.add(fillLight);
     }
 
     setupFloor() {
-        // Reflective Ground Shadow Plane
+        // Soft Ground Contact Shadow
         const shadowPlaneGeo = new THREE.PlaneGeometry(30, 30);
-        const shadowPlaneMat = new THREE.ShadowMaterial({
-            opacity: 0.55
-        });
+        const shadowPlaneMat = new THREE.ShadowMaterial({ opacity: 0.55 });
         const shadowPlane = new THREE.Mesh(shadowPlaneGeo, shadowPlaneMat);
         shadowPlane.rotation.x = -Math.PI / 2;
         shadowPlane.position.y = 0.01;
         shadowPlane.receiveShadow = true;
         this.scene.add(shadowPlane);
 
-        // Futuristic Radial Floor Grid
-        const gridHelper = new THREE.GridHelper(24, 24, 0x00d4ff, 0x222233);
+        // Futuristic Grid Floor
+        const gridHelper = new THREE.GridHelper(24, 24, 0x00d4ff, 0x1a1d29);
         gridHelper.position.y = 0.005;
         this.scene.add(gridHelper);
     }
 
     setupAudio() {
-        // Synthesizes 4.0L NA Flat-6 Rev Sound with Web Audio API
         try {
             this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         } catch (e) {
@@ -451,8 +593,7 @@ export class Porsche911Visualizer {
             let step = 0;
             const rumbleInterval = setInterval(() => {
                 this.carGroup.position.y = originalY + (Math.random() - 0.5) * 0.03;
-                // Spin wheels during rev!
-                this.wheels.forEach(w => w.rotation.x += 0.3);
+                if (this.wheels) this.wheels.forEach(w => w.rotation.x += 0.35);
                 step++;
                 if (step > 25) {
                     clearInterval(rumbleInterval);
@@ -467,13 +608,26 @@ export class Porsche911Visualizer {
         if (this.bodyMaterial) {
             this.bodyMaterial.color.setHex(hexColor);
         }
+        if (this.paintMeshes && this.paintMeshes.length > 0) {
+            this.paintMeshes.forEach(mesh => {
+                if (mesh.material) {
+                    if (Array.isArray(mesh.material)) {
+                        mesh.material.forEach(m => m.color && m.color.setHex(hexColor));
+                    } else if (mesh.material.color) {
+                        mesh.material.color.setHex(hexColor);
+                    }
+                }
+            });
+        }
     }
 
     toggleHeadlights() {
         this.lightsOn = !this.lightsOn;
-        this.headlights.forEach(light => {
-            light.intensity = this.lightsOn ? 2.0 : 0;
-        });
+        if (this.headlights) {
+            this.headlights.forEach(light => {
+                light.intensity = this.lightsOn ? 2.2 : 0;
+            });
+        }
         if (this.lightGlowMat) {
             this.lightGlowMat.opacity = this.lightsOn ? 0.95 : 0.2;
         }
@@ -492,21 +646,21 @@ export class Porsche911Visualizer {
     setPresetCamera(viewName) {
         if (!this.camera || !this.controls) return;
 
-        let targetPos = { x: 4.5, y: 2.2, z: 5.5 };
-        let targetLookAt = { x: 0, y: 0.6, z: 0 };
+        let targetPos = { x: 4.8, y: 2.1, z: 5.8 };
+        let targetLookAt = { x: 0, y: 0.62, z: 0 };
 
         switch (viewName) {
             case 'front':
-                targetPos = { x: 0, y: 1.2, z: 4.8 };
-                targetLookAt = { x: 0, y: 0.5, z: 0 };
+                targetPos = { x: 0, y: 1.15, z: 4.8 };
+                targetLookAt = { x: 0, y: 0.55, z: 0 };
                 break;
             case 'side':
-                targetPos = { x: 5.2, y: 1.1, z: 0 };
-                targetLookAt = { x: 0, y: 0.6, z: 0 };
+                targetPos = { x: 5.4, y: 1.1, z: 0 };
+                targetLookAt = { x: 0, y: 0.62, z: 0 };
                 break;
             case 'wing':
-                targetPos = { x: 2.2, y: 2.3, z: -3.8 };
-                targetLookAt = { x: 0, y: 1.2, z: -1.5 };
+                targetPos = { x: 2.2, y: 2.4, z: -3.8 };
+                targetLookAt = { x: 0, y: 1.25, z: -1.5 };
                 break;
             case 'cockpit':
                 targetPos = { x: 0.4, y: 1.15, z: 0.2 };
@@ -514,12 +668,11 @@ export class Porsche911Visualizer {
                 break;
             case 'orbit':
             default:
-                targetPos = { x: 4.5, y: 2.2, z: 5.5 };
-                targetLookAt = { x: 0, y: 0.6, z: 0 };
+                targetPos = { x: 4.8, y: 2.1, z: 5.8 };
+                targetLookAt = { x: 0, y: 0.62, z: 0 };
                 break;
         }
 
-        // Smooth GSAP transition if available
         if (typeof gsap !== 'undefined') {
             gsap.to(this.camera.position, {
                 x: targetPos.x,

@@ -514,38 +514,21 @@ export class Porsche911Visualizer {
     }
 
     setupLights() {
-        // Soft Studio Key & Bounce Lights
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+        // Clean Studio Environment Lighting (No extra glare/top spotlights)
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.95);
         this.scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.8);
-        dirLight.position.set(8, 14, 10);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+        dirLight.position.set(5, 8, 5);
         dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 2048;
         dirLight.shadow.mapSize.height = 2048;
         dirLight.shadow.bias = -0.0001;
         this.scene.add(dirLight);
 
-        const rimLight = new THREE.DirectionalLight(0x00d4ff, 1.3);
-        rimLight.position.set(-8, 7, -8);
+        const rimLight = new THREE.DirectionalLight(0x00d4ff, 0.6);
+        rimLight.position.set(-5, 4, -5);
         this.scene.add(rimLight);
-
-        const fillLight = new THREE.PointLight(0xffaa44, 1.0, 15);
-        fillLight.position.set(0, 4, 4);
-        this.scene.add(fillLight);
-
-        // Front Headlight Beam Spotlights
-        this.headlightSpotLeft = new THREE.SpotLight(0xffffff, 3.5, 22, Math.PI / 5, 0.35);
-        this.headlightSpotLeft.position.set(-0.65, 0.8, 2.0);
-        this.headlightSpotLeft.target.position.set(-0.65, 0.2, 9.0);
-        this.scene.add(this.headlightSpotLeft);
-        this.scene.add(this.headlightSpotLeft.target);
-
-        this.headlightSpotRight = new THREE.SpotLight(0xffffff, 3.5, 22, Math.PI / 5, 0.35);
-        this.headlightSpotRight.position.set(0.65, 0.8, 2.0);
-        this.headlightSpotRight.target.position.set(0.65, 0.2, 9.0);
-        this.scene.add(this.headlightSpotRight);
-        this.scene.add(this.headlightSpotRight.target);
     }
 
     setupFloor() {
@@ -636,10 +619,6 @@ export class Porsche911Visualizer {
 
     toggleHeadlights() {
         this.lightsOn = !this.lightsOn;
-        const targetIntensity = this.lightsOn ? 3.5 : 0;
-        
-        if (this.headlightSpotLeft) this.headlightSpotLeft.intensity = targetIntensity;
-        if (this.headlightSpotRight) this.headlightSpotRight.intensity = targetIntensity;
 
         if (this.headlights) {
             this.headlights.forEach(light => {

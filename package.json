@@ -4,6 +4,7 @@
   "description": "* https://drthummar.me/ --- ## Designed & Built by Dhruvil Thummar © 2025",
   "main": "index.js",
   "scripts": {
+    "build": "npx -y tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --minify || true",
     "build:css": "npx tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --minify",
     "watch:css": "npx tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --watch",
     "serve": "npx http-server . -p 3000 -c-1 --cors -o",

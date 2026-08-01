@@ -398,6 +398,7 @@ body.light-mode .premium-footer h4 {
     z-index: 100;
     background: rgba(5, 6, 12, 0.94);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -418,6 +419,7 @@ body.light-mode .premium-footer h4 {
     position: relative;
     width: min(1240px, 96vw);
     height: min(800px, 92vh);
+    height: min(800px, 92dvh);
     background: #0b0d14;
     border: 1px solid rgba(0, 212, 255, 0.25);
     border-radius: 1.25rem;
@@ -434,6 +436,7 @@ body.light-mode .premium-footer h4 {
     padding: 1rem 1.5rem;
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(11, 13, 20, 0.95));
     border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+    flex-shrink: 0;
 }
 
 .header-titles .brand-subtitle {
@@ -496,9 +499,64 @@ body.light-mode .premium-footer h4 {
 .porsche-canvas-box {
     flex: 1;
     width: 100%;
-    height: 100%;
+    min-height: 250px;
     position: relative;
     background: radial-gradient(circle at center, #131722 0%, #07080c 100%);
+    overflow: hidden;
+}
+
+/* 3D Loader Overlay */
+.porsche-loader-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(7, 8, 12, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+    z-index: 10;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+.porsche-loader-overlay.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+.loader-spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid rgba(0, 212, 255, 0.15);
+    border-top-color: #00d4ff;
+    border-radius: 50%;
+    animation: porsche-spin 0.8s linear infinite;
+}
+@keyframes porsche-spin {
+    to { transform: rotate(360deg); }
+}
+.loader-text {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #00d4ff;
+    font-family: monospace;
+    text-align: center;
+    padding: 0 1rem;
+}
+.loader-bar-bg {
+    width: 180px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    overflow: hidden;
+}
+.loader-bar-fill {
+    width: 5%;
+    height: 100%;
+    background: linear-gradient(90deg, #00d4ff, #0077ff);
+    border-radius: 999px;
+    transition: width 0.2s ease;
 }
 
 .porsche-controls-bar {
@@ -510,6 +568,7 @@ body.light-mode .premium-footer h4 {
     padding: 1.1rem 1.5rem;
     background: rgba(11, 13, 20, 0.95);
     border-top: 1px solid rgba(0, 212, 255, 0.15);
+    flex-shrink: 0;
 }
 
 .control-group {
@@ -594,14 +653,68 @@ body.light-mode .premium-footer h4 {
 }
 
 @media (max-width: 768px) {
+    .porsche-modal-backdrop {
+        padding: 0.35rem;
+    }
+    .porsche-modal-container {
+        width: 100%;
+        height: 96dvh;
+        max-height: 96vh;
+        border-radius: 1rem;
+    }
+    .porsche-modal-header {
+        padding: 0.65rem 0.9rem;
+    }
+    .header-titles .model-title {
+        font-size: 1.05rem;
+    }
+    .model-title .highlight-spec {
+        font-size: 0.75rem;
+        display: block;
+    }
+    .close-btn {
+        width: 32px;
+        height: 32px;
+        font-size: 0.85rem;
+    }
+    .porsche-canvas-box {
+        flex: 1;
+        min-height: 42vh;
+    }
     .porsche-controls-bar {
         flex-direction: column;
-        align-items: flex-start;
-        max-height: 220px;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 0.85rem;
+        max-height: 45vh;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        background: rgba(8, 10, 16, 0.98);
+    }
+    .control-group {
+        width: 100%;
+    }
+    .color-swatches {
+        justify-content: flex-start;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    .btn-grid {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 0.25rem;
+        -webkit-overflow-scrolling: touch;
+    }
+    .ctrl-btn {
+        white-space: nowrap;
+        padding: 0.45rem 0.75rem;
+        font-size: 0.72rem;
+        flex-shrink: 0;
     }
     .porsche-launcher-btn span.launcher-text {
         display: none;
     }
 }
+
 

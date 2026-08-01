@@ -9,6 +9,7 @@ export class Porsche911Visualizer {
         this.container = document.getElementById(containerId);
         if (!this.container) return;
 
+        this.isMobile = window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         this.currentColor = 0xd31027; // Default Guards Red
         this.lightsOn = true;
         this.wireframeMode = false;
@@ -38,59 +39,91 @@ export class Porsche911Visualizer {
         this.scene.background = new THREE.Color(0x06070a);
         this.scene.fog = new THREE.FogExp2(0x06070a, 0.03);
 
-        // Camera
-        this.camera = new THREE.PerspectiveCamera(36, width / height, 0.1, 100);
-        this.camera.position.set(4.8, 2.1, 5.8);
+        // Camera - Adaptive FOV and positioning for Mobile Phones
+        const fov = this.isMobile ? 44 : 36;
+        this.camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 100);
+        if (this.isMobile) {
+            this.camera.position.set(5.5, 2.4, 6.8);
+        } else {
+            this.camera.position.set(4.8, 2.1, 5.8);
+        }
 
         // Renderer
-        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        this.renderer = new THREE.WebGLRenderer({ antialias: !this.isMobile, alpha: true, powerPreference: "high-performance" });
         this.renderer.setSize(width, height);
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        const maxDpr = this.isMobile ? 1.5 : 2;
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxDpr));
         this.renderer.shadowMap.enabled = true;
-        this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        this.renderer.shadowMap.type = this.isMobile ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
         this.renderer.toneMappingExposure = 1.2;
         this.renderer.outputEncoding = THREE.sRGBEncoding;
 
-        // Clear container and append canvas
-        this.container.innerHTML = '';
+        // Container setup with loading UI
+        this.container.innerHTML = `
+            <div id="porsche-3d-loader" class="porsche-loader-overlay">
+                <div class="loader-spinner"></div>
+                <div class="loader-text" id="porsche-loader-text">Loading 3D Porsche Studio...</div>
+                <div class="loader-bar-bg"><div class="loader-bar-fill" id="porsche-loader-bar"></div></div>
+            </div>
+        `;
         this.container.appendChild(this.renderer.domElement);
+        this.renderer.domElement.style.touchAction = 'none';
 
-        // Controls
+        // Controls with Mobile Touch Support
         if (typeof THREE.OrbitControls !== 'undefined') {
             this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
             this.controls.enableDamping = true;
             this.controls.dampingFactor = 0.05;
             this.controls.maxPolarAngle = Math.PI / 2 - 0.01;
-            this.controls.minDistance = 2.0;
-            this.controls.maxDistance = 12;
+            this.controls.minDistance = 1.8;
+            this.controls.maxDistance = 14;
             this.controls.target.set(0, 0.62, 0);
+            this.controls.touches = {
+                ONE: THREE.TOUCH.ROTATE,
+                TWO: THREE.TOUCH.DOLLY_PAN
+            };
+        }
+    }
+
+    updateLoaderProgress(percent) {
+        const bar = document.getElementById('porsche-loader-bar');
+        const text = document.getElementById('porsche-loader-text');
+        if (bar) bar.style.width = percent + '%';
+        if (text) text.innerText = `Loading 3D Porsche Model (${percent}%)...`;
+    }
+
+    hideLoader() {
+        const loader = document.getElementById('porsche-3d-loader');
+        if (loader) {
+            loader.classList.add('fade-out');
+            setTimeout(() => {
+                if (loader.parentNode) loader.parentNode.removeChild(loader);
+            }, 450);
         }
     }
 
     setupEnvironmentMap() {
         // Procedural High-Dynamic Studio Environment Cube/Equirectangular Texture Map
         const canvas = document.createElement('canvas');
-        canvas.width = 512;
-        canvas.height = 256;
+        canvas.width = this.isMobile ? 256 : 512;
+        canvas.height = this.isMobile ? 128 : 256;
         const ctx = canvas.getContext('2d');
 
         // Studio Environment Gradient with Top Soft Light Box Highlights
-        const grad = ctx.createLinearGradient(0, 0, 0, 256);
+        const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
         grad.addColorStop(0, '#1e293b');
         grad.addColorStop(0.3, '#0f172a');
         grad.addColorStop(0.7, '#080c14');
         grad.addColorStop(1, '#020408');
         ctx.fillStyle = grad;
-        ctx.fillRect(0, 0, 512, 256);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Bright Soft Studio Ceiling Light Boxes for Realistic Metallic Sheen
         ctx.fillStyle = '#ffffff';
         ctx.shadowColor = '#00d4ff';
-        ctx.shadowBlur = 30;
-        ctx.fillRect(120, 20, 270, 45);
-        ctx.fillRect(40, 90, 100, 30);
-        ctx.fillRect(370, 90, 100, 30);
+        ctx.shadowBlur = 20;
+        ctx.fillRect(canvas.width * 0.23, canvas.height * 0.08, canvas.width * 0.53, canvas.height * 0.18);
 
         const envTexture = new THREE.CanvasTexture(canvas);
         envTexture.mapping = THREE.EquirectangularReflectionMapping;
@@ -106,7 +139,7 @@ export class Porsche911Visualizer {
         // Create PBR Materials with Environment Map Reflections
         this.createMaterials();
 
-        // Local Authentic 19.2MB Porsche 911 GT3 RS GLTF model
+        // Authentic 19.2MB Porsche 911 GT3 RS GLTF model
         const gltfUrl = './assets/porsche_gt3_rs.glb';
         this.paintMeshes = [];
 
@@ -173,15 +206,23 @@ export class Porsche911Visualizer {
                     });
 
                     this.carGroup.add(model);
+                    this.hideLoader();
                 },
-                undefined,
+                (xhr) => {
+                    if (xhr.lengthComputable && xhr.total > 0) {
+                        const percent = Math.round((xhr.loaded / xhr.total) * 100);
+                        this.updateLoaderProgress(percent);
+                    }
+                },
                 (error) => {
-                    console.warn("Error loading local GLTF model, rendering procedural fallback:", error);
+                    console.warn("Error loading GLTF model, rendering procedural fallback:", error);
                     this.buildProceduralPorsche();
+                    this.hideLoader();
                 }
             );
         } else {
             this.buildProceduralPorsche();
+            this.hideLoader();
         }
     }
 

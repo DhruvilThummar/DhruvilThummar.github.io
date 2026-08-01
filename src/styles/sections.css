@@ -131,6 +131,26 @@ body.light-mode .premium-footer {
     -webkit-user-select: none;
 }
 
+/* Footer Styling Enhancements */
+.premium-footer h4 {
+    position: relative;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+body.light-mode .premium-footer h4 {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.premium-footer ul li {
+    transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.25s ease;
+}
+
+.premium-footer ul li:hover {
+    transform: translateX(4px);
+    color: var(--accent-color);
+}
+
 /* Footer Grid Layout */
 .footer-grid-container {
     display: grid;

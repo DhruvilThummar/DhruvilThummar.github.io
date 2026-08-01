@@ -565,6 +565,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
     <!-- Three.js for 3D components -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <!-- Styles moved to src/styles/ service modules -->
 </head>
 
@@ -596,6 +597,11 @@
                 class="sidebar-link text-gray-300 hover:text-white hover:bg-gray-800/50 p-3 rounded-md transition-colors">Achievements</a>
             <a href="#contact"
                 class="sidebar-link text-gray-300 hover:text-white hover:bg-gray-800/50 p-3 rounded-md transition-colors">Contact</a>
+            <button id="sidebar-3d-btn"
+                class="w-full text-left flex items-center justify-between text-accent bg-accent/10 hover:bg-accent/20 p-3 rounded-md transition-colors font-semibold border border-accent/30 mt-2">
+                <span class="flex items-center gap-2.5"><i class="fa-solid fa-cube text-accent"></i> 3D Model Studio</span>
+                <span class="text-[10px] bg-accent text-black px-2 py-0.5 rounded font-extrabold">3D</span>
+            </button>
         </nav>
     </aside>
 
@@ -659,6 +665,12 @@
                 <a href="https://github.com/DhruvilThummar" target="_blank" rel="noopener noreferrer"
                     class="text-secondary hover:text-accent transition-colors text-xl"
                     aria-label="Visit my GitHub profile"><i class="fab fa-github" aria-hidden="true"></i></a>
+                <button id="navbar-3d-btn"
+                    class="navbar-3d-btn inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 hover:border-accent hover:shadow-[0_0_15px_rgba(0,212,255,0.4)] transition-all duration-300 font-semibold text-xs cursor-pointer"
+                    aria-label="Open 3D Model Studio">
+                    <i class="fa-solid fa-cube text-sm animate-pulse"></i>
+                    <span class="hidden sm:inline">3D Studio</span>
+                </button>
                 <button id="theme-toggle"
                     class="text-secondary hover:text-accent transition-colors text-xl w-8 h-8 flex items-center justify-center"
                     aria-label="Toggle dark/light mode">
@@ -690,9 +702,14 @@
                 </p> <br>
                 <div class="mt-6 flex flex-col sm:flex-row justify-center items-center gap-3">
                     <a href="#contact"
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border-color bg-black/30 text-secondary hover:border-accent hover:text-accent hover:shadow-[0_0_15px_rgba(0,210,255,0.3)] transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer">
-                        <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
-                        <span class="font-semibold text-primary">Open to Internships</span>
+                        class="internship-status-badge inline-flex items-center gap-2.5 px-4.5 py-2.5 rounded-full backdrop-blur-md transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer group">
+                        <span class="relative flex h-2.5 w-2.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
+                        </span>
+                        <i class="fa-solid fa-briefcase text-xs text-emerald-400 group-hover:scale-110 transition-transform"></i>
+                        <span class="font-mono text-xs text-emerald-400 uppercase tracking-widest font-bold group-hover:text-emerald-300">Available for Internships</span>
+                        <i class="fa-solid fa-arrow-right text-xs text-emerald-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300"></i>
                     </a>
                 </div>
                 <div id="hero-cta-container" class="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
@@ -1232,17 +1249,18 @@
                             </p>
                             <!-- Status dot indicator -->
                             <div class="pt-2">
-                                <div
-                                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-sm">
-                                    <span class="relative flex h-2 w-2">
+                                <a href="#contact"
+                                    class="internship-status-badge inline-flex items-center gap-2.5 px-4 py-2 rounded-full backdrop-blur-md transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer group">
+                                    <span class="relative flex h-2.5 w-2.5">
                                         <span
                                             class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_#10b981]"></span>
                                     </span>
                                     <span
-                                        class="text-[10px] font-mono text-emerald-500 uppercase tracking-widest font-bold">Available
+                                        class="text-xs font-mono text-emerald-400 uppercase tracking-widest font-bold group-hover:text-emerald-300">Available
                                         for Internships</span>
-                                </div>
+                                    <i class="fa-solid fa-arrow-right text-xs text-emerald-400 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300"></i>
+                                </a>
                             </div>
                         </div>
 

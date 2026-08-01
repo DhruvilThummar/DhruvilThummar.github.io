@@ -285,3 +285,323 @@ body.light-mode .premium-footer h4 {
     .iframe-scaler { display: none; }
     .project-live-preview { background: #0a0a1a; }
 }
+
+/* ── Navbar 3D Studio Button ───────────────────────────────── */
+.navbar-3d-btn {
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.18);
+    backdrop-filter: blur(8px);
+}
+
+.navbar-3d-btn:hover {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.45);
+    transform: translateY(-1px);
+}
+
+/* ── Internship Status Badge (PC & Responsive Enhancement) ──── */
+.internship-status-badge {
+    position: relative;
+    overflow: hidden;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.28);
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.12), inset 0 0 10px rgba(16, 185, 129, 0.05);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.internship-status-badge::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+    transform: skewX(-25deg);
+    transition: left 0.75s ease;
+}
+
+.internship-status-badge:hover::before {
+    left: 150%;
+}
+
+.internship-status-badge:hover {
+    background: rgba(16, 185, 129, 0.18);
+    border-color: rgba(52, 211, 153, 0.8);
+    box-shadow: 0 0 25px rgba(16, 185, 129, 0.38), 0 4px 15px rgba(0, 0, 0, 0.4);
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* Desktop PC Enhancements */
+@media (min-width: 1024px) {
+    .internship-status-badge {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        padding-top: 0.6rem;
+        padding-bottom: 0.6rem;
+    }
+    .internship-status-badge span {
+        font-size: 0.75rem !important;
+        letter-spacing: 0.12em !important;
+    }
+}
+
+/* ── 3D Floating Launcher Button ────────────────────────────── */
+.porsche-launcher-btn {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    z-index: 45;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.65rem 1.1rem;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(10, 12, 18, 0.95));
+    border: 1px solid rgba(0, 212, 255, 0.4);
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    backdrop-filter: blur(12px);
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 212, 255, 0.25);
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.porsche-launcher-btn:hover {
+    transform: translateY(-3px) scale(1.04);
+    border-color: rgba(0, 212, 255, 0.9);
+    box-shadow: 0 12px 32px rgba(0, 212, 255, 0.45);
+    color: #00d4ff;
+}
+
+.porsche-launcher-btn i {
+    color: #00d4ff;
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+.porsche-launcher-btn:hover i {
+    transform: scale(1.15) rotate(-5deg);
+}
+
+.launcher-badge {
+    background: #00d4ff;
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+}
+
+/* ── 3D Studio Panel Modal UI ───────────────────────────────── */
+.porsche-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    background: rgba(5, 6, 12, 0.94);
+    backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: modal-fade-in 0.3s ease-out;
+}
+
+@keyframes modal-fade-in {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.porsche-modal-backdrop.hidden {
+    display: none !important;
+}
+
+.porsche-modal-container {
+    position: relative;
+    width: min(1240px, 96vw);
+    height: min(800px, 92vh);
+    background: #0b0d14;
+    border: 1px solid rgba(0, 212, 255, 0.25);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 50px rgba(0, 212, 255, 0.15);
+}
+
+.porsche-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(11, 13, 20, 0.95));
+    border-bottom: 1px solid rgba(0, 212, 255, 0.15);
+}
+
+.header-titles .brand-subtitle {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--accent-color);
+}
+
+.header-titles .model-title {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #ffffff;
+    font-family: var(--font-display, sans-serif);
+}
+
+.model-title .highlight-spec {
+    color: #00d4ff;
+    font-size: 0.9rem;
+}
+
+.header-specs .spec-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    color: #e2e8f0;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.header-specs .spec-pill:hover {
+    border-color: rgba(0, 212, 255, 0.4);
+    background: rgba(0, 212, 255, 0.1);
+}
+
+.close-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.close-btn:hover {
+    background: #00d4ff;
+    border-color: #00d4ff;
+    color: #000;
+    transform: rotate(90deg) scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+}
+
+.porsche-canvas-box {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: radial-gradient(circle at center, #131722 0%, #07080c 100%);
+}
+
+.porsche-controls-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.1rem 1.5rem;
+    background: rgba(11, 13, 20, 0.95);
+    border-top: 1px solid rgba(0, 212, 255, 0.15);
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.group-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: #94a3b8;
+}
+
+.color-swatches {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.swatch.active, .swatch:hover {
+    transform: scale(1.25);
+    border-color: #ffffff;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+.btn-grid {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.ctrl-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #cbd5e1;
+    padding: 0.45rem 0.85rem;
+    border-radius: 0.6rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.ctrl-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.ctrl-btn.active {
+    background: rgba(0, 212, 255, 0.2);
+    border-color: #00d4ff;
+    color: #00d4ff;
+    box-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+}
+
+.rev-action-btn {
+    background: linear-gradient(135deg, #00d4ff, #0077ff);
+    border: none;
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+}
+
+.rev-action-btn:hover {
+    background: linear-gradient(135deg, #33e0ff, #1a88ff);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+}
+
+@media (max-width: 768px) {
+    .porsche-controls-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        max-height: 220px;
+        overflow-y: auto;
+    }
+    .porsche-launcher-btn span.launcher-text {
+        display: none;
+    }
+}
+

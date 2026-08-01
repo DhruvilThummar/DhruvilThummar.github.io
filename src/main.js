@@ -7,6 +7,7 @@ import { renderProjects } from './components/projects.js';
 import { renderSkills } from './components/skills.js';
 import { renderCertifications, renderAchievements } from './components/certifications.js';
 import { initFooter3D } from './components/footer3d.js';
+import { initPorscheShowcase } from './components/porscheModal.js';
 
 // Store original OG images for modal restore
 window._originalOgImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || "";
@@ -89,6 +90,26 @@ function setupNavbarScroll() {
 
 // ─── Matrix Background Canvas ─────────────────────────────────
 let animationFrameId;
+let isMatrixPaused = false;
+let currentDrawFunc = null;
+
+window.pauseBackgroundMatrix = function() {
+    isMatrixPaused = true;
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
+};
+
+window.resumeBackgroundMatrix = function() {
+    if (isMatrixPaused) {
+        isMatrixPaused = false;
+        if (currentDrawFunc && !animationFrameId) {
+            currentDrawFunc();
+        }
+    }
+};
+
 function setupBackgroundCanvas() {
     const canvas = document.getElementById("background-canvas");
     if (!canvas) return;
@@ -106,6 +127,7 @@ function setupBackgroundCanvas() {
         const drops = new Array(columns).fill(1);
         const charArray = characters.split("");
         function draw() {
+            if (isMatrixPaused) return;
             ctx.fillStyle = bgColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = textColor;
@@ -118,7 +140,8 @@ function setupBackgroundCanvas() {
             }
             animationFrameId = requestAnimationFrame(draw);
         }
-        draw();
+        currentDrawFunc = draw;
+        if (!isMatrixPaused) draw();
     };
     let resizeTimer;
     window.addEventListener("resize", () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(setup, 250); });
@@ -440,6 +463,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupThemeToggle();
     setupPodcastPlayer();
     initFooter3D();
+    initPorscheShowcase();
 });
 
 gsap.registerPlugin(TextPlugin);

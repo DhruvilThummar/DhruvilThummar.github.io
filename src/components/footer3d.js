@@ -181,9 +181,29 @@ export function initFooter3D() {
     observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     // Animation Loop
-    let lastTime = 0;
+    let footerAnimFrameId = null;
+    let isFooterPaused = false;
+
+    window.pauseFooter3D = function() {
+        isFooterPaused = true;
+        if (footerAnimFrameId) {
+            cancelAnimationFrame(footerAnimFrameId);
+            footerAnimFrameId = null;
+        }
+    };
+
+    window.resumeFooter3D = function() {
+        if (isFooterPaused) {
+            isFooterPaused = false;
+            if (!footerAnimFrameId) {
+                footerAnimFrameId = requestAnimationFrame(animate);
+            }
+        }
+    };
+
     function animate(time) {
-        requestAnimationFrame(animate);
+        if (isFooterPaused) return;
+        footerAnimFrameId = requestAnimationFrame(animate);
 
         // Smooth rotation interpolation (Inertia)
         mainGroup.rotation.y += (targetRotation.y - mainGroup.rotation.y) * 0.05;
@@ -223,7 +243,7 @@ export function initFooter3D() {
         renderer.render(scene, camera);
     }
 
-    requestAnimationFrame(animate);
+    footerAnimFrameId = requestAnimationFrame(animate);
 
     // Window Resize handler
     window.addEventListener("resize", () => {

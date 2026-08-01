@@ -36,12 +36,11 @@ function buildLivePreview(project) {
         </div>`;
 }
 
+// expose globally for iframe onerror
 function buildFallbackImg(src, title) {
     const url = src || `https://placehold.co/600x400/0a0a0a/00bfff?text=${encodeURIComponent(title)}`;
     return `<img src="${url}" alt="${title} screenshot" class="project-thumbnail w-full" loading="lazy">`;
 }
-
-// expose globally for iframe onerror
 window.buildFallbackImg = buildFallbackImg;
 
 export function renderProjects() {
@@ -233,6 +232,7 @@ export function openProjectModal(idx) {
     // Modal open animation from card coordinates
     modal.classList.remove('hidden');
     modal.classList.add('flex');
+    document.body.style.overflow = "hidden"; // Prevent background scroll
     
     gsap.killTweensOf(modalWrapper);
     gsap.fromTo(modalWrapper, 
@@ -304,12 +304,14 @@ export function closeProjectModal() {
             onComplete: () => {
                 modal.classList.add('hidden');
                 modal.classList.remove('flex');
+                document.body.style.overflow = ""; // Restore background scroll
                 gsap.set(modalWrapper, { x: 0, y: 0, scale: 1, opacity: 1 }); // reset position
             }
         });
     } else {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
+        document.body.style.overflow = ""; // Restore background scroll
     }
     const _orig = window._originalOgImage;
     const _origT = window._originalTwitterImage;

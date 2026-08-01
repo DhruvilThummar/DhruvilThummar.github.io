@@ -783,6 +783,7 @@ body.light-mode .mac-sidebar-icon {
     min-height: 0;
     display: flex;
     flex-direction: column;
+    -webkit-overflow-scrolling: touch;
 }
 
 .mac-sidebar-toggle-btn {

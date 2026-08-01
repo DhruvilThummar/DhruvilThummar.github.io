@@ -93,6 +93,84 @@
 
 /* ── Footer / Contact ───────────────────────────────────────── */
 #copyright { background-color: var(--footer-bg); padding: 1rem; border-top: 1px solid var(--border-color); text-align: center; }
+.premium-footer {
+    background: linear-gradient(to bottom, transparent, rgba(5, 5, 14, 0.95));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+body.light-mode .premium-footer {
+    background: linear-gradient(to bottom, transparent, rgba(240, 247, 255, 0.95));
+}
+.footer-nav-link {
+    position: relative;
+    display: inline-block;
+}
+.footer-nav-link::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: var(--accent-color);
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-out;
+}
+.footer-nav-link:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+#footer-3d-canvas-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    outline: none;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Footer Grid Layout */
+.footer-grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    align-items: start;
+    margin-bottom: 3rem;
+    text-align: left;
+}
+
+.footer-links-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+@media (min-width: 640px) {
+    .footer-links-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 768px) {
+    .footer-links-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .footer-grid-container {
+        grid-template-columns: repeat(12, 1fr);
+    }
+    .footer-links-grid {
+        grid-column: span 8;
+    }
+    .footer-3d-card {
+        grid-column: span 4;
+    }
+}
 
 /* ── Glow Link ──────────────────────────────────────────────── */
 .glow-link { transition: color 0.3s, text-shadow 0.3s; }

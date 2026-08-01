@@ -6,6 +6,7 @@
 import { renderProjects } from './components/projects.js';
 import { renderSkills } from './components/skills.js';
 import { renderCertifications, renderAchievements } from './components/certifications.js';
+import { initFooter3D } from './components/footer3d.js';
 
 // Store original OG images for modal restore
 window._originalOgImage = document.querySelector('meta[property="og:image"]')?.getAttribute('content') || "";
@@ -438,6 +439,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupContactForm();
     setupThemeToggle();
     setupPodcastPlayer();
+    initFooter3D();
 });
 
 gsap.registerPlugin(TextPlugin);

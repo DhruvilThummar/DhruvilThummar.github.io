@@ -563,6 +563,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/TextPlugin.min.js"></script>
+    <!-- Three.js for 3D components -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Styles moved to src/styles/ service modules -->
 </head>
 
@@ -687,11 +689,11 @@
                     <span class="text-accent font-semibold">Computer Engineering Student at L.J. University</span>
                 </p> <br>
                 <div class="mt-6 flex flex-col sm:flex-row justify-center items-center gap-3">
-                    <span
-                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border-color bg-black/30 text-secondary">
+                    <a href="#contact"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border-color bg-black/30 text-secondary hover:border-accent hover:text-accent hover:shadow-[0_0_15px_rgba(0,210,255,0.3)] transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer">
                         <i class="fa-solid fa-briefcase" aria-hidden="true"></i>
                         <span class="font-semibold text-primary">Open to Internships</span>
-                    </span>
+                    </a>
                 </div>
                 <div id="hero-cta-container" class="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
                     <a href="https://drive.google.com/file/d/1nrIPdXnacxYHWfA_fgeNbIMtEeH7bZJs/view?usp=sharing"
@@ -1129,7 +1131,7 @@
             <div id="achievements-grid"></div>
         </section>
 
-        <footer id="contact" class="pt-20 text-center view-section" aria-labelledby="contact-heading">
+        <section id="contact" role="region" class="pt-20 text-center view-section" aria-labelledby="contact-heading">
             <div class="container mx-auto px-4 sm:px-6">
                 <div class="glass-card rounded-lg p-8 md:p-12 max-w-4xl mx-auto">
                     <div class="contact-content">
@@ -1191,10 +1193,177 @@
                     </div>
                 </div>
             </div>
+        </section>
+
+        <footer class="premium-footer border-t border-border-color pt-16 pb-8 transition-colors duration-300">
+            <br>
+            <div class="container mx-auto px-4 sm:px-6">
+                <div class="footer-grid-container">
+                    <!-- Left: Footer Links -->
+                    <div class="footer-links-grid">
+                        <!-- Col 1: Brand & Status -->
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2">
+                                <svg id="footer-logo" class="w-28 h-auto transform hover:scale-105 transition-transform duration-300" viewBox="0 0 280 100" xmlns="http://www.w3.org/2000/svg"
+                                    aria-hidden="true">
+                                    <g>
+                                        <path id="footer-logo-path-signature"
+                                            d="M40 75 C 10 10, 100 10, 100 50 C 100 90, 40 95, 40 75 L 90 30 C 110 40, 115 75, 130 65 L 140 50 C 145 70, 155 70, 160 50 L 170 70 L 180 50 L 190 70 L 200 50 L 210 70 L 220 50 L 230 70 L 260 40"
+                                            stroke="var(--accent-color)" stroke-width="4" fill="none"
+                                            stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-dasharray="3000" stroke-dashoffset="3000">
+                                            <animate attributeName="stroke-dashoffset" from="3000" to="0" dur="5s" begin="5s"
+                                                fill="freeze" repeatCount="indefinite" />
+                                        </path>
+                                        <path id="footer-logo-path-strike" d="M20 68 C 100 55, 180 75, 270 62" stroke="var(--accent-secondary-color)"
+                                            stroke-width="3" fill="none" stroke-linecap="round"
+                                            stroke-dasharray="3000" stroke-dashoffset="3000">
+                                            <animate attributeName="stroke-dashoffset" from="3000" to="0" dur="5s" begin="5s"
+                                                fill="freeze" repeatCount="indefinite" />
+                                        </path>
+                                    </g>
+                                </svg>
+                            </div>
+                            <p class="text-secondary text-sm max-w-xs leading-relaxed">
+                                Computer Engineering student &amp; Full-Stack Developer specializing in Machine
+                                Learning, Data Analytics &amp; MERN Stack.
+                            </p>
+                            <!-- Status dot indicator -->
+                            <div class="flex items-center gap-2.5 pt-2">
+                                <span class="relative flex h-3 w-3">
+                                    <span
+                                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                                    <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                                </span>
+                                <span
+                                    class="text-xs font-mono text-emerald-500 uppercase tracking-wider font-semibold">Available
+                                    for Internships</span>
+                            </div>
+                        </div>
+
+                        <!-- Col 2: Navigation Links -->
+                        <div>
+                            <h4 class="text-primary font-semibold font-display mb-4 text-xs uppercase tracking-wider">
+                                Navigation</h4>
+                            <ul class="space-y-2.5 text-sm text-secondary">
+                                <li><a href="#home"
+                                        class="footer-nav-link hover:text-accent transition-colors duration-200">Home</a>
+                                </li>
+                                <li><a href="#about"
+                                        class="footer-nav-link hover:text-accent transition-colors duration-200">About</a>
+                                </li>
+                                <li><a href="#projects"
+                                        class="footer-nav-link hover:text-accent transition-colors duration-200">Projects</a>
+                                </li>
+                                <li><a href="#skills"
+                                        class="footer-nav-link hover:text-accent transition-colors duration-200">Skills</a>
+                                </li>
+                                <li><a href="#certifications"
+                                        class="footer-nav-link hover:text-accent transition-colors duration-200">Certifications</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Col 3: Specialties -->
+                        <div>
+                            <h4 class="text-primary font-semibold font-display mb-4 text-xs uppercase tracking-wider">
+                                Specialties</h4>
+                            <ul class="space-y-2.5 text-sm text-secondary">
+                                <li class="flex items-center gap-2"><i
+                                        class="fa-solid fa-code text-[10px] text-accent"></i> MERN Stack Dev</li>
+                                <li class="flex items-center gap-2"><i
+                                        class="fa-solid fa-brain text-[10px] text-accent"></i> Machine Learning</li>
+                                <li class="flex items-center gap-2"><i
+                                        class="fa-solid fa-chart-simple text-[10px] text-accent"></i> Data Analytics
+                                </li>
+                                <li class="flex items-center gap-2"><i
+                                        class="fa-solid fa-terminal text-[10px] text-accent"></i> Python Automation</li>
+                            </ul>
+                        </div>
+
+                        <!-- Col 4: Connect Links -->
+                        <div class="space-y-4">
+                            <div>
+                                <h4
+                                    class="text-primary font-semibold font-display mb-4 text-xs uppercase tracking-wider">
+                                    Connect</h4>
+                                <ul class="space-y-2.5 text-sm text-secondary">
+                                    <li>
+                                        <a href="https://www.linkedin.com/in/dhruvil-thummar-54422731a" target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="flex items-center gap-2 hover:text-accent transition-colors duration-200">
+                                            <i class="fab fa-linkedin w-4"></i> LinkedIn
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://github.com/DhruvilThummar" target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="flex items-center gap-2 hover:text-accent transition-colors duration-200">
+                                            <i class="fab fa-github w-4"></i> GitHub
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://www.instagram.com/dhruvil_thummar_03" target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="flex items-center gap-2 hover:text-accent transition-colors duration-200">
+                                            <i class="fab fa-instagram w-4"></i> Instagram
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="mailto:dhruvithummar1303@gmail.com"
+                                            class="flex items-center gap-2 hover:text-accent transition-colors duration-200">
+                                            <i class="fa-solid fa-envelope w-4"></i> Email
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: 3D Interactive Component -->
+                    <div
+                        class="footer-3d-card flex flex-col items-center justify-center relative min-h-[260px] bg-black/20 dark:bg-white/5 border border-border-color/30 rounded-2xl p-6 text-center backdrop-blur-md overflow-hidden hover:border-accent/50 transition-all duration-300 group shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
+                        <!-- Background glow effect -->
+                        <div
+                            class="absolute -top-10 -right-10 w-32 h-32 bg-accent/10 rounded-full blur-2xl group-hover:bg-accent/20 transition-all duration-300">
+                        </div>
+                        <div
+                            class="absolute -bottom-10 -left-10 w-32 h-32 bg-accent-secondary/10 rounded-full blur-2xl group-hover:bg-accent-secondary/20 transition-all duration-300">
+                        </div>
+
+                        <!-- 3D Canvas Container -->
+                        <div id="footer-3d-canvas-container"
+                            class="w-full h-44 cursor-grab active:cursor-grabbing relative z-10"></div>
+
+                        <div class="mt-4 relative z-10">
+                            <h5 class="text-xs font-mono text-accent uppercase tracking-widest font-bold">Orbital
+                                Digital Globe</h5>
+                            <p class="text-[10px] text-secondary mt-1 leading-relaxed">Drag to spin • Hover to shift
+                                position</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="border-t border-border-color my-8"></div>
+
+                <!-- Footer Bottom -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-secondary">
+                    <div class="flex items-center gap-2">
+                        <span>Designed &amp; Built by</span>
+                        <a href="https://github.com/DhruvilThummar" target="_blank" rel="noopener noreferrer"
+                            class="text-primary font-semibold hover:text-accent transition-colors">Dhruvil Thummar</a>
+                    </div>
+                    <div class="flex items-center gap-4 font-mono text-xs">
+                        <span>&copy; 2026 All rights reserved.</span>
+                        <a href="#home" class="flex items-center gap-1 hover:text-accent transition-colors"
+                            aria-label="Scroll back to top">
+                            Back to top <i class="fas fa-arrow-up text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
         </footer>
-        <div id="copyright" class="text-center text-secondary text-sm">
-            Designed &amp; Built by Dhruvil Thummar &copy; 2026
-        </div>
     </main>
 
     <!-- Podcast Mini Player (Fixed position when scrolled) -->

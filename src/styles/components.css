@@ -11,11 +11,11 @@
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border-color);
 }
-#header-logo path {
+#header-logo path, #footer-logo path {
     stroke: var(--text-primary); stroke-width: 5; fill: none;
     transition: stroke 0.3s ease, filter 0.3s ease;
 }
-#header-logo:hover path { stroke: var(--accent-color); filter: drop-shadow(0 0 8px var(--accent-color)); }
+#header-logo:hover path, #footer-logo:hover path { stroke: var(--accent-color); filter: drop-shadow(0 0 8px var(--accent-color)); }
 
 /* ── Sidebar ────────────────────────────────────────────────── */
 #sidebar-menu { transition: transform 0.3s ease-in-out; }

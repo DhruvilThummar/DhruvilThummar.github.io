@@ -533,6 +533,19 @@ export class Porsche911Visualizer {
         const fillLight = new THREE.PointLight(0xffaa44, 1.0, 15);
         fillLight.position.set(0, 4, 4);
         this.scene.add(fillLight);
+
+        // Front Headlight Beam Spotlights
+        this.headlightSpotLeft = new THREE.SpotLight(0xffffff, 3.5, 22, Math.PI / 5, 0.35);
+        this.headlightSpotLeft.position.set(-0.65, 0.8, 2.0);
+        this.headlightSpotLeft.target.position.set(-0.65, 0.2, 9.0);
+        this.scene.add(this.headlightSpotLeft);
+        this.scene.add(this.headlightSpotLeft.target);
+
+        this.headlightSpotRight = new THREE.SpotLight(0xffffff, 3.5, 22, Math.PI / 5, 0.35);
+        this.headlightSpotRight.position.set(0.65, 0.8, 2.0);
+        this.headlightSpotRight.target.position.set(0.65, 0.2, 9.0);
+        this.scene.add(this.headlightSpotRight);
+        this.scene.add(this.headlightSpotRight.target);
     }
 
     setupFloor() {
@@ -623,23 +636,55 @@ export class Porsche911Visualizer {
 
     toggleHeadlights() {
         this.lightsOn = !this.lightsOn;
+        const targetIntensity = this.lightsOn ? 3.5 : 0;
+        
+        if (this.headlightSpotLeft) this.headlightSpotLeft.intensity = targetIntensity;
+        if (this.headlightSpotRight) this.headlightSpotRight.intensity = targetIntensity;
+
         if (this.headlights) {
             this.headlights.forEach(light => {
-                light.intensity = this.lightsOn ? 2.2 : 0;
+                if (light.spot) light.spot.intensity = this.lightsOn ? 2.2 : 0;
+                else if (light.intensity !== undefined) light.intensity = this.lightsOn ? 2.2 : 0;
             });
         }
         if (this.lightGlowMat) {
-            this.lightGlowMat.opacity = this.lightsOn ? 0.95 : 0.2;
+            this.lightGlowMat.opacity = this.lightsOn ? 0.95 : 0.1;
+        }
+
+        // Traverse GLTF scene to toggle emissive materials on headlights/lamps
+        if (this.carGroup) {
+            this.carGroup.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    const toggleEmissive = (m) => {
+                        const nameStr = ((child.name || '') + (m.name || '')).toLowerCase();
+                        if (nameStr.includes('light') || nameStr.includes('lamp') || nameStr.includes('glass') || nameStr.includes('headlight')) {
+                            if (m.emissive) {
+                                m.emissive.setHex(this.lightsOn ? 0xffffff : 0x000000);
+                                m.emissiveIntensity = this.lightsOn ? 1.8 : 0;
+                            }
+                        }
+                    };
+                    if (Array.isArray(child.material)) child.material.forEach(toggleEmissive);
+                    else toggleEmissive(child.material);
+                }
+            });
         }
     }
 
     toggleWireframe() {
         this.wireframeMode = !this.wireframeMode;
-        if (this.bodyMaterial) {
-            this.bodyMaterial.wireframe = this.wireframeMode;
-        }
-        if (this.carbonMaterial) {
-            this.carbonMaterial.wireframe = this.wireframeMode;
+        
+        // Traverse carGroup (both GLTF & procedural meshes) to toggle wireframe
+        if (this.carGroup) {
+            this.carGroup.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    if (Array.isArray(child.material)) {
+                        child.material.forEach(m => m.wireframe = this.wireframeMode);
+                    } else {
+                        child.material.wireframe = this.wireframeMode;
+                    }
+                }
+            });
         }
     }
 

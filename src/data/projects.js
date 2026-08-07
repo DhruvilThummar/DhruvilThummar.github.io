@@ -10,7 +10,7 @@ export const projectsData = [
             "A 3-tier microservice platform (React SPA + Node.js Gateway + Django ML) predicting commodity valuations across 12 crop types. Trained ensemble models achieving 83.10% accuracy and 0.9131 ROC-AUC. Integrated live web scrapers and a 100k-sample Pandas analytics pipeline.",
         tags: ["Django", "Scikit-Learn", "Node.js", "React", "Pandas", "MongoDB"],
         githubUrl: "https://github.com/DhruvilThummar/AgriPulse-AI",
-        liveUrl: null,
+        liveUrl: "https://agricastai.vercel.app/",
         imageUrl: "https://placehold.co/600x400/000000/00BFFF?text=AgriPulse+AI",
         featured: true,
         features: [

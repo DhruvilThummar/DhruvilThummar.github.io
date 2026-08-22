@@ -249,18 +249,20 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
         {/* Main Aerodynamic Chassis */}
         <mesh position={[0, 0.4, 0]} castShadow receiveShadow>
           <boxGeometry args={[1.85, 0.45, 4.1]} />
-          <meshStandardMaterial
+          <meshPhysicalMaterial
             color="#09090B"
-            roughness={0.15}
-            metalness={0.85}
-            envMapIntensity={1.5}
+            roughness={0.08}
+            metalness={0.92}
+            clearcoat={1.0}
+            clearcoatRoughness={0.04}
+            envMapIntensity={2.5}
           />
         </mesh>
 
         {/* Lower Front Splitter / Side Skirts */}
         <mesh position={[0, 0.2, 0]} castShadow>
           <boxGeometry args={[1.92, 0.15, 4.2]} />
-          <meshStandardMaterial color="#18181B" roughness={0.3} metalness={0.9} />
+          <meshStandardMaterial color="#18181B" roughness={0.2} metalness={0.95} />
         </mesh>
 
         {/* Fastback Cabin & Tinted Glass Cockpit */}
@@ -268,33 +270,37 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
           <boxGeometry args={[1.45, 0.42, 2.2]} />
           <meshPhysicalMaterial
             color="#09090B"
-            roughness={0.1}
-            metalness={0.9}
-            transmission={0.4}
+            roughness={0.05}
+            metalness={0.95}
+            transmission={0.5}
             transparent
             opacity={0.95}
           />
         </mesh>
 
-        {/* Front Headlight LED Lightstrips (Cyan / White Bloom) */}
+        {/* Front Headlight LED Lightstrips (Hyper-Bright Cyan Bloom) */}
         <mesh position={[-0.7, 0.42, -2.06]}>
-          <boxGeometry args={[0.35, 0.08, 0.08]} />
+          <boxGeometry args={[0.38, 0.09, 0.08]} />
           <meshStandardMaterial
-            color="#38BDF8"
-            emissive="#38BDF8"
-            emissiveIntensity={4.5}
+            color="#60A5FA"
+            emissive="#60A5FA"
+            emissiveIntensity={8.0}
             toneMapped={false}
           />
         </mesh>
         <mesh position={[0.7, 0.42, -2.06]}>
-          <boxGeometry args={[0.35, 0.08, 0.08]} />
+          <boxGeometry args={[0.38, 0.09, 0.08]} />
           <meshStandardMaterial
-            color="#38BDF8"
-            emissive="#38BDF8"
-            emissiveIntensity={4.5}
+            color="#60A5FA"
+            emissive="#60A5FA"
+            emissiveIntensity={8.0}
             toneMapped={false}
           />
         </mesh>
+
+        {/* Dynamic Forward Headlight Beams (Spotlights) */}
+        <pointLight position={[-0.7, 0.45, -2.2]} intensity={18.0} distance={15} color="#60A5FA" />
+        <pointLight position={[0.7, 0.45, -2.2]} intensity={18.0} distance={15} color="#60A5FA" />
 
         {/* Rear Taillight Continuous LED Bar (Apex Neon Red Bloom) */}
         <mesh position={[0, 0.46, 2.06]}>
@@ -302,16 +308,22 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
           <meshStandardMaterial
             color="#EF4444"
             emissive="#EF4444"
-            emissiveIntensity={6.0}
+            emissiveIntensity={10.0}
             toneMapped={false}
           />
         </mesh>
+
+        {/* Dynamic Rear Taillight Road Illumination */}
+        <pointLight position={[0, 0.46, 2.3]} intensity={14.0} distance={8} color="#EF4444" />
+
+        {/* Futuristic Cyber Neon Chassis Underglow */}
+        <pointLight position={[0, 0.15, 0]} intensity={12.0} distance={5} color="#0066CC" />
 
         {/* Rear Aerodynamic GT Wing / Spoiler */}
         <group position={[0, 0.82, 1.85]}>
           <mesh position={[0, 0.1, 0]} castShadow>
             <boxGeometry args={[1.8, 0.05, 0.35]} />
-            <meshStandardMaterial color="#09090B" roughness={0.2} metalness={0.8} />
+            <meshStandardMaterial color="#09090B" roughness={0.15} metalness={0.85} />
           </mesh>
           <mesh position={[-0.65, -0.05, 0]}>
             <boxGeometry args={[0.06, 0.25, 0.2]} />
@@ -384,12 +396,19 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
   );
 }
 
+interface SmashableObjectItem {
+  id: number;
+  type: 'glassCube' | 'metallicSphere' | 'neonPrism';
+  position: [number, number, number];
+  scale: number;
+}
+
 // ==========================================
 // 2. Smashable Interactive Geometric RigidBodies
 // ==========================================
 function SmashableObjects() {
   const objects = useMemo(() => {
-    const list = [];
+    const list: SmashableObjectItem[] = [];
     const types: Array<'glassCube' | 'metallicSphere' | 'neonPrism'> = [
       'glassCube',
       'metallicSphere',
@@ -510,10 +529,11 @@ function GameScene({
 }: VehicleProps & { isMobile: boolean }) {
   return (
     <>
-      <ambientLight intensity={0.8} />
+      <ambientLight intensity={0.9} />
+      {/* Key Sun Directional Light */}
       <directionalLight
         position={[25, 35, 20]}
-        intensity={1.8}
+        intensity={2.2}
         castShadow={!isMobile} // Optimize shadows on mobile
         shadow-mapSize={isMobile ? [1024, 1024] : [2048, 2048]}
         shadow-camera-left={-30}
@@ -522,6 +542,9 @@ function GameScene({
         shadow-camera-bottom={-30}
         shadow-bias={-0.0001}
       />
+
+      {/* Futuristic Metallic Rim Light */}
+      <directionalLight position={[-25, 30, -25]} intensity={1.4} color="#60A5FA" />
       <Environment preset="city" />
 
       <Physics gravity={[0, -9.81, 0]}>
@@ -645,7 +668,7 @@ export default function InteractiveHeroCar() {
 
       if (driveKeys.includes(e.code) || driveKeys.includes(e.key)) {
         // Prevent default native page scrolling if user is engaged on page
-        const activeElem = document.activeElement;
+        const activeElem = document.activeElement as HTMLElement | null;
         const isInputElement =
           activeElem &&
           (activeElem.tagName === 'INPUT' ||

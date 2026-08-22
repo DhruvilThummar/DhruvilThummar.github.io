@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google';
 import './globals.css';
 import { CommandPalette } from '@/components/ui/CommandPalette';
 import { PWAInitializer } from '@/components/PWAInitializer';
+import { SmoothScrollProvider } from '@/components/SmoothScrollProvider';
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -153,10 +154,12 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="bg-[#FCFCFC] text-[#09090B] antialiased selection:bg-[#09090B] selection:text-white">
-        <PWAInitializer />
-        <CommandPalette />
-        {children}
+      <body className="bg-[#FCFCFC] text-[#09090B] antialiased selection:bg-[#09090B] selection:text-white overflow-x-hidden">
+        <SmoothScrollProvider>
+          <PWAInitializer />
+          <CommandPalette />
+          {children}
+        </SmoothScrollProvider>
       </body>
     </html>
   );

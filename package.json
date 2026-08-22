@@ -23,11 +23,15 @@
   "dependencies": {
     "@react-three/drei": "^9.121.5",
     "@react-three/fiber": "^9.0.0-rc.1",
+    "@react-three/postprocessing": "^3.0.5",
+    "@react-three/rapier": "^2.2.0",
+    "@studio-freight/react-lenis": "^0.0.47",
     "cmdk": "^1.1.1",
     "framer-motion": "^11.18.2",
     "gsap": "^3.15.0",
     "lucide-react": "^0.475.0",
     "next": "^16.3.2",
+    "postprocessing": "^6.39.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "three": "^0.173.0"

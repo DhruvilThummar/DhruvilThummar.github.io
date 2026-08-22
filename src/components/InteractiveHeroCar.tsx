@@ -529,7 +529,12 @@ function GameScene({
 }: VehicleProps & { isMobile: boolean }) {
   return (
     <>
-      <ambientLight intensity={0.9} />
+      {/* 💡 Atmospheric Depth Fog for Infinite Smooth Horizon Fade */}
+      <fog attach="fog" args={['#FCFCFC', 18, 85]} />
+
+      {/* 💡 Natural Soft Sky/Ground Hemisphere Ambient Fill Light */}
+      <hemisphereLight args={['#FFFFFF', '#E4E4E7', 0.85]} />
+
       {/* Key Sun Directional Light */}
       <directionalLight
         position={[25, 35, 20]}
@@ -545,6 +550,9 @@ function GameScene({
 
       {/* Futuristic Metallic Rim Light */}
       <directionalLight position={[-25, 30, -25]} intensity={1.4} color="#60A5FA" />
+
+      {/* Distant Cyber Blue Background Ambient Light */}
+      <pointLight position={[0, 12, -35]} intensity={30.0} color="#38BDF8" distance={65} />
       <Environment preset="city" />
 
       <Physics gravity={[0, -9.81, 0]}>
@@ -582,8 +590,8 @@ function GameScene({
         color="#000000"
       />
 
-      {/* 💡 Adaptive Mobile Tiering: Skip Bloom on Mobile to prevent GPU throttling */}
-      {!isMobile ? (
+      {/* 💡 Adaptive Mobile Tiering: Skip Post-Processing on Mobile for maximum performance */}
+      {!isMobile && (
         <EffectComposer>
           <Bloom
             intensity={1.2}
@@ -591,10 +599,6 @@ function GameScene({
             luminanceSmoothing={0.85}
           />
           <Vignette offset={0.3} darkness={0.45} />
-        </EffectComposer>
-      ) : (
-        <EffectComposer>
-          <Vignette offset={0.3} darkness={0.35} />
         </EffectComposer>
       )}
     </>

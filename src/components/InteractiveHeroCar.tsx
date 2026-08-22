@@ -200,9 +200,18 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
     });
 
     // ------------------------------------------
-    // E. Cinematic Chase Camera System
+    // E. Infinite World Position Wrap Safeguard
     // ------------------------------------------
     const pos = rigidBodyRef.current.translation();
+    if (Math.abs(pos.x) > 160 || Math.abs(pos.z) > 160) {
+      const newX = Math.abs(pos.x) > 160 ? (pos.x > 0 ? -120 : 120) : pos.x;
+      const newZ = Math.abs(pos.z) > 160 ? (pos.z > 0 ? -120 : 120) : pos.z;
+      rigidBodyRef.current.setTranslation({ x: newX, y: pos.y, z: pos.z }, true);
+    }
+
+    // ------------------------------------------
+    // F. Cinematic Chase Camera System
+    // ------------------------------------------
     const carPos = new THREE.Vector3(pos.x, pos.y, pos.z);
 
     // Dynamic offset behind car
@@ -518,6 +527,44 @@ function SmashableObjects() {
 }
 
 // ==========================================
+// Dynamic Truly Infinite Floor Component
+// ==========================================
+function InfiniteFloor() {
+  const floorRef = useRef<THREE.Mesh>(null);
+  const gridRef = useRef<THREE.GridHelper>(null);
+
+  useFrame((state) => {
+    const camPos = state.camera.position;
+    if (floorRef.current) {
+      floorRef.current.position.x = camPos.x;
+      floorRef.current.position.z = camPos.z;
+    }
+    if (gridRef.current) {
+      gridRef.current.position.x = Math.floor(camPos.x / 4) * 4;
+      gridRef.current.position.z = Math.floor(camPos.z / 4) * 4;
+    }
+  });
+
+  return (
+    <group>
+      {/* Infinite Fixed Collider Floor */}
+      <RigidBody type="fixed" friction={0.7} restitution={0.2}>
+        <CuboidCollider args={[400, 0.5, 400]} position={[0, -0.5, 0]} />
+      </RigidBody>
+
+      {/* Dynamic Visual Floor Plane Following Camera */}
+      <mesh ref={floorRef} position={[0, -0.01, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[600, 600]} />
+        <meshStandardMaterial color="#F4F4F5" roughness={0.75} metalness={0.01} />
+      </mesh>
+
+      {/* Dynamic Grid Following Camera Snapped to Grid Units */}
+      <gridHelper ref={gridRef} args={[600, 300, '#D4D4D8', '#E4E4E7']} position={[0, 0.01, 0]} />
+    </group>
+  );
+}
+
+// ==========================================
 // 3. Main Scene Setup with Adaptive Mobile FX
 // ==========================================
 function GameScene({
@@ -556,17 +603,8 @@ function GameScene({
       <Environment preset="city" />
 
       <Physics gravity={[0, -9.81, 0]}>
-        {/* Infinite Soft Matte Floor */}
-        <RigidBody type="fixed" friction={0.7} restitution={0.2}>
-          <CuboidCollider args={[150, 0.5, 150]} position={[0, -0.5, 0]} />
-        </RigidBody>
-
-        <mesh position={[0, -0.01, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-          <planeGeometry args={[300, 300]} />
-          <meshStandardMaterial color="#F4F4F5" roughness={0.75} metalness={0.01} />
-        </mesh>
-
-        <gridHelper args={[300, 150, '#D4D4D8', '#E4E4E7']} position={[0, 0.01, 0]} />
+        {/* Dynamic Infinite Floor & Grid */}
+        <InfiniteFloor />
 
         {/* Driveable Raycast Arcade Vehicle */}
         <ArcadeVehicle
@@ -687,6 +725,36 @@ export default function InteractiveHeroCar() {
 
     window.addEventListener('keydown', handleKeyDown, { passive: false });
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isInView]);
+
+  // ------------------------------------------
+  // 💡 Universal Touch & Mobile Swipe Lock (Eliminates Drag/Swipe Scroll Jumps)
+  // ------------------------------------------
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const preventScroll = (e: Event) => {
+      if (e.cancelable && isInView) {
+        const activeElem = document.activeElement as HTMLElement | null;
+        const isInputElement =
+          activeElem &&
+          (activeElem.tagName === 'INPUT' ||
+            activeElem.tagName === 'TEXTAREA' ||
+            activeElem.isContentEditable);
+        if (!isInputElement) {
+          e.preventDefault();
+        }
+      }
+    };
+
+    container.addEventListener('touchmove', preventScroll, { passive: false });
+    container.addEventListener('touchstart', preventScroll, { passive: false });
+
+    return () => {
+      container.removeEventListener('touchmove', preventScroll);
+      container.removeEventListener('touchstart', preventScroll);
+    };
   }, [isInView]);
 
   const handleTouchStart = (control: keyof MobileControlsState) => {

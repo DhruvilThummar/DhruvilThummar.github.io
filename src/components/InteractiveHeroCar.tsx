@@ -120,9 +120,9 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
     // ------------------------------------------
     // A. Driving Dynamics & Acceleration Tuning
     // ------------------------------------------
-    const acceleration = 38.0;
+    const acceleration = 45.0;
     const reverseAccel = 22.0;
-    const maxSpeed = 32.0; // ~115 km/h top speed inside Hero section
+    const maxSpeed = 42.0; // ~115 km/h top speed inside Hero section
     const steerSpeed = 2.4;
 
     // Apply forward/backward propulsion
@@ -203,9 +203,9 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
     // E. Infinite World Position Wrap Safeguard
     // ------------------------------------------
     const pos = rigidBodyRef.current.translation();
-    if (Math.abs(pos.x) > 160 || Math.abs(pos.z) > 160) {
-      const newX = Math.abs(pos.x) > 160 ? (pos.x > 0 ? -120 : 120) : pos.x;
-      const newZ = Math.abs(pos.z) > 160 ? (pos.z > 0 ? -120 : 120) : pos.z;
+    if (Math.abs(pos.x) > 350 || Math.abs(pos.z) > 350) {
+      const newX = Math.abs(pos.x) > 350 ? (pos.x > 0 ? -120 : 120) : pos.x;
+      const newZ = Math.abs(pos.z) > 350 ? (pos.z > 0 ? -120 : 120) : pos.z;
       rigidBodyRef.current.setTranslation({ x: newX, y: pos.y, z: pos.z }, true);
     }
 
@@ -438,11 +438,28 @@ function SmashableObjects() {
       { x: 0, z: -20 },
       { x: -18, z: -28 },
       { x: 18, z: -28 },
+      { x: -25, z: -45 },
+      { x: 25, z: -45 },
+      { x: -10, z: -55 },
+      { x: 10, z: -55 },
+      { x: 0, z: -60 },
+      { x: -30, z: -75 },
+      { x: 30, z: -75 },
+      { x: -15, z: -85 },
+      { x: 15, z: -85 },
+      { x: 0, z: -95 },
+      { x: -40, z: -105 },
+      { x: 40, z: -105 },
+      { x: -20, z: -120 },
+      { x: 20, z: -120 },
+      { x: 0, z: -135 },
+      { x: -35, z: -150 },
+      { x: 35, z: -150 },
     ];
 
     coordinates.forEach((coord, i) => {
       const type = types[i % types.length];
-      const scale = 0.8 + (i % 3) * 0.35;
+      const scale = 0.8 + (i % 4) * 0.35;
       list.push({ id: i, type, position: [coord.x, scale + 0.5, coord.z] as [number, number, number], scale });
     });
 
@@ -527,19 +544,36 @@ function SmashableObjects() {
 }
 
 // ==========================================
-// 🚀 Stunt Jump Ramps & Cyber Checkpoint Gates
+// 🚀 Stunt Jump Ramps & Cyber Checkpoint Gates (Mega Arena)
 // ==========================================
 function ArenaTrackFeatures() {
   const ramps = [
-    { position: [0, 0.45, -18] as [number, number, number], rotation: [-0.3, 0, 0] as [number, number, number] },
-    { position: [-16, 0.45, -34] as [number, number, number], rotation: [-0.3, 0.4, 0] as [number, number, number] },
-    { position: [16, 0.45, -34] as [number, number, number], rotation: [-0.3, -0.4, 0] as [number, number, number] },
+    { position: [0, 0.55, -22] as [number, number, number], rotation: [-0.35, 0, 0] as [number, number, number], scale: [6.0, 0.3, 5.0] },
+    { position: [-22, 0.5, -45] as [number, number, number], rotation: [-0.32, 0.4, 0] as [number, number, number], scale: [5.0, 0.25, 4.5] },
+    { position: [22, 0.5, -45] as [number, number, number], rotation: [-0.32, -0.4, 0] as [number, number, number], scale: [5.0, 0.25, 4.5] },
+    { position: [0, 0.55, -80] as [number, number, number], rotation: [-0.35, 0, 0] as [number, number, number], scale: [6.5, 0.3, 5.5] },
+    { position: [-30, 0.5, -110] as [number, number, number], rotation: [-0.32, 0.3, 0] as [number, number, number], scale: [5.0, 0.25, 4.5] },
+    { position: [30, 0.5, -110] as [number, number, number], rotation: [-0.32, -0.3, 0] as [number, number, number], scale: [5.0, 0.25, 4.5] },
   ];
 
   const gateArches = [
     { position: [0, 0, -12] as [number, number, number] },
-    { position: [-18, 0, -26] as [number, number, number] },
-    { position: [18, 0, -26] as [number, number, number] },
+    { position: [-22, 0, -32] as [number, number, number] },
+    { position: [22, 0, -32] as [number, number, number] },
+    { position: [0, 0, -60] as [number, number, number] },
+    { position: [-30, 0, -95] as [number, number, number] },
+    { position: [30, 0, -95] as [number, number, number] },
+  ];
+
+  const lightPillars = [
+    { position: [-50, 0, -20] as [number, number, number] },
+    { position: [50, 0, -20] as [number, number, number] },
+    { position: [-50, 0, -60] as [number, number, number] },
+    { position: [50, 0, -60] as [number, number, number] },
+    { position: [-50, 0, -100] as [number, number, number] },
+    { position: [50, 0, -100] as [number, number, number] },
+    { position: [-50, 0, -140] as [number, number, number] },
+    { position: [50, 0, -140] as [number, number, number] },
   ];
 
   return (
@@ -550,17 +584,17 @@ function ArenaTrackFeatures() {
           <group>
             {/* Main Ramp Surface */}
             <mesh castShadow receiveShadow>
-              <boxGeometry args={[4.5, 0.25, 4.0]} />
+              <boxGeometry args={ramp.scale as [number, number, number]} />
               <meshStandardMaterial color="#09090B" roughness={0.2} metalness={0.8} />
             </mesh>
             {/* Glowing Cyan LED Edge Strips */}
-            <mesh position={[-2.2, 0.15, 0]}>
-              <boxGeometry args={[0.1, 0.08, 4.0]} />
-              <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={3.5} toneMapped={false} />
+            <mesh position={[-ramp.scale[0] / 2, 0.15, 0]}>
+              <boxGeometry args={[0.12, 0.1, ramp.scale[2]]} />
+              <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={4.0} toneMapped={false} />
             </mesh>
-            <mesh position={[2.2, 0.15, 0]}>
-              <boxGeometry args={[0.1, 0.08, 4.0]} />
-              <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={3.5} toneMapped={false} />
+            <mesh position={[ramp.scale[0] / 2, 0.15, 0]}>
+              <boxGeometry args={[0.12, 0.1, ramp.scale[2]]} />
+              <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={4.0} toneMapped={false} />
             </mesh>
           </group>
         </RigidBody>
@@ -570,19 +604,33 @@ function ArenaTrackFeatures() {
       {gateArches.map((gate, i) => (
         <group key={`gate-${i}`} position={gate.position}>
           {/* Left Pillar */}
-          <mesh position={[-4.5, 2.5, 0]} castShadow>
-            <cylinderGeometry args={[0.15, 0.15, 5.0, 16]} />
-            <meshStandardMaterial color="#0066CC" emissive="#0066CC" emissiveIntensity={2.5} toneMapped={false} />
+          <mesh position={[-5.0, 3.0, 0]} castShadow>
+            <cylinderGeometry args={[0.18, 0.18, 6.0, 16]} />
+            <meshStandardMaterial color="#0066CC" emissive="#0066CC" emissiveIntensity={3.0} toneMapped={false} />
           </mesh>
           {/* Right Pillar */}
-          <mesh position={[4.5, 2.5, 0]} castShadow>
-            <cylinderGeometry args={[0.15, 0.15, 5.0, 16]} />
-            <meshStandardMaterial color="#0066CC" emissive="#0066CC" emissiveIntensity={2.5} toneMapped={false} />
+          <mesh position={[5.0, 3.0, 0]} castShadow>
+            <cylinderGeometry args={[0.18, 0.18, 6.0, 16]} />
+            <meshStandardMaterial color="#0066CC" emissive="#0066CC" emissiveIntensity={3.0} toneMapped={false} />
           </mesh>
           {/* Top Crossbar */}
-          <mesh position={[0, 5.0, 0]} castShadow>
-            <boxGeometry args={[9.2, 0.2, 0.2]} />
-            <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={3.5} toneMapped={false} />
+          <mesh position={[0, 6.0, 0]} castShadow>
+            <boxGeometry args={[10.2, 0.25, 0.25]} />
+            <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={4.0} toneMapped={false} />
+          </mesh>
+        </group>
+      ))}
+
+      {/* 💡 Cyber Perimeter Light Pillars */}
+      {lightPillars.map((pillar, i) => (
+        <group key={`pillar-${i}`} position={pillar.position}>
+          <mesh position={[0, 4.0, 0]} castShadow>
+            <cylinderGeometry args={[0.2, 0.2, 8.0, 16]} />
+            <meshStandardMaterial color="#09090B" roughness={0.3} metalness={0.8} />
+          </mesh>
+          <mesh position={[0, 8.2, 0]}>
+            <sphereGeometry args={[0.45, 16, 16]} />
+            <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={5.0} toneMapped={false} />
           </mesh>
         </group>
       ))}
@@ -591,7 +639,7 @@ function ArenaTrackFeatures() {
 }
 
 // ==========================================
-// Dynamic Truly Infinite Floor Component
+// Dynamic Truly Infinite Mega Floor Component
 // ==========================================
 function InfiniteFloor() {
   const floorRef = useRef<THREE.Mesh>(null);
@@ -611,19 +659,19 @@ function InfiniteFloor() {
 
   return (
     <group>
-      {/* Infinite Fixed Collider Floor */}
+      {/* Mega Fixed Collider Floor */}
       <RigidBody type="fixed" friction={0.7} restitution={0.2}>
-        <CuboidCollider args={[400, 0.5, 400]} position={[0, -0.5, 0]} />
+        <CuboidCollider args={[800, 0.5, 800]} position={[0, -0.5, 0]} />
       </RigidBody>
 
       {/* Dynamic Visual Floor Plane Following Camera */}
       <mesh ref={floorRef} position={[0, -0.01, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[600, 600]} />
-        <meshStandardMaterial color="#F4F4F5" roughness={0.75} metalness={0.01} />
+        <planeGeometry args={[1600, 1600]} />
+        <meshStandardMaterial color="#E2E8F0" roughness={0.92} metalness={0.0} envMapIntensity={0.1} />
       </mesh>
 
       {/* Dynamic Grid Following Camera Snapped to Grid Units */}
-      <gridHelper ref={gridRef} args={[600, 300, '#D4D4D8', '#E4E4E7']} position={[0, 0.01, 0]} />
+      <gridHelper ref={gridRef} args={[1600, 400, '#CBD5E1', '#E2E8F0']} position={[0, 0.01, 0]} />
     </group>
   );
 }
@@ -640,16 +688,16 @@ function GameScene({
 }: VehicleProps & { isMobile: boolean }) {
   return (
     <>
-      {/* 💡 Atmospheric Depth Fog for Infinite Smooth Horizon Fade */}
-      <fog attach="fog" args={['#FCFCFC', 20, 90]} />
+      {/* 💡 Soft Atmospheric Depth Fog for Subdued Horizon */}
+      <fog attach="fog" args={['#FCFCFC', 40, 160]} />
 
-      {/* 💡 Soft Subdued Ambient Fill Light */}
-      <hemisphereLight args={['#FFFFFF', '#F4F4F5', 0.45]} />
+      {/* 💡 Subdued Soft Ambient Fill Light */}
+      <hemisphereLight args={['#FFFFFF', '#E2E8F0', 0.25]} />
 
-      {/* Toned Down Key Directional Light */}
+      {/* Low-Intensity Key Directional Light */}
       <directionalLight
         position={[25, 35, 20]}
-        intensity={1.0}
+        intensity={0.65}
         castShadow={!isMobile} // Optimize shadows on mobile
         shadow-mapSize={isMobile ? [1024, 1024] : [2048, 2048]}
         shadow-camera-left={-30}
@@ -659,11 +707,11 @@ function GameScene({
         shadow-bias={-0.0001}
       />
 
-      {/* Soft Rim Light */}
-      <directionalLight position={[-25, 30, -25]} intensity={0.6} color="#60A5FA" />
+      {/* Subtle Rim Light */}
+      <directionalLight position={[-25, 30, -25]} intensity={0.4} color="#60A5FA" />
 
-      {/* Subtle Background Ambient Accent */}
-      <pointLight position={[0, 12, -35]} intensity={6.0} color="#38BDF8" distance={65} />
+      {/* Subdued Background Ambient Accent */}
+      <pointLight position={[0, 12, -35]} intensity={3.0} color="#38BDF8" distance={65} />
       <Environment preset="city" />
 
       <Physics gravity={[0, -9.81, 0]}>

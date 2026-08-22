@@ -23,7 +23,7 @@
   "dependencies": {
     "@react-three/drei": "^9.121.5",
     "@react-three/fiber": "^9.0.0-rc.1",
-    "@react-three/postprocessing": "^3.0.5",
+    "@react-three/postprocessing": "^2.16.3",
     "@react-three/rapier": "^2.2.0",
     "@studio-freight/react-lenis": "^0.0.47",
     "cmdk": "^1.1.1",
@@ -51,6 +51,7 @@
     "svgo": "4.0.1",
     "@react-three/fiber": "$@react-three/fiber",
     "react": "$react",
-    "react-dom": "$react-dom"
+    "react-dom": "$react-dom",
+    "three": "$three"
   }
 }

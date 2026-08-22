@@ -89,7 +89,7 @@ export function Preloader() {
             <div className="absolute top-8 left-8 md:top-12 md:left-12 flex items-center gap-3">
               <img src="/assets/dt-logo.svg" alt="DT Monogram" className="w-7 h-7 object-contain" />
               <span className="font-mono text-xs font-semibold tracking-widest text-[#09090B] uppercase">
-                D R THUMMAR // ARCHITECT
+                D R THUMMAR • ARCHITECT
               </span>
             </div>
 

@@ -64,7 +64,7 @@ export default function HomePage() {
           {/* ── 2. ABOUT / GENESIS DUAL TIMELINE ──────────────────── */}
           <SectionWrapper id="about">
             <SectionHeader
-              eyebrow="01 // DUAL REALITY"
+              eyebrow="DUAL REALITY"
               title="The Genesis"
               italicAccent="Timeline"
               description="Bridging academic computer engineering rigor at L.J. University with active CTO leadership at The Intelliverse."
@@ -138,7 +138,7 @@ export default function HomePage() {
           {/* ── 3. SKILLS MATRIX ─────────────────────────────────── */}
           <SectionWrapper id="skills">
             <SectionHeader
-              eyebrow="02 // TECHNICAL ARSENAL"
+              eyebrow="TECHNICAL ARSENAL"
               title="Engineering"
               italicAccent="Proficiency"
               description="Hover over any skill badge to inspect its architectural context across real-world systems."
@@ -197,7 +197,7 @@ export default function HomePage() {
       <SectionWrapper id="projects">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
           <SectionHeader
-            eyebrow="03 // MISSION ARCHIVES"
+            eyebrow="MISSION ARCHIVES"
             title="Featured"
             italicAccent="Systems"
             description="Top architectural systems engineered by D R Thummar. Presented as Problem ➔ Solution breakdowns."
@@ -302,7 +302,7 @@ export default function HomePage() {
       {/* ── 5. VERIFIED CREDENTIALS & CERTIFICATIONS ─────────── */}
       <SectionWrapper id="certifications">
         <SectionHeader
-          eyebrow="04 // VERIFIED CREDENTIALS"
+          eyebrow="VERIFIED CREDENTIALS"
           title="Certifications &"
           italicAccent="Achievements"
           description="Official verified credentials from IBM, Penn Engineering, LearnQuest, and competitive hackathons."
@@ -376,7 +376,7 @@ export default function HomePage() {
       {/* ── 6. TEAM & COMMUNITY ALLIANCES ────────────────────── */}
       <SectionWrapper id="team">
         <SectionHeader
-          eyebrow="05 // LEADERSHIP & ALLIANCES"
+          eyebrow="LEADERSHIP & ALLIANCES"
           title="The Intelliverse"
           italicAccent="Guild"
           description="Leading technical vision alongside industry founders & driving community developer alliances."
@@ -417,7 +417,7 @@ export default function HomePage() {
       {/* ── 7. CONTACT SECTION ────────────────────────────────── */}
       <SectionWrapper id="contact">
         <SectionHeader
-          eyebrow="06 // GET IN TOUCH"
+          eyebrow="GET IN TOUCH"
           title="Let's Build"
           italicAccent="Together"
           description="Reach out for technical consultations, software architecture, or partnership opportunities."

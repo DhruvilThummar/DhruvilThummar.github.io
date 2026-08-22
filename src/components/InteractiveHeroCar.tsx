@@ -666,7 +666,7 @@ function InfiniteFloor() {
       {/* Dynamic Visual Floor Plane Following Camera */}
       <mesh ref={floorRef} position={[0, -0.01, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[1600, 1600]} />
-        <meshStandardMaterial color="#E2E8F0" roughness={0.92} metalness={0.0} envMapIntensity={0.1} />
+        <meshStandardMaterial color="#E2E8F0" roughness={1.0} metalness={0.0} envMapIntensity={0.0} />
       </mesh>
 
       {/* Dynamic Grid Following Camera Snapped to Grid Units */}
@@ -687,8 +687,8 @@ function GameScene({
 }: VehicleProps & { isMobile: boolean }) {
   return (
     <>
-      {/* 💡 Soft Atmospheric Depth Fog for Subdued Horizon */}
-      <fog attach="fog" args={['#FCFCFC', 40, 160]} />
+      {/* 💡 Subdued Atmospheric Depth Fog Matched to Land Floor Color */}
+      <fog attach="fog" args={['#E2E8F0', 50, 220]} />
 
       {/* 💡 Subdued Soft Ambient Fill Light */}
       <hemisphereLight args={['#FFFFFF', '#E2E8F0', 0.25]} />
@@ -696,7 +696,7 @@ function GameScene({
       {/* Low-Intensity Key Directional Light */}
       <directionalLight
         position={[25, 35, 20]}
-        intensity={0.65}
+        intensity={0.55}
         castShadow={!isMobile} // Optimize shadows on mobile
         shadow-mapSize={isMobile ? [1024, 1024] : [2048, 2048]}
         shadow-camera-left={-30}
@@ -707,10 +707,10 @@ function GameScene({
       />
 
       {/* Subtle Rim Light */}
-      <directionalLight position={[-25, 30, -25]} intensity={0.4} color="#60A5FA" />
+      <directionalLight position={[-25, 30, -25]} intensity={0.3} color="#60A5FA" />
 
       {/* Subdued Background Ambient Accent */}
-      <pointLight position={[0, 12, -35]} intensity={3.0} color="#38BDF8" distance={65} />
+      <pointLight position={[0, 12, -35]} intensity={2.0} color="#38BDF8" distance={65} />
       <Environment preset="city" />
 
       <Physics gravity={[0, -9.81, 0]}>
@@ -727,9 +727,6 @@ function GameScene({
           resetTrigger={resetTrigger}
           isInView={isInView}
         />
-
-        {/* Collidable Smashable Objects */}
-        <SmashableObjects />
       </Physics>
 
       {/* Realistic Soft Contact Shadows */}
@@ -983,8 +980,8 @@ export default function InteractiveHeroCar() {
         </Canvas>
       </KeyboardControls>
 
-      {/* Apex Racing Telemetry & HUD Overlay (z-20 pointer-events-auto) */}
-      <div className="absolute top-6 right-6 z-20 pointer-events-auto flex items-center gap-3">
+      {/* Apex Racing Telemetry & HUD Overlay (Positioned below top Navbar pill) */}
+      <div className="absolute top-24 right-4 md:right-8 z-20 pointer-events-auto flex items-center gap-2.5">
         {/* Speedometer Badge */}
         <div className="flex items-center gap-2 px-3.5 py-1.5 bg-white/80 backdrop-blur-md border border-black/[0.08] rounded-full shadow-xs">
           <Zap className="w-3.5 h-3.5 text-[#0066CC] animate-pulse" />

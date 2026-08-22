@@ -643,6 +643,7 @@ function ArenaTrackFeatures() {
 function InfiniteFloor() {
   const floorRef = useRef<THREE.Mesh>(null);
   const gridRef = useRef<THREE.GridHelper>(null);
+  const shadowGroupRef = useRef<THREE.Group>(null);
 
   useFrame((state) => {
     const camPos = state.camera.position;
@@ -653,6 +654,10 @@ function InfiniteFloor() {
     if (gridRef.current) {
       gridRef.current.position.x = Math.floor(camPos.x / 4) * 4;
       gridRef.current.position.z = Math.floor(camPos.z / 4) * 4;
+    }
+    if (shadowGroupRef.current) {
+      shadowGroupRef.current.position.x = camPos.x;
+      shadowGroupRef.current.position.z = camPos.z;
     }
   });
 
@@ -671,6 +676,18 @@ function InfiniteFloor() {
 
       {/* Dynamic Grid Following Camera Snapped to Grid Units */}
       <gridHelper ref={gridRef} args={[1600, 400, '#CBD5E1', '#E2E8F0']} position={[0, 0.01, 0]} />
+
+      {/* Dynamic Contact Shadow Following Camera & Car Everywhere */}
+      <group ref={shadowGroupRef}>
+        <ContactShadows
+          position={[0, 0.02, 0]}
+          opacity={0.45}
+          scale={80}
+          blur={2.0}
+          far={15}
+          color="#000000"
+        />
+      </group>
     </group>
   );
 }
@@ -688,26 +705,24 @@ function GameScene({
   return (
     <>
       {/* 💡 Subdued Atmospheric Depth Fog Matched to Land Floor Color */}
-      <fog attach="fog" args={['#E2E8F0', 50, 220]} />
+      <fog attach="fog" args={['#E2E8F0', 100, 400]} />
 
       {/* 💡 Subdued Soft Ambient Fill Light */}
-      <hemisphereLight args={['#FFFFFF', '#E2E8F0', 0.2]} />
+      <hemisphereLight args={['#FFFFFF', '#E2E8F0', 0.25]} />
 
-      {/* Low-Intensity Key Directional Light (Uniform Lighting) */}
+      {/* Overhead Directional Light (100% Isotropic & Uniform Lighting Everywhere) */}
       <directionalLight
-        position={[25, 35, 20]}
+        position={[0, 45, 0]}
         intensity={0.35}
         castShadow={!isMobile} // Optimize shadows on mobile
         shadow-mapSize={isMobile ? [1024, 1024] : [2048, 2048]}
-        shadow-camera-left={-30}
-        shadow-camera-right={30}
-        shadow-camera-top={30}
-        shadow-camera-bottom={-30}
+        shadow-camera-left={-35}
+        shadow-camera-right={35}
+        shadow-camera-top={35}
+        shadow-camera-bottom={-35}
         shadow-bias={-0.0001}
       />
 
-      {/* Subtle Soft Rim Light */}
-      <directionalLight position={[-25, 30, -25]} intensity={0.2} color="#60A5FA" />
       <Environment preset="city" />
 
       <Physics gravity={[0, -9.81, 0]}>
@@ -722,16 +737,6 @@ function GameScene({
           isInView={isInView}
         />
       </Physics>
-
-      {/* Realistic Soft Contact Shadows */}
-      <ContactShadows
-        position={[0, 0.02, 0]}
-        opacity={0.55}
-        scale={60}
-        blur={1.8}
-        far={12}
-        color="#000000"
-      />
 
       {/* 💡 Adaptive Mobile Tiering: Skip Post-Processing on Mobile for maximum performance */}
       {!isMobile && (
@@ -959,7 +964,7 @@ export default function InteractiveHeroCar() {
         <Canvas
           shadows={!isMobile}
           camera={{ position: [0, 3.5, 8.5], fov: 50 }}
-          className="w-full h-full bg-[#FCFCFC]"
+          className="w-full h-full bg-[#E2E8F0]"
           dpr={isMobile ? [1, 1.25] : [1, 2]} // 💡 Adaptive Mobile DPR
           frameloop={isInView ? 'always' : 'never'} // 💡 Off-Screen GPU Throttling
           gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}

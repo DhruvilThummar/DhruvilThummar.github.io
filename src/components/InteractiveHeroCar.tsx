@@ -671,17 +671,17 @@ function InfiniteFloor() {
       {/* Dynamic Visual Floor Plane Following Camera */}
       <mesh ref={floorRef} position={[0, -0.01, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[1600, 1600]} />
-        <meshStandardMaterial color="#E2E8F0" roughness={1.0} metalness={0.0} envMapIntensity={0.0} />
+        <meshStandardMaterial color="#CBD5E1" roughness={1.0} metalness={0.0} envMapIntensity={0.0} />
       </mesh>
 
       {/* Dynamic Grid Following Camera Snapped to Grid Units */}
-      <gridHelper ref={gridRef} args={[1600, 400, '#CBD5E1', '#E2E8F0']} position={[0, 0.01, 0]} />
+      <gridHelper ref={gridRef} args={[1600, 400, '#94A3B8', '#CBD5E1']} position={[0, 0.01, 0]} />
 
       {/* Dynamic Contact Shadow Following Camera & Car Everywhere */}
       <group ref={shadowGroupRef}>
         <ContactShadows
           position={[0, 0.02, 0]}
-          opacity={0.45}
+          opacity={0.35}
           scale={80}
           blur={2.0}
           far={15}
@@ -704,16 +704,16 @@ function GameScene({
 }: VehicleProps & { isMobile: boolean }) {
   return (
     <>
-      {/* 💡 Subdued Atmospheric Depth Fog Matched to Land Floor Color */}
-      <fog attach="fog" args={['#E2E8F0', 100, 400]} />
+      {/* 💡 Dim Atmospheric Depth Fog Matched to Land Floor Color */}
+      <fog attach="fog" args={['#CBD5E1', 80, 300]} />
 
-      {/* 💡 Subdued Soft Ambient Fill Light */}
-      <hemisphereLight args={['#FFFFFF', '#E2E8F0', 0.25]} />
+      {/* 💡 Ultra-Low Ambient Fill Light */}
+      <hemisphereLight args={['#FFFFFF', '#CBD5E1', 0.1]} />
 
-      {/* Overhead Directional Light (100% Isotropic & Uniform Lighting Everywhere) */}
+      {/* Low-Intensity Overhead Directional Light */}
       <directionalLight
         position={[0, 45, 0]}
-        intensity={0.35}
+        intensity={0.12}
         castShadow={!isMobile} // Optimize shadows on mobile
         shadow-mapSize={isMobile ? [1024, 1024] : [2048, 2048]}
         shadow-camera-left={-35}
@@ -767,8 +767,28 @@ function TouchJoystick({ onMove }: TouchJoystickProps) {
 
   const maxRadius = 45; // Max displacement radius in pixels
 
+  // 💡 Lock page scrolling ONLY when user is touching/dragging the Joystick
+  useEffect(() => {
+    const elem = joystickRef.current;
+    if (!elem) return;
+
+    const preventDefaultScroll = (e: TouchEvent) => {
+      if (e.cancelable) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    elem.addEventListener('touchstart', preventDefaultScroll, { passive: false });
+    elem.addEventListener('touchmove', preventDefaultScroll, { passive: false });
+
+    return () => {
+      elem.removeEventListener('touchstart', preventDefaultScroll);
+      elem.removeEventListener('touchmove', preventDefaultScroll);
+    };
+  }, []);
+
   const handleTouch = (e: React.TouchEvent<HTMLDivElement>) => {
-    e.preventDefault();
     if (!joystickRef.current || e.touches.length === 0) return;
 
     const rect = joystickRef.current.getBoundingClientRect();
@@ -799,8 +819,7 @@ function TouchJoystick({ onMove }: TouchJoystickProps) {
     });
   };
 
-  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-    e.preventDefault();
+  const handleTouchEnd = () => {
     setKnobPos({ x: 0, y: 0 });
     setActive(false);
     onMove({ left: false, right: false, forward: false, backward: false });
@@ -812,9 +831,10 @@ function TouchJoystick({ onMove }: TouchJoystickProps) {
       onTouchStart={handleTouch}
       onTouchMove={handleTouch}
       onTouchEnd={handleTouchEnd}
-      className={`relative w-28 h-28 rounded-full bg-white/40 backdrop-blur-md border ${
-        active ? 'border-[#0066CC] bg-white/60' : 'border-black/15'
-      } shadow-md flex items-center justify-center touch-none select-none cursor-pointer`}
+      onTouchCancel={handleTouchEnd}
+      className={`relative w-28 h-28 rounded-full bg-white/45 backdrop-blur-md border ${
+        active ? 'border-[#0066CC] bg-white/70 shadow-lg scale-105' : 'border-black/15 shadow-md'
+      } transition-transform flex items-center justify-center touch-none select-none cursor-pointer`}
     >
       {/* Inner Ring Guide */}
       <div className="w-16 h-16 rounded-full border border-black/10 pointer-events-none" />
@@ -915,56 +935,18 @@ export default function InteractiveHeroCar() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isInView]);
 
-  // ------------------------------------------
-  // 💡 Universal Touch & Mobile Swipe Lock (Eliminates Drag/Swipe Scroll Jumps)
-  // ------------------------------------------
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const preventScroll = (e: Event) => {
-      if (e.cancelable && isInView) {
-        const activeElem = document.activeElement as HTMLElement | null;
-        const isInputElement =
-          activeElem &&
-          (activeElem.tagName === 'INPUT' ||
-            activeElem.tagName === 'TEXTAREA' ||
-            activeElem.isContentEditable);
-        if (!isInputElement) {
-          e.preventDefault();
-        }
-      }
-    };
-
-    container.addEventListener('touchmove', preventScroll, { passive: false });
-    container.addEventListener('touchstart', preventScroll, { passive: false });
-
-    return () => {
-      container.removeEventListener('touchmove', preventScroll);
-      container.removeEventListener('touchstart', preventScroll);
-    };
-  }, [isInView]);
-
   const handleJoystickMove = (partialControls: Partial<MobileControlsState>) => {
     setMobileControls((prev) => ({ ...prev, ...partialControls }));
   };
 
-  const handleTouchStart = (control: keyof MobileControlsState) => {
-    setMobileControls((prev) => ({ ...prev, [control]: true }));
-  };
-
-  const handleTouchEnd = (control: keyof MobileControlsState) => {
-    setMobileControls((prev) => ({ ...prev, [control]: false }));
-  };
-
   return (
-    <div ref={containerRef} className="relative w-full h-full touch-none select-none" style={{ touchAction: 'none' }}>
+    <div ref={containerRef} className="relative w-full h-full select-none">
       {/* 3D WebGL Canvas Layer (Frameloop paused when off-screen) */}
       <KeyboardControls map={keyboardMap}>
         <Canvas
           shadows={!isMobile}
           camera={{ position: [0, 3.5, 8.5], fov: 50 }}
-          className="w-full h-full bg-[#E2E8F0]"
+          className="w-full h-full bg-[#CBD5E1]"
           dpr={isMobile ? [1, 1.25] : [1, 2]} // 💡 Adaptive Mobile DPR
           frameloop={isInView ? 'always' : 'never'} // 💡 Off-Screen GPU Throttling
           gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
@@ -1014,61 +996,9 @@ export default function InteractiveHeroCar() {
         <span>RESET</span>
       </div>
 
-      {/* 💡 Mobile Dual-Thumb Controls: 360° Analog Touch Joystick (Left) + Action Buttons (Right) */}
-      <div className="absolute bottom-6 left-4 right-4 z-20 pointer-events-auto flex md:hidden items-end justify-between select-none">
-        {/* Left Side: 360° Touch Joystick */}
+      {/* 💡 Mobile View Controls: Pure 360° Touch Joystick (Page scroll works everywhere except on joystick) */}
+      <div className="absolute bottom-6 left-6 z-20 pointer-events-auto flex md:hidden items-center select-none">
         <TouchJoystick onMove={handleJoystickMove} />
-
-        {/* Right Side: Dual Action Buttons (GAS, BRAKE, REV) */}
-        <div className="flex items-center gap-2 pb-1">
-          <button
-            onMouseDown={() => handleTouchStart('backward')}
-            onMouseUp={() => handleTouchEnd('backward')}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              handleTouchStart('backward');
-            }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              handleTouchEnd('backward');
-            }}
-            className="w-12 h-12 bg-white/85 backdrop-blur-md border border-black/15 rounded-full font-mono text-xs font-bold text-[#71717A] active:bg-black active:text-white shadow-sm flex items-center justify-center select-none cursor-pointer"
-          >
-            REV
-          </button>
-
-          <button
-            onMouseDown={() => handleTouchStart('brake')}
-            onMouseUp={() => handleTouchEnd('brake')}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              handleTouchStart('brake');
-            }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              handleTouchEnd('brake');
-            }}
-            className="w-13 h-13 bg-red-500/15 backdrop-blur-md border border-red-500/35 rounded-full font-mono text-xs font-bold text-red-600 active:bg-red-600 active:text-white shadow-sm flex items-center justify-center select-none cursor-pointer"
-          >
-            STOP
-          </button>
-
-          <button
-            onMouseDown={() => handleTouchStart('forward')}
-            onMouseUp={() => handleTouchEnd('forward')}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              handleTouchStart('forward');
-            }}
-            onTouchEnd={(e) => {
-              e.preventDefault();
-              handleTouchStart('forward');
-            }}
-            className="w-14 h-14 bg-[#09090B] text-white rounded-full font-mono text-xs font-extrabold active:bg-black shadow-md flex items-center justify-center select-none cursor-pointer"
-          >
-            GAS
-          </button>
-        </div>
       </div>
     </div>
   );

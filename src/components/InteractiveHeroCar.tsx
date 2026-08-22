@@ -530,15 +530,15 @@ function GameScene({
   return (
     <>
       {/* 💡 Atmospheric Depth Fog for Infinite Smooth Horizon Fade */}
-      <fog attach="fog" args={['#FCFCFC', 18, 85]} />
+      <fog attach="fog" args={['#FCFCFC', 20, 90]} />
 
-      {/* 💡 Natural Soft Sky/Ground Hemisphere Ambient Fill Light */}
-      <hemisphereLight args={['#FFFFFF', '#E4E4E7', 0.85]} />
+      {/* 💡 Soft Subdued Ambient Fill Light */}
+      <hemisphereLight args={['#FFFFFF', '#F4F4F5', 0.45]} />
 
-      {/* Key Sun Directional Light */}
+      {/* Toned Down Key Directional Light */}
       <directionalLight
         position={[25, 35, 20]}
-        intensity={2.2}
+        intensity={1.0}
         castShadow={!isMobile} // Optimize shadows on mobile
         shadow-mapSize={isMobile ? [1024, 1024] : [2048, 2048]}
         shadow-camera-left={-30}
@@ -548,25 +548,25 @@ function GameScene({
         shadow-bias={-0.0001}
       />
 
-      {/* Futuristic Metallic Rim Light */}
-      <directionalLight position={[-25, 30, -25]} intensity={1.4} color="#60A5FA" />
+      {/* Soft Rim Light */}
+      <directionalLight position={[-25, 30, -25]} intensity={0.6} color="#60A5FA" />
 
-      {/* Distant Cyber Blue Background Ambient Light */}
-      <pointLight position={[0, 12, -35]} intensity={30.0} color="#38BDF8" distance={65} />
+      {/* Subtle Background Ambient Accent */}
+      <pointLight position={[0, 12, -35]} intensity={6.0} color="#38BDF8" distance={65} />
       <Environment preset="city" />
 
       <Physics gravity={[0, -9.81, 0]}>
-        {/* Infinite Alabaster (#FCFCFC) Floor */}
+        {/* Infinite Soft Matte Floor */}
         <RigidBody type="fixed" friction={0.7} restitution={0.2}>
           <CuboidCollider args={[150, 0.5, 150]} position={[0, -0.5, 0]} />
         </RigidBody>
 
         <mesh position={[0, -0.01, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
           <planeGeometry args={[300, 300]} />
-          <meshStandardMaterial color="#FCFCFC" roughness={0.4} metalness={0.05} />
+          <meshStandardMaterial color="#F4F4F5" roughness={0.75} metalness={0.01} />
         </mesh>
 
-        <gridHelper args={[300, 150, '#A1A1AA', '#E4E4E7']} position={[0, 0.01, 0]} />
+        <gridHelper args={[300, 150, '#D4D4D8', '#E4E4E7']} position={[0, 0.01, 0]} />
 
         {/* Driveable Raycast Arcade Vehicle */}
         <ArcadeVehicle

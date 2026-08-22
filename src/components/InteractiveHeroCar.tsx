@@ -313,9 +313,9 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
           />
         </mesh>
 
-        {/* Dynamic Forward Headlight Beams (Spotlights) */}
-        <pointLight position={[-0.7, 0.45, -2.2]} intensity={18.0} distance={15} color="#60A5FA" />
-        <pointLight position={[0.7, 0.45, -2.2]} intensity={18.0} distance={15} color="#60A5FA" />
+        {/* Dynamic Soft Forward Headlight LED Accents */}
+        <pointLight position={[-0.7, 0.45, -2.2]} intensity={3.0} distance={8} color="#60A5FA" />
+        <pointLight position={[0.7, 0.45, -2.2]} intensity={3.0} distance={8} color="#60A5FA" />
 
         {/* Rear Taillight Continuous LED Bar (Apex Neon Red Bloom) */}
         <mesh position={[0, 0.46, 2.06]}>
@@ -691,12 +691,12 @@ function GameScene({
       <fog attach="fog" args={['#E2E8F0', 50, 220]} />
 
       {/* 💡 Subdued Soft Ambient Fill Light */}
-      <hemisphereLight args={['#FFFFFF', '#E2E8F0', 0.25]} />
+      <hemisphereLight args={['#FFFFFF', '#E2E8F0', 0.2]} />
 
-      {/* Low-Intensity Key Directional Light */}
+      {/* Low-Intensity Key Directional Light (Uniform Lighting) */}
       <directionalLight
         position={[25, 35, 20]}
-        intensity={0.55}
+        intensity={0.35}
         castShadow={!isMobile} // Optimize shadows on mobile
         shadow-mapSize={isMobile ? [1024, 1024] : [2048, 2048]}
         shadow-camera-left={-30}
@@ -706,19 +706,13 @@ function GameScene({
         shadow-bias={-0.0001}
       />
 
-      {/* Subtle Rim Light */}
-      <directionalLight position={[-25, 30, -25]} intensity={0.3} color="#60A5FA" />
-
-      {/* Subdued Background Ambient Accent */}
-      <pointLight position={[0, 12, -35]} intensity={2.0} color="#38BDF8" distance={65} />
+      {/* Subtle Soft Rim Light */}
+      <directionalLight position={[-25, 30, -25]} intensity={0.2} color="#60A5FA" />
       <Environment preset="city" />
 
       <Physics gravity={[0, -9.81, 0]}>
         {/* Dynamic Infinite Floor & Grid */}
         <InfiniteFloor />
-
-        {/* 🚀 Stunt Jump Ramps & Checkpoint Gate Arches */}
-        <ArenaTrackFeatures />
 
         {/* Driveable Raycast Arcade Vehicle */}
         <ArcadeVehicle

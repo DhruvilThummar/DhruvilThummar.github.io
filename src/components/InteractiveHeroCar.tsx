@@ -16,7 +16,7 @@ import {
 } from '@react-three/drei';
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing';
 import * as THREE from 'three';
-import { RefreshCw, Zap, ShieldCheck } from 'lucide-react';
+import { RefreshCw, Zap } from 'lucide-react';
 
 // Keyboard control enum mapping
 export enum ControlKeys {
@@ -37,7 +37,7 @@ const keyboardMap = [
   { name: ControlKeys.reset, keys: ['KeyR'] },
 ];
 
-interface MobileControlsState {
+export interface MobileControlsState {
   forward: boolean;
   backward: boolean;
   left: boolean;
@@ -50,6 +50,13 @@ interface VehicleProps {
   onSpeedUpdate: (speedKmh: number) => void;
   resetTrigger: number;
   isInView: boolean;
+}
+
+interface SmashableObjectItem {
+  id: number;
+  type: 'glassCube' | 'metallicSphere' | 'neonPrism';
+  position: [number, number, number];
+  scale: number;
 }
 
 // ==========================================
@@ -118,12 +125,12 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
     onSpeedUpdate(speedKmh);
 
     // ------------------------------------------
-    // A. Driving Dynamics & Acceleration Tuning
+    // A. Driving Dynamics & Acceleration Tuning (Apex Mega Boost)
     // ------------------------------------------
-    const acceleration = 45.0;
-    const reverseAccel = 22.0;
-    const maxSpeed = 42.0; // ~115 km/h top speed inside Hero section
-    const steerSpeed = 2.4;
+    const acceleration = 46.0;
+    const reverseAccel = 25.0;
+    const maxSpeed = 42.0; // ~150 km/h top speed inside Mega Arena
+    const steerSpeed = 2.6;
 
     // Apply forward/backward propulsion
     if (isForward && forwardSpeed < maxSpeed) {
@@ -149,7 +156,6 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
     );
 
     if (Math.abs(currentSteerAngle.current) > 0.01 && (isForward || isBackward || Math.abs(forwardSpeed) > 1.0)) {
-      // Scale steering strength based on velocity direction
       const directionMultiplier = forwardSpeed >= -0.5 ? 1 : -1;
       const turnTorque = currentSteerAngle.current * steerSpeed * directionMultiplier;
       rigidBodyRef.current.setAngvel(
@@ -162,7 +168,7 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
     // C. Lateral Drift Damping (Apex Racing Feel)
     // ------------------------------------------
     const lateralVel = currentVel.dot(rightVec);
-    const driftFactor = isBrake ? 0.85 : 0.45; // Enhanced sliding when braking
+    const driftFactor = isBrake ? 0.85 : 0.45;
     const counterForce = rightVec.clone().multiplyScalar(-lateralVel * driftFactor * rigidBodyRef.current.mass() * delta * 60);
     rigidBodyRef.current.applyImpulse(counterForce, true);
 
@@ -403,13 +409,6 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
       </group>
     </RigidBody>
   );
-}
-
-interface SmashableObjectItem {
-  id: number;
-  type: 'glassCube' | 'metallicSphere' | 'neonPrism';
-  position: [number, number, number];
-  scale: number;
 }
 
 // ==========================================
@@ -759,6 +758,85 @@ function GameScene({
 }
 
 // ==========================================
+// 💡 360-Degree Analog Touch Joystick for Mobile
+// ==========================================
+interface TouchJoystickProps {
+  onMove: (controls: Partial<MobileControlsState>) => void;
+}
+
+function TouchJoystick({ onMove }: TouchJoystickProps) {
+  const joystickRef = useRef<HTMLDivElement>(null);
+  const [knobPos, setKnobPos] = useState({ x: 0, y: 0 });
+  const [active, setActive] = useState(false);
+
+  const maxRadius = 45; // Max displacement radius in pixels
+
+  const handleTouch = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (!joystickRef.current || e.touches.length === 0) return;
+
+    const rect = joystickRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    const touch = e.touches[0];
+    const dx = touch.clientX - centerX;
+    const dy = touch.clientY - centerY;
+
+    const distance = Math.min(maxRadius, Math.hypot(dx, dy));
+    const angle = Math.atan2(dy, dx);
+
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance;
+
+    setKnobPos({ x, y });
+    setActive(true);
+
+    const normX = x / maxRadius;
+    const normY = y / maxRadius;
+
+    onMove({
+      left: normX < -0.25,
+      right: normX > 0.25,
+      forward: normY < -0.25,
+      backward: normY > 0.25,
+    });
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setKnobPos({ x: 0, y: 0 });
+    setActive(false);
+    onMove({ left: false, right: false, forward: false, backward: false });
+  };
+
+  return (
+    <div
+      ref={joystickRef}
+      onTouchStart={handleTouch}
+      onTouchMove={handleTouch}
+      onTouchEnd={handleTouchEnd}
+      className={`relative w-28 h-28 rounded-full bg-white/40 backdrop-blur-md border ${
+        active ? 'border-[#0066CC] bg-white/60' : 'border-black/15'
+      } shadow-md flex items-center justify-center touch-none select-none cursor-pointer`}
+    >
+      {/* Inner Ring Guide */}
+      <div className="w-16 h-16 rounded-full border border-black/10 pointer-events-none" />
+
+      {/* Draggable Knob */}
+      <div
+        className="absolute w-12 h-12 rounded-full bg-[#09090B] text-white shadow-lg flex items-center justify-center pointer-events-none"
+        style={{
+          transform: `translate3d(${knobPos.x}px, ${knobPos.y}px, 0)`,
+        }}
+      >
+        <div className="w-3.5 h-3.5 rounded-full bg-[#38BDF8] animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
 // 4. Exported Interactive Hero Car Canvas Component
 // ==========================================
 export default function InteractiveHeroCar() {
@@ -824,7 +902,6 @@ export default function InteractiveHeroCar() {
       ];
 
       if (driveKeys.includes(e.code) || driveKeys.includes(e.key)) {
-        // Prevent default native page scrolling if user is engaged on page
         const activeElem = document.activeElement as HTMLElement | null;
         const isInputElement =
           activeElem &&
@@ -872,6 +949,10 @@ export default function InteractiveHeroCar() {
     };
   }, [isInView]);
 
+  const handleJoystickMove = (partialControls: Partial<MobileControlsState>) => {
+    setMobileControls((prev) => ({ ...prev, ...partialControls }));
+  };
+
   const handleTouchStart = (control: keyof MobileControlsState) => {
     setMobileControls((prev) => ({ ...prev, [control]: true }));
   };
@@ -881,7 +962,7 @@ export default function InteractiveHeroCar() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-full">
+    <div ref={containerRef} className="relative w-full h-full touch-none select-none" style={{ touchAction: 'none' }}>
       {/* 3D WebGL Canvas Layer (Frameloop paused when off-screen) */}
       <KeyboardControls map={keyboardMap}>
         <Canvas
@@ -937,92 +1018,60 @@ export default function InteractiveHeroCar() {
         <span>RESET</span>
       </div>
 
-      {/* Mobile Touch Control Layer (z-20 pointer-events-auto) */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 pointer-events-auto flex md:hidden flex-col items-center gap-2 select-none">
-        {/* D-Pad Steering & Drive Controls */}
-        <div className="flex items-center gap-3">
-          {/* Left / Right Steering */}
-          <div className="flex items-center gap-1.5">
-            <button
-              onMouseDown={() => handleTouchStart('left')}
-              onMouseUp={() => handleTouchEnd('left')}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                handleTouchStart('left');
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                handleTouchEnd('left');
-              }}
-              className="w-12 h-12 bg-white/90 border border-black/10 rounded-full font-mono text-sm font-bold text-[#09090B] active:bg-black active:text-white shadow-sm flex items-center justify-center select-none cursor-pointer"
-            >
-              ←
-            </button>
-            <button
-              onMouseDown={() => handleTouchStart('right')}
-              onMouseUp={() => handleTouchEnd('right')}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                handleTouchStart('right');
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                handleTouchEnd('right');
-              }}
-              className="w-12 h-12 bg-white/90 border border-black/10 rounded-full font-mono text-sm font-bold text-[#09090B] active:bg-black active:text-white shadow-sm flex items-center justify-center select-none cursor-pointer"
-            >
-              →
-            </button>
-          </div>
+      {/* 💡 Mobile Dual-Thumb Controls: 360° Analog Touch Joystick (Left) + Action Buttons (Right) */}
+      <div className="absolute bottom-6 left-4 right-4 z-20 pointer-events-auto flex md:hidden items-end justify-between select-none">
+        {/* Left Side: 360° Touch Joystick */}
+        <TouchJoystick onMove={handleJoystickMove} />
 
-          {/* Forward / Reverse / Brake */}
-          <div className="flex items-center gap-1.5">
-            <button
-              onMouseDown={() => handleTouchStart('backward')}
-              onMouseUp={() => handleTouchEnd('backward')}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                handleTouchStart('backward');
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                handleTouchEnd('backward');
-              }}
-              className="w-12 h-12 bg-white/90 border border-black/10 rounded-full font-mono text-xs font-bold text-[#71717A] active:bg-black active:text-white shadow-sm flex items-center justify-center select-none cursor-pointer"
-            >
-              REV
-            </button>
-            <button
-              onMouseDown={() => handleTouchStart('brake')}
-              onMouseUp={() => handleTouchEnd('brake')}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                handleTouchStart('brake');
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                handleTouchEnd('brake');
-              }}
-              className="w-12 h-12 bg-red-500/10 border border-red-500/30 rounded-full font-mono text-xs font-bold text-red-600 active:bg-red-600 active:text-white shadow-sm flex items-center justify-center select-none cursor-pointer"
-            >
-              STOP
-            </button>
-            <button
-              onMouseDown={() => handleTouchStart('forward')}
-              onMouseUp={() => handleTouchEnd('forward')}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                handleTouchStart('forward');
-              }}
-              onTouchEnd={(e) => {
-                e.preventDefault();
-                handleTouchEnd('forward');
-              }}
-              className="w-12 h-12 bg-[#09090B] text-white rounded-full font-mono text-xs font-bold active:bg-black shadow-sm flex items-center justify-center select-none cursor-pointer"
-            >
-              GAS
-            </button>
-          </div>
+        {/* Right Side: Dual Action Buttons (GAS, BRAKE, REV) */}
+        <div className="flex items-center gap-2 pb-1">
+          <button
+            onMouseDown={() => handleTouchStart('backward')}
+            onMouseUp={() => handleTouchEnd('backward')}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              handleTouchStart('backward');
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              handleTouchEnd('backward');
+            }}
+            className="w-12 h-12 bg-white/85 backdrop-blur-md border border-black/15 rounded-full font-mono text-xs font-bold text-[#71717A] active:bg-black active:text-white shadow-sm flex items-center justify-center select-none cursor-pointer"
+          >
+            REV
+          </button>
+
+          <button
+            onMouseDown={() => handleTouchStart('brake')}
+            onMouseUp={() => handleTouchEnd('brake')}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              handleTouchStart('brake');
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              handleTouchEnd('brake');
+            }}
+            className="w-13 h-13 bg-red-500/15 backdrop-blur-md border border-red-500/35 rounded-full font-mono text-xs font-bold text-red-600 active:bg-red-600 active:text-white shadow-sm flex items-center justify-center select-none cursor-pointer"
+          >
+            STOP
+          </button>
+
+          <button
+            onMouseDown={() => handleTouchStart('forward')}
+            onMouseUp={() => handleTouchEnd('forward')}
+            onTouchStart={(e) => {
+              e.preventDefault();
+              handleTouchStart('forward');
+            }}
+            onTouchEnd={(e) => {
+              e.preventDefault();
+              handleTouchStart('forward');
+            }}
+            className="w-14 h-14 bg-[#09090B] text-white rounded-full font-mono text-xs font-extrabold active:bg-black shadow-md flex items-center justify-center select-none cursor-pointer"
+          >
+            GAS
+          </button>
         </div>
       </div>
     </div>

@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-geist-mono',
   display: 'swap',
+  preload: false,
 });
 
 const instrumentSerif = Instrument_Serif({
@@ -22,6 +23,7 @@ const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   variable: '--font-instrument-serif',
   display: 'swap',
+  preload: false,
 });
 
 export const viewport: Viewport = {

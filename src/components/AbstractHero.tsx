@@ -82,6 +82,11 @@ export function AbstractHero() {
       <Canvas
         camera={{ position: [0, 0, 5.5], fov: 45 }}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+        onCreated={({ gl }) => {
+          if (typeof window !== 'undefined') {
+            gl.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+          }
+        }}
         className="w-full h-full"
       >
         {/* Lights for Refraction & Glow */}

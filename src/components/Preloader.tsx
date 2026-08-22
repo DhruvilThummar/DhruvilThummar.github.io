@@ -67,7 +67,7 @@ export function Preloader() {
             initial={{ y: 0 }}
             exit={{ y: '-100%' }}
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-            className="absolute top-0 left-0 right-0 h-1/2 bg-[#FCFCFC] border-b border-black/[0.04] z-10"
+            className="absolute top-0 left-0 right-0 h-1/2 bg-[#FCFCFC] z-10"
           />
 
           {/* Bottom Curtain Panel */}
@@ -75,7 +75,7 @@ export function Preloader() {
             initial={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-            className="absolute bottom-0 left-0 right-0 h-1/2 bg-[#FCFCFC] border-t border-black/[0.04] z-10"
+            className="absolute bottom-0 left-0 right-0 h-1/2 bg-[#FCFCFC] z-10"
           />
 
           {/* Center Counter Content Overlay */}

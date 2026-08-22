@@ -1,25 +1,52 @@
 {
   "name": "dhruvilthummar.github.io",
   "version": "1.0.0",
-  "description": "* https://drthummar.me/ --- ## Designed & Built by Dhruvil Thummar © 2025",
+  "description": "D R Thummar Portfolio — Co-founder & CTO at The Intelliverse",
   "main": "index.js",
   "scripts": {
-    "build": "npx -y tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --minify || true",
-    "build:css": "npx tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --minify",
-    "watch:css": "npx tailwindcss -i ./assets/tailwind-input.css -o ./assets/tailwind.css --watch",
-    "serve": "npx http-server . -p 3000 -c-1 --cors -o",
-    "dev": "npx http-server . -p 3000 -c-1 --cors -o"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "portfolio",
+    "nextjs",
+    "react",
+    "threejs",
+    "framer-motion",
+    "cto",
+    "intelliverse"
+  ],
+  "author": "D R Thummar <dhruvilthummar1303@gmail.com>",
   "license": "ISC",
+  "dependencies": {
+    "@react-three/drei": "^9.121.5",
+    "@react-three/fiber": "^9.0.0-rc.1",
+    "cmdk": "^1.1.1",
+    "framer-motion": "^11.18.2",
+    "gsap": "^3.15.0",
+    "lucide-react": "^0.475.0",
+    "next": "^16.3.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "three": "^0.173.0"
+  },
   "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@types/three": "^0.173.0",
     "autoprefixer": "^10.4.22",
     "cssnano": "^7.1.2",
     "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.14"
+    "tailwindcss": "^3.4.14",
+    "typescript": "^5.7.3"
   },
   "overrides": {
-    "svgo": "4.0.1"
+    "svgo": "4.0.1",
+    "@react-three/fiber": "$@react-three/fiber",
+    "react": "$react",
+    "react-dom": "$react-dom"
   }
 }

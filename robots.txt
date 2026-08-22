@@ -1,23 +1,78 @@
-# Robots.txt for drthummar.me
-# Developer Portfolio - Dhruvil Thummar
+# ═══════════════════════════════════════════════════════════════
+# robots.txt for drthummar.me
+# D R Thummar — Co-founder & CTO at The Intelliverse
+# Portfolio: Interactive 3D WebGL Space & Glassmorphism UI
+# ═══════════════════════════════════════════════════════════════
 
-# Allow all crawlers full access
+# Allow all crawlers full access (Traditional Search Engines)
 User-agent: *
 Allow: /
+Disallow: /functions/
+Disallow: /.env
+Disallow: /.git/
 
-# Google
+# ─── Google Search & Discovery ────────────────────────────────
 User-agent: Googlebot
 Allow: /
 
-# Bing
-User-agent: Bingbot
-Allow: /
-
-# Google Images
 User-agent: Googlebot-Image
 Allow: /assets/
 
-# Social Media Crawlers
+User-agent: Googlebot-Video
+Allow: /assets/
+
+User-agent: Google-Extended
+Allow: /
+
+# ─── Bing Search ──────────────────────────────────────────────
+User-agent: Bingbot
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
+# ─── AI Answer Engines (AEO — Critical for AI Search) ────────
+# Allow AI crawlers to index and extract structured data (JSON-LD)
+# and semantic HTML bio block for knowledge graph generation.
+
+# OpenAI / ChatGPT
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic / Claude
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+
+# Google SGE / Gemini
+User-agent: Google-Extended
+Allow: /
+
+# Cohere AI
+User-agent: cohere-ai
+Allow: /
+
+# Meta AI
+User-agent: FacebookBot
+Allow: /
+
+User-agent: meta-externalagent
+Allow: /
+
+# Apple / Applebot (Siri, Spotlight)
+User-agent: Applebot
+Allow: /
+
+# ─── Social Media Crawlers (Open Graph Previews) ─────────────
 User-agent: facebookexternalhit
 Allow: /
 
@@ -27,8 +82,20 @@ Allow: /
 User-agent: LinkedInBot
 Allow: /
 
-# Sitemap Location
+User-agent: WhatsApp
+Allow: /
+
+User-agent: Slackbot
+Allow: /
+
+User-agent: TelegramBot
+Allow: /
+
+User-agent: Discordbot
+Allow: /
+
+# ─── Sitemap Location ────────────────────────────────────────
 Sitemap: https://drthummar.me/sitemap.xml
 
-# Host
+# ─── Host ─────────────────────────────────────────────────────
 Host: https://drthummar.me

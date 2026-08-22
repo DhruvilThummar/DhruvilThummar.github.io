@@ -3,79 +3,87 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-  <!-- Homepage -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Homepage (Priority 1.0 — Main Entry Point)                 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
   <url>
     <loc>https://drthummar.me/</loc>
-    <lastmod>2025-12-14</lastmod>
+    <lastmod>2025-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://drthummar.me/assets/dt-logo-og.png</image:loc>
-      <image:title>Dhruvil Thummar - Java &amp; Python Developer Portfolio</image:title>
-      <image:caption>Professional portfolio of Dhruvil Thummar, Java, Python and Full Stack Web Developer from Ahmedabad, India</image:caption>
+      <image:title>D R Thummar — Co-founder and CTO at The Intelliverse, Full Stack Developer Portfolio</image:title>
+      <image:caption>Interactive 3D portfolio of D R Thummar, Co-founder and CTO at The Intelliverse, Full Stack Developer and Systems Architect based in Ahmedabad, Gujarat, India.</image:caption>
     </image:image>
   </url>
 
-  <!-- About Section -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Chapter 01: The Genesis Dual Timeline (About / Origin)     -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
   <url>
-    <loc>https://drthummar.me/#about</loc>
-    <lastmod>2025-12-14</lastmod>
+    <loc>https://drthummar.me/#genesis</loc>
+    <lastmod>2025-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- Education Section -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Chapter 02: The Arsenal (Skills / Tech Stack)              -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
   <url>
-    <loc>https://drthummar.me/#education</loc>
-    <lastmod>2025-12-14</lastmod>
+    <loc>https://drthummar.me/#arsenal</loc>
+    <lastmod>2025-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- Projects Section -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Chapter 03: The Mission Archives (Projects)                -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
   <url>
-    <loc>https://drthummar.me/#projects</loc>
-    <lastmod>2025-12-14</lastmod>
+    <loc>https://drthummar.me/#missions</loc>
+    <lastmod>2025-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- Skills Section -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Chapter 04: The Guild / Alliances (Leadership Team)        -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
   <url>
-    <loc>https://drthummar.me/#skills</loc>
-    <lastmod>2025-12-14</lastmod>
+    <loc>https://drthummar.me/#guild</loc>
+    <lastmod>2025-08-22</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
 
-  <!-- Contact Section -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Chapter 05: Contact Portal (Terminal Shell)                -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
   <url>
     <loc>https://drthummar.me/#contact</loc>
-    <lastmod>2025-12-14</lastmod>
+    <lastmod>2025-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- Live Project: Script Converter Studio -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Career Timeline (Git Commit Milestones)                    -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
   <url>
-    <loc>https://drthummar.me/Script-Converter-Studio/</loc>
-    <lastmod>2025-12-14</lastmod>
+    <loc>https://drthummar.me/#timeline</loc>
+    <lastmod>2025-08-22</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.6</priority>
   </url>
 
-  <!-- Live Project: What's in My Fridge -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Live Sub-Projects (Hosted on GitHub Pages)                 -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
   <url>
-    <loc>https://drthummar.me/What-s-In-My-Fridge/</loc>
-    <lastmod>2025-12-14</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Live Project: The Intelliverse -->
-  <url>
-    <loc>https://drthummar.me/The-Intelliverse/</loc>
-    <lastmod>2025-12-14</lastmod>
+    <loc>https://dhruvilthummar.github.io/Script-Converter-Studio/</loc>
+    <lastmod>2025-08-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>

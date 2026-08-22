@@ -1,0 +1,49 @@
+<svg width="280" height="100" viewBox="0 0 280 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="handwriting">
+      <feTurbulence type="fractalNoise" baseFrequency="0.08" numOctaves="1" result="turbulence" />
+      <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="1.2" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+
+  <style>
+    /* This section defines the animation for the logo paths */
+    .logo-path {
+      stroke: #00BFFF; /* This is the accent blue color */
+      fill: none;
+      stroke-dasharray: 1500; /* A high value to cover the path length */
+      stroke-dashoffset: 1500; /* Start with the path fully hidden */
+      animation-timing-function: ease-in-out;
+      animation-fill-mode: forwards; /* Keep the final state of the animation */
+    }
+
+    #signature-path {
+      stroke-width: 3;
+      animation: draw 2s forwards;
+    }
+
+    #strike-path {
+      stroke-width: 2;
+      animation: draw 1s 1s forwards; /* Starts after a 1-second delay */
+    }
+
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0; /* Animate to reveal the full path */
+      }
+    }
+  </style>
+
+  <g filter="url(#handwriting)">
+    <path
+      id="signature-path"
+      class="logo-path"
+      d="M40 75 C 10 10, 100 10, 100 50 C 100 90, 40 95, 40 75 L 90 30 C 110 40, 115 75, 130 65 L 140 50 C 145 70, 155 70, 160 50 L 170 70 L 180 50 L 190 70 L 200 50 L 210 70 L 220 50 L 230 70 L 260 40"
+    />
+    <path
+      id="strike-path"
+      class="logo-path"
+      d="M20 68 C 100 55, 180 75, 270 62"
+    />
+  </g>
+</svg>

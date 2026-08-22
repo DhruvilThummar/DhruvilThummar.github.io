@@ -527,6 +527,70 @@ function SmashableObjects() {
 }
 
 // ==========================================
+// 🚀 Stunt Jump Ramps & Cyber Checkpoint Gates
+// ==========================================
+function ArenaTrackFeatures() {
+  const ramps = [
+    { position: [0, 0.45, -18] as [number, number, number], rotation: [-0.3, 0, 0] as [number, number, number] },
+    { position: [-16, 0.45, -34] as [number, number, number], rotation: [-0.3, 0.4, 0] as [number, number, number] },
+    { position: [16, 0.45, -34] as [number, number, number], rotation: [-0.3, -0.4, 0] as [number, number, number] },
+  ];
+
+  const gateArches = [
+    { position: [0, 0, -12] as [number, number, number] },
+    { position: [-18, 0, -26] as [number, number, number] },
+    { position: [18, 0, -26] as [number, number, number] },
+  ];
+
+  return (
+    <group>
+      {/* 🚀 Stunt Jump Ramps */}
+      {ramps.map((ramp, i) => (
+        <RigidBody key={`ramp-${i}`} type="fixed" friction={0.6} position={ramp.position} rotation={ramp.rotation}>
+          <group>
+            {/* Main Ramp Surface */}
+            <mesh castShadow receiveShadow>
+              <boxGeometry args={[4.5, 0.25, 4.0]} />
+              <meshStandardMaterial color="#09090B" roughness={0.2} metalness={0.8} />
+            </mesh>
+            {/* Glowing Cyan LED Edge Strips */}
+            <mesh position={[-2.2, 0.15, 0]}>
+              <boxGeometry args={[0.1, 0.08, 4.0]} />
+              <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={3.5} toneMapped={false} />
+            </mesh>
+            <mesh position={[2.2, 0.15, 0]}>
+              <boxGeometry args={[0.1, 0.08, 4.0]} />
+              <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={3.5} toneMapped={false} />
+            </mesh>
+          </group>
+        </RigidBody>
+      ))}
+
+      {/* ⚡ Glowing Neon Checkpoint Gate Arches */}
+      {gateArches.map((gate, i) => (
+        <group key={`gate-${i}`} position={gate.position}>
+          {/* Left Pillar */}
+          <mesh position={[-4.5, 2.5, 0]} castShadow>
+            <cylinderGeometry args={[0.15, 0.15, 5.0, 16]} />
+            <meshStandardMaterial color="#0066CC" emissive="#0066CC" emissiveIntensity={2.5} toneMapped={false} />
+          </mesh>
+          {/* Right Pillar */}
+          <mesh position={[4.5, 2.5, 0]} castShadow>
+            <cylinderGeometry args={[0.15, 0.15, 5.0, 16]} />
+            <meshStandardMaterial color="#0066CC" emissive="#0066CC" emissiveIntensity={2.5} toneMapped={false} />
+          </mesh>
+          {/* Top Crossbar */}
+          <mesh position={[0, 5.0, 0]} castShadow>
+            <boxGeometry args={[9.2, 0.2, 0.2]} />
+            <meshStandardMaterial color="#38BDF8" emissive="#38BDF8" emissiveIntensity={3.5} toneMapped={false} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// ==========================================
 // Dynamic Truly Infinite Floor Component
 // ==========================================
 function InfiniteFloor() {
@@ -605,6 +669,9 @@ function GameScene({
       <Physics gravity={[0, -9.81, 0]}>
         {/* Dynamic Infinite Floor & Grid */}
         <InfiniteFloor />
+
+        {/* 🚀 Stunt Jump Ramps & Checkpoint Gate Arches */}
+        <ArenaTrackFeatures />
 
         {/* Driveable Raycast Arcade Vehicle */}
         <ArcadeVehicle

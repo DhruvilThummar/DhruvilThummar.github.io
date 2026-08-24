@@ -235,7 +235,7 @@ export function HeroSection() {
 
           {/* Bio & Architectural Summary */}
           <motion.div variants={itemVariants} className="space-y-3">
-            <p className="text-sm sm:text-base md:text-lg font-sans leading-[1.65] text-[#3F3F46] max-w-2xl bg-white/75 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-black/[0.06] shadow-xs">
+            <p className="text-sm sm:text-base md:text-lg font-sans leading-[1.65] text-[#27272A] max-w-2xl bg-transparent">
               Computer Engineering student specializing in{' '}
               <strong className="font-semibold text-[#09090B]">Machine Learning</strong>,{' '}
               <strong className="font-semibold text-[#09090B]">Data Analytics</strong>, and{' '}

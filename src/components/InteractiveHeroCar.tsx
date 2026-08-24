@@ -707,6 +707,11 @@ function InfiniteFloor() {
       floorRef.current.position.x = camPos.x;
       floorRef.current.position.z = camPos.z;
     }
+    if (groundTexture) {
+      // 💡 Truly Infinite Texture Offset Scrolling: Grid patterns roll endlessly in all 360 degrees
+      groundTexture.offset.x = (camPos.x / 10) % 1;
+      groundTexture.offset.y = (-camPos.z / 10) % 1;
+    }
     if (shadowGroupRef.current) {
       shadowGroupRef.current.position.x = camPos.x;
       shadowGroupRef.current.position.z = camPos.z;
@@ -715,14 +720,14 @@ function InfiniteFloor() {
 
   return (
     <group>
-      {/* Mega Fixed Collider Floor */}
+      {/* ♾️ Truly Infinite 100,000m x 100,000m Physics Collider Floor */}
       <RigidBody type="fixed" friction={0.7} restitution={0.2}>
-        <CuboidCollider args={[800, 0.5, 800]} position={[0, -0.5, 0]} />
+        <CuboidCollider args={[50000, 0.5, 50000]} position={[0, -0.5, 0]} />
       </RigidBody>
 
-      {/* Dynamic Visual Cyber Floor Plane Following Camera */}
+      {/* Dynamic Visual Cyber Floor Plane Following Camera Everywhere */}
       <mesh ref={floorRef} position={[0, -0.01, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[1600, 1600]} />
+        <planeGeometry args={[10000, 10000]} />
         <meshStandardMaterial
           map={groundTexture}
           color="#0F172A"
@@ -759,7 +764,7 @@ function GameScene({
   return (
     <>
       {/* 💡 Atmospheric Depth Fog Matched to Dark Land Floor */}
-      <fog attach="fog" args={['#0F172A', 30, 160]} />
+      <fog attach="fog" args={['#0F172A', 40, 350]} />
 
       {/* 💡 Balanced Ambient Fill Light */}
       <hemisphereLight args={['#1E293B', '#0F172A', 0.4]} />

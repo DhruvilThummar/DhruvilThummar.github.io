@@ -652,13 +652,65 @@ function ArenaTrackFeatures() {
 
 // ==========================================
 // ==========================================
+// ==========================================
+// 💡 Floating Ground Cyber Particles for 3D Velocity Perception
+// ==========================================
+function GroundCyberParticles() {
+  const particlesRef = useRef<THREE.Points>(null);
+  const count = 350;
+
+  const [positions, colors] = useMemo(() => {
+    const pos = new Float32Array(count * 3);
+    const col = new Float32Array(count * 3);
+    const cyan = new THREE.Color('#38BDF8');
+    const blue = new THREE.Color('#0066CC');
+
+    for (let i = 0; i < count; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 350;
+      pos[i * 3 + 1] = 0.15 + Math.random() * 0.45;
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 350;
+
+      const c = Math.random() > 0.5 ? cyan : blue;
+      col[i * 3] = c.r;
+      col[i * 3 + 1] = c.g;
+      col[i * 3 + 2] = c.b;
+    }
+    return [pos, col];
+  }, []);
+
+  useFrame((state) => {
+    const camPos = state.camera.position;
+    if (particlesRef.current) {
+      particlesRef.current.position.x = camPos.x;
+      particlesRef.current.position.z = camPos.z;
+    }
+  });
+
+  return (
+    <points ref={particlesRef}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
+        <bufferAttribute attach="attributes-color" args={[colors, 3]} />
+      </bufferGeometry>
+      <pointsMaterial
+        size={0.28}
+        vertexColors
+        transparent
+        opacity={0.65}
+        sizeAttenuation
+      />
+    </points>
+  );
+}
+
+// ==========================================
 // Dynamic Truly Infinite Mega Cyber Floor Component
 // ==========================================
 function InfiniteFloor() {
   const floorRef = useRef<THREE.Mesh>(null);
   const shadowGroupRef = useRef<THREE.Group>(null);
 
-  // Generate high-resolution procedural cyber grid & road markings texture
+  // Generate high-resolution procedural hex-grid & racing asphalt texture
   const groundTexture = useMemo(() => {
     if (typeof document === 'undefined') return null;
     const canvas = document.createElement('canvas');
@@ -667,13 +719,13 @@ function InfiniteFloor() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
 
-    // Dark carbon studio floor base
-    ctx.fillStyle = '#080C14';
+    // Dark carbon asphalt base
+    ctx.fillStyle = '#060A12';
     ctx.fillRect(0, 0, 512, 512);
 
-    // Fine grid lines
-    ctx.strokeStyle = 'rgba(0, 102, 204, 0.22)';
-    ctx.lineWidth = 1.5;
+    // Fine cyber grid lines
+    ctx.strokeStyle = 'rgba(0, 102, 204, 0.28)';
+    ctx.lineWidth = 1.8;
     const step = 64;
     for (let x = 0; x <= 512; x += step) {
       ctx.beginPath();
@@ -688,20 +740,35 @@ function InfiniteFloor() {
       ctx.stroke();
     }
 
-    // Glowing cyan corner intersection nodes
+    // Hexagonal / Diamond Micro-Circuit Accents inside grid cells
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
+    ctx.lineWidth = 1;
+    for (let x = 32; x < 512; x += step) {
+      for (let y = 32; y < 512; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, y - 12);
+        ctx.lineTo(x + 12, y);
+        ctx.lineTo(x, y + 12);
+        ctx.lineTo(x - 12, y);
+        ctx.closePath();
+        ctx.stroke();
+      }
+    }
+
+    // Glowing cyan intersection nodes
     ctx.fillStyle = '#38BDF8';
     for (let x = 0; x <= 512; x += step) {
       for (let y = 0; y <= 512; y += step) {
         ctx.beginPath();
-        ctx.arc(x, y, 2.0, 0, Math.PI * 2);
+        ctx.arc(x, y, 2.2, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Glowing center lane dash markings
-    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+    // Glowing amber center lane dash markings
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.4)';
     ctx.setLineDash([16, 16]);
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 3.5;
     ctx.beginPath();
     ctx.moveTo(256, 0);
     ctx.lineTo(256, 512);
@@ -721,7 +788,7 @@ function InfiniteFloor() {
       floorRef.current.position.z = camPos.z;
     }
     if (groundTexture) {
-      // 💡 Truly Infinite Texture Offset Scrolling: Grid patterns roll endlessly in all 360 degrees
+      // Truly Infinite Texture Offset Scrolling in all 360 degrees
       groundTexture.offset.x = (camPos.x / 10) % 1;
       groundTexture.offset.y = (-camPos.z / 10) % 1;
     }
@@ -738,14 +805,17 @@ function InfiniteFloor() {
         <CuboidCollider args={[50000, 0.5, 50000]} position={[0, -0.5, 0]} />
       </RigidBody>
 
-      {/* Dynamic Visual Cyber Floor Plane Following Camera Everywhere */}
+      {/* Dynamic Physical Cyber Floor Plane with Clearcoat Specular Reflections */}
       <mesh ref={floorRef} position={[0, -0.01, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[10000, 10000]} />
-        <meshStandardMaterial
+        <meshPhysicalMaterial
           map={groundTexture}
-          color="#0F172A"
-          roughness={0.25}
-          metalness={0.5}
+          color="#0B0F19"
+          roughness={0.2}
+          metalness={0.6}
+          clearcoat={1.0}
+          clearcoatRoughness={0.15}
+          reflectivity={0.8}
         />
       </mesh>
 
@@ -760,6 +830,9 @@ function InfiniteFloor() {
           color="#000000"
         />
       </group>
+
+      {/* 🌟 Floating Ground Cyber Particles for 3D Velocity Perception */}
+      <GroundCyberParticles />
     </group>
   );
 }

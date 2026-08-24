@@ -17,7 +17,6 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { profileData } from '@/data/profile';
-import { p } from 'framer-motion/client';
 
 // ==========================================
 // 💡 Suspense Skeleton Loader for Seamless Boot
@@ -40,7 +39,7 @@ function HeroSkeleton() {
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#0066CC]" />
           </span>
           <span className="font-mono text-xs font-bold text-[#09090B] tracking-wider animate-pulse">
-            [ INITIALIZING 3D ENGINE... ]
+            [ INITIALIZING ENGINE... ]
           </span>
         </div>
       </div>
@@ -48,13 +47,8 @@ function HeroSkeleton() {
   );
 }
 
-// Dynamic Imports for 3D Scenes
+// Dynamic Imports for 3D Scenes & Interactive Core
 const InteractiveHeroCar = dynamic(() => import('@/components/InteractiveHeroCar'), {
-  ssr: false,
-  loading: () => <HeroSkeleton />,
-});
-
-const AbstractHeroWrapper = dynamic(() => import('@/components/AbstractHeroWrapper'), {
   ssr: false,
   loading: () => <HeroSkeleton />,
 });
@@ -105,7 +99,7 @@ const itemVariants = {
 };
 
 export function HeroSection() {
-  // Automatic device detection: 'car' on PC / Desktop, 'sphere' on Phone / Mobile
+  // Automatic device detection: 'car' on PC / Desktop, 'neural' on Phone / Mobile
   const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [roleIndex, setRoleIndex] = useState(0);
   const [timeString, setTimeString] = useState('');
@@ -150,7 +144,7 @@ export function HeroSection() {
   return (
     <section className="relative min-h-[100dvh] w-full overflow-hidden bg-[#FCFCFC] flex flex-col justify-between pt-20 pb-6 md:pt-24 md:pb-8">
       {/* ==========================================
-          1. 3D WebGL Canvas Layer (PC Desktop Full Background)
+          1. 3D WebGL Canvas Layer (PC Desktop Full Background Engine)
           ========================================== */}
       {isMobile === false && (
         <div className="absolute inset-0 z-0 pointer-events-none">
@@ -165,9 +159,9 @@ export function HeroSection() {
       <div className="aurora-background pointer-events-none opacity-30 z-0" />
 
       {/* ==========================================
-          2. Hero Content Container (z-10)
+          2. Hero Content Container (First Full Screen on Mobile)
           ========================================== */}
-      <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-between pointer-events-none">
+      <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-between pointer-events-none min-h-[calc(100dvh-5rem)]">
         
         {/* Top Header Bar */}
         <motion.div
@@ -270,6 +264,33 @@ export function HeroSection() {
               <span>Resume Protocol</span>
             </a>
           </motion.div>
+        </motion.div>
+
+        {/* Highlights & Metrics Glass Strip + Telemetry Bar */}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="w-full pt-2 pb-2 pointer-events-auto"
+        >
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+            {heroMetrics.map((metric) => (
+              <div
+                key={metric.label}
+                className="bg-white/70 backdrop-blur-md border border-black/[0.06] p-3 rounded-xl shadow-2xs hover:border-[#0066CC]/20 transition-all"
+              >
+                <span className="block font-mono text-[9px] sm:text-[10px] text-[#71717A] tracking-wider uppercase font-semibold">
+                  {metric.label}
+                </span>
+                <span className="block font-heading font-bold text-sm sm:text-base text-[#09090B] truncate">
+                  {metric.value}
+                </span>
+                <span className="block font-mono text-[10px] text-[#0066CC] font-medium truncate">
+                  {metric.sub}
+                </span>
+              </div>
+            ))}
+          </div>
 
           {/* Bottom Social & Telemetry Bar */}
           <div className="mt-3 w-full border-t border-black/[0.06] pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono text-xs text-[#71717A] bg-white/50 backdrop-blur-xs px-4 py-2.5 rounded-xl">
@@ -311,24 +332,30 @@ export function HeroSection() {
               </div>
             </div>
           </div>
-
-          {/* 📱 Mobile-Only Interactive Quantum Neural Core Showcase (Rendered at the VERY END after ALL Hero text, metrics & links) */}
-          {isMobile === true && (
-            <motion.div
-              variants={itemVariants}
-              className="w-full h-[360px] sm:h-[400px] mt-6 relative pointer-events-auto flex items-center justify-center rounded-2xl bg-white/60 backdrop-blur-md border border-black/[0.08] shadow-xs overflow-hidden"
-            >
-              <div className="absolute top-3 left-4 z-10 font-mono text-[11px] text-[#71717A] flex items-center gap-1.5 bg-white/90 px-3 py-1 rounded-full border border-black/[0.06] shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-[#0066CC] animate-ping" />
-                <span>SYSTEM ARCHITECTURE MATRIX</span>
-              </div>
-              <Suspense fallback={<HeroSkeleton />}>
-                <QuantumNeuralCore />
-              </Suspense>
-            </motion.div>
-          )}
         </motion.div>
       </div>
+
+      {/* ==========================================
+          3. Mobile Showcase Section (Appears after scrolling down on Phone view)
+          ========================================== */}
+      {isMobile === true && (
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 mt-6 pb-6 relative z-10 pointer-events-auto">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="w-full min-h-[380px] sm:min-h-[440px] relative flex items-center justify-center rounded-2xl bg-white/80 backdrop-blur-md border border-black/[0.08] shadow-sm overflow-hidden"
+          >
+            <div className="absolute top-3 left-4 z-10 font-mono text-[11px] text-[#71717A] flex items-center gap-1.5 bg-white/95 px-3 py-1 rounded-full border border-black/[0.06] shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-[#0066CC] animate-ping" />
+              <span>SYSTEM ARCHITECTURE MATRIX</span>
+            </div>
+            <Suspense fallback={<HeroSkeleton />}>
+              <QuantumNeuralCore />
+            </Suspense>
+          </motion.div>
+        </div>
+      )}
     </section>
   );
 }

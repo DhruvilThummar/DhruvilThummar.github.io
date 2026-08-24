@@ -17,6 +17,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { profileData } from '@/data/profile';
+import { p } from 'framer-motion/client';
 
 // ==========================================
 // 💡 Suspense Skeleton Loader for Seamless Boot
@@ -265,45 +266,6 @@ export function HeroSection() {
             </a>
           </motion.div>
 
-          {/* 📱 Mobile-Only 3D Circle Sphere Component (Rendered after ALL Hero Text & Buttons on Phone) */}
-          {isMobile === true && (
-            <motion.div
-              variants={itemVariants}
-              className="w-full h-[240px] sm:h-[280px] my-2 relative pointer-events-auto flex items-center justify-center"
-            >
-              <Suspense fallback={<HeroSkeleton />}>
-                <AbstractHeroWrapper />
-              </Suspense>
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Highlights & Metrics Glass Strip */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="w-full pt-4 pointer-events-auto"
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
-            {heroMetrics.map((metric) => (
-              <div
-                key={metric.label}
-                className="bg-white/70 backdrop-blur-md border border-black/[0.06] p-3 rounded-xl shadow-2xs hover:border-[#0066CC]/20 transition-all"
-              >
-                <span className="block font-mono text-[9px] sm:text-[10px] text-[#71717A] tracking-wider uppercase font-semibold">
-                  {metric.label}
-                </span>
-                <span className="block font-heading font-bold text-sm sm:text-base text-[#09090B] truncate">
-                  {metric.value}
-                </span>
-                <span className="block font-mono text-[10px] text-[#0066CC] font-medium truncate">
-                  {metric.sub}
-                </span>
-              </div>
-            ))}
-          </div>
-
           {/* Bottom Social & Telemetry Bar */}
           <div className="mt-3 w-full border-t border-black/[0.06] pt-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-mono text-xs text-[#71717A] bg-white/50 backdrop-blur-xs px-4 py-2.5 rounded-xl">
             <div className="flex items-center gap-4">
@@ -344,6 +306,18 @@ export function HeroSection() {
               </div>
             </div>
           </div>
+
+          {/* 📱 Mobile-Only 3D Circle Sphere Component (Rendered at the VERY END after metrics, social links & telemetry bar) */}
+          {isMobile === true && (
+            <motion.div
+              variants={itemVariants}
+              className="w-full h-[260px] sm:h-[300px] mt-4 relative pointer-events-auto flex items-center justify-center"
+            >
+              <Suspense fallback={<HeroSkeleton />}>
+                <AbstractHeroWrapper />
+              </Suspense>
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </section>

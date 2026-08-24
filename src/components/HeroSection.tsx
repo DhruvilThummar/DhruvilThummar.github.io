@@ -66,8 +66,6 @@ const heroRoles = [
   { title: 'IBM-Certified Data Science', org: 'Specialist', icon: ShieldCheck, color: 'text-blue-700' },
 ];
 
-
-
 // Highlights / Metrics Strip
 const heroMetrics = [
   { label: 'EXPERIENCE', value: '3+ Years', sub: 'ML & Full-Stack' },
@@ -146,23 +144,22 @@ export function HeroSection() {
   return (
     <section className="relative min-h-[100dvh] w-full overflow-hidden bg-[#FCFCFC] flex flex-col justify-between pt-20 pb-6 md:pt-24 md:pb-8">
       {/* ==========================================
-          1. 3D WebGL Canvas Background Layer (z-0)
-             - PC (Desktop): 3D Arcade Car Game Engine
-             - Phone (Mobile): Interactive Glass Sphere (smooth lag-free scrolling)
+          1. 3D WebGL Canvas Layer (PC Desktop Full Background)
           ========================================== */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <Suspense fallback={<HeroSkeleton />}>
-          {isMobile === false && <InteractiveHeroCar />}
-          {isMobile === true && <AbstractHeroWrapper />}
-        </Suspense>
-      </div>
+      {isMobile === false && (
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <Suspense fallback={<HeroSkeleton />}>
+            <InteractiveHeroCar />
+          </Suspense>
+        </div>
+      )}
 
       {/* Ambient Lighting Spotlights & Aurora Overlay */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-gradient-to-tr from-[#0066CC]/10 via-sky-400/10 to-transparent blur-3xl pointer-events-none z-0 rounded-full" />
       <div className="aurora-background pointer-events-none opacity-30 z-0" />
 
       {/* ==========================================
-          2. Hero Content Overlay Container (z-10)
+          2. Hero Content Container (z-10)
           ========================================== */}
       <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-between pointer-events-none">
         
@@ -199,7 +196,7 @@ export function HeroSection() {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="max-w-3xl space-y-4 sm:space-y-6 my-auto pt-6 pb-6 pointer-events-auto"
+          className="max-w-3xl space-y-4 sm:space-y-5 my-auto pt-4 pb-4 pointer-events-auto"
         >
           {/* Dynamic Role Carousel Pill */}
           <motion.div variants={itemVariants} className="h-9 flex items-center overflow-hidden">
@@ -225,7 +222,7 @@ export function HeroSection() {
 
           {/* Main Shimmer Headline */}
           <motion.div variants={itemVariants} className="space-y-1">
-            <h1 className="text-[clamp(3rem,6vw,5.5rem)] font-heading font-extrabold tracking-tight leading-[0.95] text-[#09090B]">
+            <h1 className="text-[clamp(2.75rem,5.5vw,5.5rem)] font-heading font-extrabold tracking-tight leading-[0.95] text-[#09090B]">
               D R{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#09090B] via-[#0066CC] to-[#09090B] animate-pulse">
                 Thummar
@@ -247,10 +244,20 @@ export function HeroSection() {
             </p>
           </motion.div>
 
-
+          {/* 📱 Mobile-Only 3D Circle Sphere Component (Rendered IN-LINE after Hero text on Phone) */}
+          {isMobile === true && (
+            <motion.div
+              variants={itemVariants}
+              className="w-full h-[240px] sm:h-[280px] my-2 relative pointer-events-auto flex items-center justify-center"
+            >
+              <Suspense fallback={<HeroSkeleton />}>
+                <AbstractHeroWrapper />
+              </Suspense>
+            </motion.div>
+          )}
 
           {/* Apple-Grade CTAs */}
-          <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3.5 pt-2">
+          <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3.5 pt-1">
             <a
               href="#projects"
               className="bg-[#09090B] text-white hover:bg-black/90 px-6 py-3.5 rounded-full font-medium transition-all shadow-sm hover:shadow-md flex items-center gap-2 group text-xs sm:text-sm min-h-[48px] touch-target cursor-pointer"

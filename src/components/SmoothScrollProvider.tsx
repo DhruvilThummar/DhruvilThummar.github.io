@@ -19,7 +19,7 @@ export function SmoothScrollProvider({ children }: SmoothScrollProviderProps) {
         lerp: 0.08,
         duration: 1.2,
         smoothWheel: true,
-        syncTouch: true,
+        syncTouch: false, // 💡 Native hardware-accelerated touch scrolling on mobile to prevent JS scroll lag
       }}
     >
       {children as any}

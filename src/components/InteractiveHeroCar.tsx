@@ -940,7 +940,7 @@ export default function InteractiveHeroCar() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-full select-none">
+    <div ref={containerRef} className="relative w-full h-full select-none pointer-events-none md:pointer-events-auto">
       {/* 3D WebGL Canvas Layer (Frameloop paused when off-screen) */}
       <KeyboardControls map={keyboardMap}>
         <Canvas

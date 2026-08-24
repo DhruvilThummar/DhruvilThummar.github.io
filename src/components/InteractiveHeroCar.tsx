@@ -308,31 +308,31 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
           <meshStandardMaterial
             color="#60A5FA"
             emissive="#60A5FA"
-            emissiveIntensity={8.0}
+            emissiveIntensity={2.5}
             toneMapped={false}
           />
         </mesh>
 
         {/* Dynamic Soft Forward Headlight LED Accents */}
-        <pointLight position={[-0.7, 0.45, -2.2]} intensity={3.0} distance={8} color="#60A5FA" />
-        <pointLight position={[0.7, 0.45, -2.2]} intensity={3.0} distance={8} color="#60A5FA" />
+        <pointLight position={[-0.7, 0.45, -2.2]} intensity={1.5} distance={8} color="#60A5FA" />
+        <pointLight position={[0.7, 0.45, -2.2]} intensity={1.5} distance={8} color="#60A5FA" />
 
-        {/* Rear Taillight Continuous LED Bar (Apex Neon Red Bloom) */}
+        {/* Rear Taillight Continuous LED Bar */}
         <mesh position={[0, 0.46, 2.06]}>
           <boxGeometry args={[1.75, 0.09, 0.08]} />
           <meshStandardMaterial
             color="#EF4444"
             emissive="#EF4444"
-            emissiveIntensity={10.0}
+            emissiveIntensity={3.5}
             toneMapped={false}
           />
         </mesh>
 
         {/* Dynamic Rear Taillight Road Illumination */}
-        <pointLight position={[0, 0.46, 2.3]} intensity={14.0} distance={8} color="#EF4444" />
+        <pointLight position={[0, 0.46, 2.3]} intensity={2.5} distance={8} color="#EF4444" />
 
         {/* Futuristic Cyber Neon Chassis Underglow */}
-        <pointLight position={[0, 0.15, 0]} intensity={12.0} distance={5} color="#0066CC" />
+        <pointLight position={[0, 0.15, 0]} intensity={2.5} distance={5} color="#0066CC" />
 
         {/* Rear Aerodynamic GT Wing / Spoiler */}
         <group position={[0, 0.82, 1.85]}>
@@ -668,20 +668,20 @@ function InfiniteFloor() {
         <CuboidCollider args={[800, 0.5, 800]} position={[0, -0.5, 0]} />
       </RigidBody>
 
-      {/* Dynamic Visual Floor Plane Following Camera */}
+      {/* Dynamic Visual Floor Plane Following Camera (Sleek Dark Carbon Finish) */}
       <mesh ref={floorRef} position={[0, -0.01, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[1600, 1600]} />
-        <meshStandardMaterial color="#CBD5E1" roughness={1.0} metalness={0.0} envMapIntensity={0.0} />
+        <meshStandardMaterial color="#0F172A" roughness={0.5} metalness={0.4} />
       </mesh>
 
       {/* Dynamic Grid Following Camera Snapped to Grid Units */}
-      <gridHelper ref={gridRef} args={[1600, 400, '#94A3B8', '#CBD5E1']} position={[0, 0.01, 0]} />
+      <gridHelper ref={gridRef} args={[1600, 400, '#0066CC', '#1E293B']} position={[0, 0.01, 0]} />
 
       {/* Dynamic Contact Shadow Following Camera & Car Everywhere */}
       <group ref={shadowGroupRef}>
         <ContactShadows
           position={[0, 0.02, 0]}
-          opacity={0.35}
+          opacity={0.6}
           scale={80}
           blur={2.0}
           far={15}
@@ -693,7 +693,7 @@ function InfiniteFloor() {
 }
 
 // ==========================================
-// 3. Main Scene Setup with Adaptive Mobile FX
+// 3. Main Scene Setup with Soft Studio Lighting
 // ==========================================
 function GameScene({
   mobileControls,
@@ -704,16 +704,16 @@ function GameScene({
 }: VehicleProps & { isMobile: boolean }) {
   return (
     <>
-      {/* 💡 Dim Atmospheric Depth Fog Matched to Land Floor Color */}
-      <fog attach="fog" args={['#CBD5E1', 80, 300]} />
+      {/* 💡 Atmospheric Depth Fog Matched to Dark Land Floor */}
+      <fog attach="fog" args={['#0F172A', 30, 160]} />
 
-      {/* 💡 Ultra-Low Ambient Fill Light */}
-      <hemisphereLight args={['#FFFFFF', '#CBD5E1', 0.1]} />
+      {/* 💡 Balanced Ambient Fill Light */}
+      <hemisphereLight args={['#1E293B', '#0F172A', 0.4]} />
 
-      {/* Low-Intensity Overhead Directional Light */}
+      {/* Soft Directional Overhead Key Light */}
       <directionalLight
-        position={[0, 45, 0]}
-        intensity={0.12}
+        position={[20, 45, 20]}
+        intensity={0.6}
         castShadow={!isMobile} // Optimize shadows on mobile
         shadow-mapSize={isMobile ? [1024, 1024] : [2048, 2048]}
         shadow-camera-left={-35}
@@ -946,7 +946,7 @@ export default function InteractiveHeroCar() {
         <Canvas
           shadows={!isMobile}
           camera={{ position: [0, 3.5, 8.5], fov: 50 }}
-          className="w-full h-full bg-[#CBD5E1]"
+          className="w-full h-full bg-[#0F172A]"
           dpr={isMobile ? [1, 1.25] : [1, 2]} // 💡 Adaptive Mobile DPR
           frameloop={isInView ? 'always' : 'never'} // 💡 Off-Screen GPU Throttling
           gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}

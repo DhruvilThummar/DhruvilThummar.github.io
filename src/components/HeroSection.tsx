@@ -11,12 +11,7 @@ import {
   Linkedin,
   Mail,
   Cpu,
-  Zap,
-  Gamepad2,
-  Globe2,
   Clock,
-  Layers,
-  Box,
   Brain,
   ShieldCheck,
   CheckCircle2,
@@ -63,11 +58,6 @@ const AbstractHeroWrapper = dynamic(() => import('@/components/AbstractHeroWrapp
   loading: () => <HeroSkeleton />,
 });
 
-const CyberGridHero = dynamic(() => import('@/components/CyberGridHero'), {
-  ssr: false,
-  loading: () => <HeroSkeleton />,
-});
-
 // Roles for Dynamic Carousel
 const heroRoles = [
   { title: 'Co-founder & CTO', org: '@ The Intelliverse', icon: Sparkles, color: 'text-[#0066CC]' },
@@ -76,15 +66,7 @@ const heroRoles = [
   { title: 'IBM-Certified Data Science', org: 'Specialist', icon: ShieldCheck, color: 'text-blue-700' },
 ];
 
-// Tech stack pills
-const techPills = [
-  { name: 'PyTorch / ML', highlight: true },
-  { name: 'React 19 & Next.js 16', highlight: false },
-  { name: 'Three.js / R3F', highlight: true },
-  { name: 'Rapier 3D Physics', highlight: false },
-  { name: 'TypeScript', highlight: false },
-  { name: 'TailwindCSS', highlight: false },
-];
+
 
 // Highlights / Metrics Strip
 const heroMetrics = [
@@ -119,17 +101,18 @@ const itemVariants = {
 };
 
 export function HeroSection() {
-  // 3D Canvas mode: 'car' | 'sphere' | 'grid'
-  const [heroMode, setHeroMode] = useState<'car' | 'sphere' | 'grid'>('sphere');
+  // Automatic device detection: 'car' on PC / Desktop, 'sphere' on Phone / Mobile
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const [roleIndex, setRoleIndex] = useState(0);
   const [timeString, setTimeString] = useState('');
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
 
-  // Auto-detect mobile screen & set lightweight mode for 100% smooth scrolling
   useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    setIsMobileDevice(isMobile);
-    setHeroMode(isMobile ? 'grid' : 'car');
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   // Cycle roles every 3.5 seconds
@@ -163,13 +146,14 @@ export function HeroSection() {
   return (
     <section className="relative min-h-[100dvh] w-full overflow-hidden bg-[#FCFCFC] flex flex-col justify-between pt-20 pb-6 md:pt-24 md:pb-8">
       {/* ==========================================
-          1. 3D WebGL Canvas Layer (z-0, pointer-events-none for 100% touch scroll safety)
+          1. 3D WebGL Canvas Background Layer (z-0)
+             - PC (Desktop): 3D Arcade Car Game Engine
+             - Phone (Mobile): Interactive Glass Sphere (smooth lag-free scrolling)
           ========================================== */}
       <div className="absolute inset-0 z-0 pointer-events-none">
         <Suspense fallback={<HeroSkeleton />}>
-          {heroMode === 'car' && <InteractiveHeroCar />}
-          {heroMode === 'sphere' && <AbstractHeroWrapper />}
-          {heroMode === 'grid' && <CyberGridHero />}
+          {isMobile === false && <InteractiveHeroCar />}
+          {isMobile === true && <AbstractHeroWrapper />}
         </Suspense>
       </div>
 
@@ -178,11 +162,11 @@ export function HeroSection() {
       <div className="aurora-background pointer-events-none opacity-30 z-0" />
 
       {/* ==========================================
-          2. Hero Content Container (z-10)
+          2. Hero Content Overlay Container (z-10)
           ========================================== */}
       <div className="relative z-10 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 flex-1 flex flex-col justify-between pointer-events-none">
         
-        {/* Top Header Controls Bar */}
+        {/* Top Header Bar */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -207,48 +191,6 @@ export function HeroSection() {
                 <span>{timeString} IST</span>
               </div>
             )}
-          </motion.div>
-
-          {/* 3D Scene Visual Mode Switcher */}
-          <motion.div variants={itemVariants} className="flex items-center gap-1 bg-white/80 backdrop-blur-md border border-black/[0.08] p-1 rounded-full shadow-xs">
-            <button
-              onClick={() => setHeroMode('car')}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all ${
-                heroMode === 'car'
-                  ? 'bg-[#09090B] text-white shadow-xs'
-                  : 'text-[#71717A] hover:text-[#09090B] hover:bg-black/[0.04]'
-              }`}
-              title="Interactive 3D Arcade Vehicle Physics"
-            >
-              <Gamepad2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">3D Drive</span>
-            </button>
-
-            <button
-              onClick={() => setHeroMode('sphere')}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all ${
-                heroMode === 'sphere'
-                  ? 'bg-[#09090B] text-white shadow-xs'
-                  : 'text-[#71717A] hover:text-[#09090B] hover:bg-black/[0.04]'
-              }`}
-              title="Refractive Quantum Glass Sphere"
-            >
-              <Box className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Glass Sphere</span>
-            </button>
-
-            <button
-              onClick={() => setHeroMode('grid')}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-mono font-medium transition-all ${
-                heroMode === 'grid'
-                  ? 'bg-[#09090B] text-white shadow-xs'
-                  : 'text-[#71717A] hover:text-[#09090B] hover:bg-black/[0.04]'
-              }`}
-              title="Cyber Matrix Grid (Ultra-Smooth Mobile Mode)"
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Cyber Grid</span>
-            </button>
           </motion.div>
         </motion.div>
 
@@ -305,21 +247,7 @@ export function HeroSection() {
             </p>
           </motion.div>
 
-          {/* Tech Badges Strip */}
-          <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-1.5 pt-1">
-            {techPills.map((pill) => (
-              <span
-                key={pill.name}
-                className={`px-3 py-1 rounded-lg text-xs font-mono font-medium border transition-all ${
-                  pill.highlight
-                    ? 'bg-[#0066CC]/10 text-[#0066CC] border-[#0066CC]/30 font-semibold'
-                    : 'bg-white/80 text-[#71717A] border-black/[0.06] hover:text-[#09090B] hover:bg-white'
-                }`}
-              >
-                {pill.name}
-              </span>
-            ))}
-          </motion.div>
+
 
           {/* Apple-Grade CTAs */}
           <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3.5 pt-2">
@@ -402,8 +330,10 @@ export function HeroSection() {
             <div className="flex items-center gap-2 font-mono text-[10px] sm:text-[11px]">
               <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-white border border-black/[0.08] rounded-md text-[#09090B] font-medium shadow-2xs">
                 <Cpu className="w-3 h-3 text-[#0066CC]" />
-                <span className="text-[#71717A]">MODE:</span>
-                <span className="font-semibold text-[#0066CC] uppercase">{heroMode}</span>
+                <span className="text-[#71717A]">ENGINE:</span>
+                <span className="font-semibold text-[#0066CC] uppercase">
+                  {isMobile ? '3D GLASS SPHERE' : '3D RAPIER CAR ENGINE'}
+                </span>
               </div>
             </div>
           </div>

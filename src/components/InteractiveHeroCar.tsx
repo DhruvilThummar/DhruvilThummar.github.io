@@ -638,22 +638,74 @@ function ArenaTrackFeatures() {
 }
 
 // ==========================================
-// Dynamic Truly Infinite Mega Floor Component
+// ==========================================
+// Dynamic Truly Infinite Mega Cyber Floor Component
 // ==========================================
 function InfiniteFloor() {
   const floorRef = useRef<THREE.Mesh>(null);
-  const gridRef = useRef<THREE.GridHelper>(null);
   const shadowGroupRef = useRef<THREE.Group>(null);
+
+  // Generate high-resolution procedural cyber grid & road markings texture
+  const groundTexture = useMemo(() => {
+    if (typeof document === 'undefined') return null;
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    // Dark carbon studio floor base
+    ctx.fillStyle = '#080C14';
+    ctx.fillRect(0, 0, 512, 512);
+
+    // Fine grid lines
+    ctx.strokeStyle = 'rgba(0, 102, 204, 0.22)';
+    ctx.lineWidth = 1.5;
+    const step = 64;
+    for (let x = 0; x <= 512; x += step) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, 512);
+      ctx.stroke();
+    }
+    for (let y = 0; y <= 512; y += step) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(512, y);
+      ctx.stroke();
+    }
+
+    // Glowing cyan corner intersection nodes
+    ctx.fillStyle = '#38BDF8';
+    for (let x = 0; x <= 512; x += step) {
+      for (let y = 0; y <= 512; y += step) {
+        ctx.beginPath();
+        ctx.arc(x, y, 2.0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    // Glowing center lane dash markings
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+    ctx.setLineDash([16, 16]);
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(256, 0);
+    ctx.lineTo(256, 512);
+    ctx.stroke();
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(160, 160);
+    return texture;
+  }, []);
 
   useFrame((state) => {
     const camPos = state.camera.position;
     if (floorRef.current) {
       floorRef.current.position.x = camPos.x;
       floorRef.current.position.z = camPos.z;
-    }
-    if (gridRef.current) {
-      gridRef.current.position.x = Math.floor(camPos.x / 4) * 4;
-      gridRef.current.position.z = Math.floor(camPos.z / 4) * 4;
     }
     if (shadowGroupRef.current) {
       shadowGroupRef.current.position.x = camPos.x;
@@ -668,20 +720,22 @@ function InfiniteFloor() {
         <CuboidCollider args={[800, 0.5, 800]} position={[0, -0.5, 0]} />
       </RigidBody>
 
-      {/* Dynamic Visual Floor Plane Following Camera (Sleek Dark Carbon Finish) */}
+      {/* Dynamic Visual Cyber Floor Plane Following Camera */}
       <mesh ref={floorRef} position={[0, -0.01, 0]} receiveShadow rotation={[-Math.PI / 2, 0, 0]}>
         <planeGeometry args={[1600, 1600]} />
-        <meshStandardMaterial color="#0F172A" roughness={0.5} metalness={0.4} />
+        <meshStandardMaterial
+          map={groundTexture}
+          color="#0F172A"
+          roughness={0.25}
+          metalness={0.5}
+        />
       </mesh>
-
-      {/* Dynamic Grid Following Camera Snapped to Grid Units */}
-      <gridHelper ref={gridRef} args={[1600, 400, '#0066CC', '#1E293B']} position={[0, 0.01, 0]} />
 
       {/* Dynamic Contact Shadow Following Camera & Car Everywhere */}
       <group ref={shadowGroupRef}>
         <ContactShadows
           position={[0, 0.02, 0]}
-          opacity={0.6}
+          opacity={0.65}
           scale={80}
           blur={2.0}
           far={15}

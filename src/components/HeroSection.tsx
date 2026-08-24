@@ -59,6 +59,11 @@ const AbstractHeroWrapper = dynamic(() => import('@/components/AbstractHeroWrapp
   loading: () => <HeroSkeleton />,
 });
 
+const QuantumNeuralCore = dynamic(() => import('@/components/QuantumNeuralCore'), {
+  ssr: false,
+  loading: () => <HeroSkeleton />,
+});
+
 // Roles for Dynamic Carousel
 const heroRoles = [
   { title: 'Co-founder & CTO', org: '@ The Intelliverse', icon: Sparkles, color: 'text-[#0066CC]' },
@@ -301,24 +306,24 @@ export function HeroSection() {
                 <Cpu className="w-3 h-3 text-[#0066CC]" />
                 <span className="text-[#71717A]">ENGINE:</span>
                 <span className="font-semibold text-[#0066CC] uppercase">
-                  {isMobile ? '3D GLASS SPHERE' : '3D RAPIER CAR ENGINE'}
+                  {isMobile ? 'NEURAL MATRIX ENGINE' : '3D RAPIER CAR ENGINE'}
                 </span>
               </div>
             </div>
           </div>
 
-          {/* 📱 Mobile-Only Full 3D Quantum Glass Sphere Showcase (Rendered at the VERY END after ALL Hero text, metrics & links) */}
+          {/* 📱 Mobile-Only Interactive Quantum Neural Core Showcase (Rendered at the VERY END after ALL Hero text, metrics & links) */}
           {isMobile === true && (
             <motion.div
               variants={itemVariants}
-              className="w-full h-[360px] sm:h-[420px] mt-6 relative pointer-events-auto flex items-center justify-center rounded-2xl bg-white/60 backdrop-blur-md border border-black/[0.08] shadow-xs overflow-hidden"
+              className="w-full h-[360px] sm:h-[400px] mt-6 relative pointer-events-auto flex items-center justify-center rounded-2xl bg-white/60 backdrop-blur-md border border-black/[0.08] shadow-xs overflow-hidden"
             >
               <div className="absolute top-3 left-4 z-10 font-mono text-[11px] text-[#71717A] flex items-center gap-1.5 bg-white/90 px-3 py-1 rounded-full border border-black/[0.06] shadow-2xs">
                 <span className="w-2 h-2 rounded-full bg-[#0066CC] animate-ping" />
-                <span>INTERACTIVE 3D QUANTUM CORE</span>
+                <span>SYSTEM ARCHITECTURE MATRIX</span>
               </div>
               <Suspense fallback={<HeroSkeleton />}>
-                <AbstractHeroWrapper />
+                <QuantumNeuralCore />
               </Suspense>
             </motion.div>
           )}

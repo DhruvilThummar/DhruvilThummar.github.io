@@ -59,6 +59,22 @@ interface SmashableObjectItem {
   scale: number;
 }
 
+// 💡 Zero-GC Static Vector Singletons to eliminate JavaScript Garbage Collection micro-lag during 60FPS physics loops
+const _quat = new THREE.Quaternion();
+const _euler = new THREE.Euler(0, 0, 0, 'YXZ');
+const _resetQuat = new THREE.Quaternion();
+const _forwardVec = new THREE.Vector3();
+const _rightVec = new THREE.Vector3();
+const _currentVel = new THREE.Vector3();
+const _impulseForce = new THREE.Vector3();
+const _counterForce = new THREE.Vector3();
+const _brakeForce = new THREE.Vector3();
+const _carPos = new THREE.Vector3();
+const _camOffset = new THREE.Vector3();
+const _targetCamPos = new THREE.Vector3();
+const _lookAtOffset = new THREE.Vector3();
+const _targetLookAt = new THREE.Vector3();
+
 // ==========================================
 // 1. Sleek Jet Black Sports Car & Raycast Arcade Vehicle Engine
 // ==========================================
@@ -111,34 +127,34 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
     // Vehicle orientation & linear velocity
     const linvel = rigidBodyRef.current.linvel();
     const rot = rigidBodyRef.current.rotation();
-    const quat = new THREE.Quaternion(rot.x, rot.y, rot.z, rot.w);
+    _quat.set(rot.x, rot.y, rot.z, rot.w);
 
     // Direction vectors
-    const forwardVec = new THREE.Vector3(0, 0, -1).applyQuaternion(quat);
-    const rightVec = new THREE.Vector3(1, 0, 0).applyQuaternion(quat);
+    _forwardVec.set(0, 0, -1).applyQuaternion(_quat);
+    _rightVec.set(1, 0, 0).applyQuaternion(_quat);
 
     // Current speeds
-    const currentVel = new THREE.Vector3(linvel.x, linvel.y, linvel.z);
-    const speed = currentVel.length();
-    const forwardSpeed = currentVel.dot(forwardVec);
+    _currentVel.set(linvel.x, linvel.y, linvel.z);
+    const speed = _currentVel.length();
+    const forwardSpeed = _currentVel.dot(_forwardVec);
     const speedKmh = Math.round(speed * 3.6);
     onSpeedUpdate(speedKmh);
 
     // ------------------------------------------
-    // A. Driving Dynamics & Acceleration Tuning (Apex Mega Boost)
+    // A. Driving Dynamics & Acceleration Tuning
     // ------------------------------------------
     const acceleration = 46.0;
     const reverseAccel = 25.0;
-    const maxSpeed = 42.0; // ~150 km/h top speed inside Mega Arena
+    const maxSpeed = 42.0;
     const steerSpeed = 2.6;
 
     // Apply forward/backward propulsion
     if (isForward && forwardSpeed < maxSpeed) {
-      const force = forwardVec.clone().multiplyScalar(acceleration * rigidBodyRef.current.mass() * delta);
-      rigidBodyRef.current.applyImpulse(force, true);
+      _impulseForce.copy(_forwardVec).multiplyScalar(acceleration * rigidBodyRef.current.mass() * delta);
+      rigidBodyRef.current.applyImpulse(_impulseForce, true);
     } else if (isBackward && forwardSpeed > -maxSpeed * 0.4) {
-      const force = forwardVec.clone().multiplyScalar(-reverseAccel * rigidBodyRef.current.mass() * delta);
-      rigidBodyRef.current.applyImpulse(force, true);
+      _impulseForce.copy(_forwardVec).multiplyScalar(-reverseAccel * rigidBodyRef.current.mass() * delta);
+      rigidBodyRef.current.applyImpulse(_impulseForce, true);
     }
 
     // ------------------------------------------
@@ -165,24 +181,24 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
     }
 
     // ------------------------------------------
-    // C. Lateral Drift Damping (Apex Racing Feel)
+    // C. Lateral Drift Damping
     // ------------------------------------------
-    const lateralVel = currentVel.dot(rightVec);
+    const lateralVel = _currentVel.dot(_rightVec);
     const driftFactor = isBrake ? 0.85 : 0.45;
-    const counterForce = rightVec.clone().multiplyScalar(-lateralVel * driftFactor * rigidBodyRef.current.mass() * delta * 60);
-    rigidBodyRef.current.applyImpulse(counterForce, true);
+    _counterForce.copy(_rightVec).multiplyScalar(-lateralVel * driftFactor * rigidBodyRef.current.mass() * delta * 60);
+    rigidBodyRef.current.applyImpulse(_counterForce, true);
 
     // Braking
     if (isBrake) {
-      const brakeForce = currentVel.clone().multiplyScalar(-0.6 * rigidBodyRef.current.mass() * delta);
-      rigidBodyRef.current.applyImpulse(brakeForce, true);
+      _brakeForce.copy(_currentVel).multiplyScalar(-0.6 * rigidBodyRef.current.mass() * delta);
+      rigidBodyRef.current.applyImpulse(_brakeForce, true);
     }
 
     // Stabilize roll & pitch to prevent flipping upside down
-    const euler = new THREE.Euler().setFromQuaternion(quat, 'YXZ');
-    if (Math.abs(euler.x) > 0.35 || Math.abs(euler.z) > 0.35) {
-      const resetQuat = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, euler.y, 0));
-      rigidBodyRef.current.setRotation(resetQuat, true);
+    _euler.setFromQuaternion(_quat, 'YXZ');
+    if (Math.abs(_euler.x) > 0.35 || Math.abs(_euler.z) > 0.35) {
+      _resetQuat.setFromEuler(_euler.set(0, _euler.y, 0, 'YXZ'));
+      rigidBodyRef.current.setRotation(_resetQuat, true);
       rigidBodyRef.current.setAngvel({ x: 0, y: rigidBodyRef.current.angvel().y, z: 0 }, true);
     }
 
@@ -218,24 +234,21 @@ function ArcadeVehicle({ mobileControls, onSpeedUpdate, resetTrigger, isInView }
     // ------------------------------------------
     // F. Cinematic Chase Camera System
     // ------------------------------------------
-    const carPos = new THREE.Vector3(pos.x, pos.y, pos.z);
+    _carPos.set(pos.x, pos.y, pos.z);
 
     // Dynamic offset behind car
     const camDistance = 8.2 + Math.min(speed * 0.08, 2.5);
     const camHeight = 3.2 + Math.min(speed * 0.04, 1.2);
 
-    // Smooth trailing position calculation
-    const camOffset = new THREE.Vector3(0, camHeight, camDistance).applyQuaternion(quat);
-    const targetCamPos = carPos.clone().add(camOffset);
+    _camOffset.set(0, camHeight, camDistance).applyQuaternion(_quat);
+    _targetCamPos.copy(_carPos).add(_camOffset);
 
-    // Smooth lerp camera position
-    state.camera.position.lerp(targetCamPos, delta * 6.5);
+    state.camera.position.lerp(_targetCamPos, delta * 6.5);
 
-    // Look-at point slightly in front of car
-    const lookAtOffset = new THREE.Vector3(0, 0.8, -3.5).applyQuaternion(quat);
-    const targetLookAt = carPos.clone().add(lookAtOffset);
+    _lookAtOffset.set(0, 0.8, -3.5).applyQuaternion(_quat);
+    _targetLookAt.copy(_carPos).add(_lookAtOffset);
 
-    state.camera.lookAt(targetLookAt);
+    state.camera.lookAt(_targetLookAt);
 
     // Dynamic Speed FOV Expansion
     const targetFov = 48 + Math.min(speed * 0.45, 18);
@@ -772,19 +785,19 @@ function GameScene({
       {/* Soft Directional Overhead Key Light */}
       <directionalLight
         position={[20, 45, 20]}
-        intensity={0.6}
-        castShadow={!isMobile} // Optimize shadows on mobile
-        shadow-mapSize={isMobile ? [1024, 1024] : [2048, 2048]}
+        intensity={0.5}
+        castShadow={!isMobile}
+        shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-35}
         shadow-camera-right={35}
         shadow-camera-top={35}
         shadow-camera-bottom={-35}
-        shadow-bias={-0.0001}
+        shadow-bias={-0.0005}
       />
 
       <Environment preset="city" />
 
-      <Physics gravity={[0, -9.81, 0]}>
+      <Physics gravity={[0, -9.81, 0]} timeStep={1 / 60}>
         {/* Dynamic Infinite Floor & Grid */}
         <InfiniteFloor />
 
@@ -1006,7 +1019,7 @@ export default function InteractiveHeroCar() {
           shadows={!isMobile}
           camera={{ position: [0, 3.5, 8.5], fov: 50 }}
           className="w-full h-full bg-[#0F172A]"
-          dpr={isMobile ? [1, 1.25] : [1, 2]} // 💡 Adaptive Mobile DPR
+          dpr={isMobile ? [1, 1] : [1, 1.5]} // 💡 High-Performance DPR capping
           frameloop={isInView ? 'always' : 'never'} // 💡 Off-Screen GPU Throttling
           gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
         >

@@ -307,12 +307,16 @@ export function HeroSection() {
             </div>
           </div>
 
-          {/* 📱 Mobile-Only 3D Circle Sphere Component (Rendered at the VERY END after metrics, social links & telemetry bar) */}
+          {/* 📱 Mobile-Only Full 3D Quantum Glass Sphere Showcase (Rendered at the VERY END after ALL Hero text, metrics & links) */}
           {isMobile === true && (
             <motion.div
               variants={itemVariants}
-              className="w-full h-[260px] sm:h-[300px] mt-4 relative pointer-events-auto flex items-center justify-center"
+              className="w-full h-[360px] sm:h-[420px] mt-6 relative pointer-events-auto flex items-center justify-center rounded-2xl bg-white/60 backdrop-blur-md border border-black/[0.08] shadow-xs overflow-hidden"
             >
+              <div className="absolute top-3 left-4 z-10 font-mono text-[11px] text-[#71717A] flex items-center gap-1.5 bg-white/90 px-3 py-1 rounded-full border border-black/[0.06] shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-[#0066CC] animate-ping" />
+                <span>INTERACTIVE 3D QUANTUM CORE</span>
+              </div>
               <Suspense fallback={<HeroSkeleton />}>
                 <AbstractHeroWrapper />
               </Suspense>

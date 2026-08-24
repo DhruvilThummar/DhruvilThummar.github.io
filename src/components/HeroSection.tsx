@@ -244,18 +244,6 @@ export function HeroSection() {
             </p>
           </motion.div>
 
-          {/* 📱 Mobile-Only 3D Circle Sphere Component (Rendered IN-LINE after Hero text on Phone) */}
-          {isMobile === true && (
-            <motion.div
-              variants={itemVariants}
-              className="w-full h-[240px] sm:h-[280px] my-2 relative pointer-events-auto flex items-center justify-center"
-            >
-              <Suspense fallback={<HeroSkeleton />}>
-                <AbstractHeroWrapper />
-              </Suspense>
-            </motion.div>
-          )}
-
           {/* Apple-Grade CTAs */}
           <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-3.5 pt-1">
             <a
@@ -276,6 +264,18 @@ export function HeroSection() {
               <span>Resume Protocol</span>
             </a>
           </motion.div>
+
+          {/* 📱 Mobile-Only 3D Circle Sphere Component (Rendered after ALL Hero Text & Buttons on Phone) */}
+          {isMobile === true && (
+            <motion.div
+              variants={itemVariants}
+              className="w-full h-[240px] sm:h-[280px] my-2 relative pointer-events-auto flex items-center justify-center"
+            >
+              <Suspense fallback={<HeroSkeleton />}>
+                <AbstractHeroWrapper />
+              </Suspense>
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Highlights & Metrics Glass Strip */}

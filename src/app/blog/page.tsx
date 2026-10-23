@@ -134,7 +134,7 @@ export default function BlogArchivePage() {
           <div className="relative z-10 max-w-5xl mb-12">
             <Link href={`/blog/${featuredPost.slug}`} className="block group">
               <GlassCard
-                variant="glow"
+                variant="elevated"
                 className="p-6 sm:p-8 md:p-10 border border-black/[0.08] hover:border-[#0066CC]/30 transition-all duration-300 relative overflow-hidden"
               >
                 <div

@@ -84,6 +84,18 @@
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
+  <url>
+    <loc>https://drthummar.me/blog/real-time-financial-dashboards-socketio-nextjs16</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://drthummar.me/blog/production-mlops-feature-drift-pipelines-python</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
 
   <!-- ═══════════════════════════════════════════════════════════ -->
   <!-- Projects Archive: Production Systems & ML Models           -->

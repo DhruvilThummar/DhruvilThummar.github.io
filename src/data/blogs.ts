@@ -486,4 +486,121 @@ print("Best Hyperparameters:", study.best_params)
 - **Logarithmic Scaling**: Always use \`log=True\` for learning rates and regularization penalties to explore across orders of magnitude evenly.
     `,
   },
+  {
+    slug: 'real-time-financial-dashboards-socketio-nextjs16',
+    title: 'Building Real-Time Financial Dashboards: Next.js 16, Highcharts & Socket.io Architecture',
+    excerpt:
+      'Designing low-latency streaming financial UI architectures capable of rendering 120 FPS candlestick updates with zero frame drops or React state thrashing.',
+    date: 'Aug 08, 2026',
+    readTime: '8 min read',
+    category: 'MERN Architecture',
+    tags: ['React 19', 'Next.js 16', 'WebSockets', 'Financial Tech', 'Socket.io'],
+    gradient: 'from-emerald-600/20 via-blue-600/20 to-teal-600/20',
+    author: {
+      name: 'Dhruvil Thummar',
+      role: 'Full Stack Systems Architect',
+      avatar: '/assets/dt-logo-circle.svg',
+    },
+    metrics: [
+      { label: 'Render FPS', value: '120 FPS' },
+      { label: 'Tick Latency', value: '<6ms' },
+      { label: 'State Thrash', value: 'Zero Over-render' },
+    ],
+    content: `
+### The React Re-render Bottleneck in High-Frequency Streams
+Streaming 50+ ticker updates per second directly into standard React component state (\`useState\`) triggers catastrophic Virtual DOM reconciliation cascades, causing frame drops and unresponsive browser tabs.
+
+### The RAF Decoupled Buffer Pattern
+Instead of re-rendering on every incoming WebSocket packet, we push ticks into an unobserved ring buffer and flush updates via \`requestAnimationFrame\`:
+
+\`\`\`typescript
+import { useRef, useEffect } from 'react';
+
+export function useHighFrequencyStream(socket: any, onBatchFlush: (ticks: any[]) => void) {
+  const tickBuffer = useRef<any[]>([]);
+  const rafId = useRef<number | null>(null);
+
+  useEffect(() => {
+    const handleTick = (tick: any) => {
+      tickBuffer.current.push(tick);
+    };
+
+    socket.on('market_tick', handleTick);
+
+    const flushLoop = () => {
+      if (tickBuffer.current.length > 0) {
+        const batch = tickBuffer.current.splice(0, tickBuffer.current.length);
+        onBatchFlush(batch);
+      }
+      rafId.current = requestAnimationFrame(flushLoop);
+    };
+
+    rafId.current = requestAnimationFrame(flushLoop);
+
+    return () => {
+      socket.off('market_tick', handleTick);
+      if (rafId.current) cancelAnimationFrame(rafId.current);
+    };
+  }, [socket, onBatchFlush]);
+}
+\`\`\`
+
+### Architectural Principles
+- **Direct Canvas / WebGL Series Updates**: For charting millions of historical candles, bypass DOM layers entirely using WebGL acceleration.
+- **Binary Protocols (MessagePack/Protobuf)**: Swap heavy JSON payloads for binary serialization to cut network ingress bandwidth by 65%.
+    `,
+  },
+  {
+    slug: 'production-mlops-feature-drift-pipelines-python',
+    title: 'From Feature Engineering to Model Drift: Building Resilient Production MLOps in Python',
+    excerpt:
+      'Continuous monitoring protocols for data drift, concept drift, Kolmogorov-Smirnov statistical tests, and automated retraining triggers in production.',
+    date: 'Jul 26, 2026',
+    readTime: '9 min read',
+    category: 'Data Science',
+    tags: ['MLOps', 'Data Science', 'Python', 'Feature Drift', 'Model Monitoring'],
+    gradient: 'from-indigo-600/20 via-purple-600/20 to-blue-600/20',
+    author: {
+      name: 'Dhruvil Thummar',
+      role: 'IBM-Certified Data Scientist',
+      avatar: '/assets/dt-logo-circle.svg',
+    },
+    metrics: [
+      { label: 'Drift Detection', value: '<24h Alert' },
+      { label: 'KS Test Alpha', value: 'p < 0.05' },
+      { label: 'Retraining Cycle', value: 'Automated' },
+    ],
+    content: `
+### The Silent Failure of Machine Learning
+Unlike traditional software bugs that throw 500 errors, machine learning models in production fail silently. Inputs shift, consumer habits change, and statistical relationships drift while the API continues responding with 200 OK.
+
+### Statistical Drift Auditing with Kolmogorov-Smirnov
+We compute the **two-sample Kolmogorov-Smirnov (KS) test** across sliding inference windows against baseline training distributions:
+
+\`\`\`python
+import numpy as np
+from scipy import stats
+
+def check_feature_drift(baseline_distribution: np.ndarray, current_window: np.ndarray, alpha=0.05):
+    """
+    Evaluates whether inference features have statistically drifted
+    from baseline training data distributions using KS test.
+    """
+    statistic, p_value = stats.ks_2samp(baseline_distribution, current_window)
+    is_drifted = p_value < alpha
+
+    return {
+        'ks_statistic': round(statistic, 4),
+        'p_value': round(p_value, 5),
+        'drift_detected': is_drifted,
+        'action_required': 'Trigger Retraining Pipeline' if is_drifted else 'Normal Operation'
+    }
+\`\`\`
+
+### The MLOps Governance Lifecycle
+1. **Feature Store Immutability**: Pin exact feature definitions to timestamped schemas to prevent training-serving skew.
+2. **Confidence Quantiles**: Log prediction confidence intervals and alert whenever prediction entropy exceeds 2 standard deviations from the rolling mean.
+3. **Shadow Deployments**: Run newly retrained models in shadow mode parallel to production traffic for 48 hours before automated blue-green cutover.
+    `,
+  },
 ];

@@ -73,7 +73,7 @@ export default function BlogArchivePage() {
 
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-white border border-black/[0.08] rounded-full text-xs font-mono text-[#0066CC] font-semibold shadow-2xs mb-4">
             <Sparkles className="w-3.5 h-3.5 text-[#0066CC]" />
-            <span>ENGINEERING INSIGHTS // 08 ESSAYS</span>
+            <span>ENGINEERING INSIGHTS // 10 ESSAYS</span>
           </div>
 
           <h1 className="text-[clamp(2.5rem,5.5vw,4.5rem)] font-heading font-extrabold tracking-tight text-[#09090B] leading-[1.05] mb-4">

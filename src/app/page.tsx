@@ -61,6 +61,49 @@ export default function HomePage() {
           {/* ── 1. HERO SECTION ───────────────────────────────────── */}
           <HeroSection />
 
+          {/* ── Semantic SEO Knowledge Profile for Search Crawlers & AI Engines ── */}
+          <section
+            aria-label="Professional Profile of Dhruvil Thummar"
+            className="sr-only"
+            itemScope
+            itemType="https://schema.org/Person"
+          >
+            <h2 itemProp="name">Dhruvil Thummar (D R Thummar)</h2>
+            <p itemProp="jobTitle">
+              Co-founder & Chief Technology Officer (CTO) at The Intelliverse | Machine Learning Engineer, Data Scientist & MERN Stack Developer
+            </p>
+            <p itemProp="description">
+              Dhruvil Thummar is an accomplished Software Engineer, Machine Learning Engineer, Data Scientist, and MERN Stack Developer based in Ahmedabad, Gujarat, India. Co-founder and CTO at The Intelliverse, architecting high-performance enterprise applications, real-time WebSockets engines, and predictive AI models.
+            </p>
+            <div itemProp="hasOccupation" itemScope itemType="https://schema.org/Occupation">
+              <span itemProp="name">Chief Technology Officer (CTO)</span>
+              <span itemProp="description">
+                Technical leadership, cloud infrastructure, and 3-tier microservice architecture at The Intelliverse.
+              </span>
+            </div>
+            <div itemProp="hasOccupation" itemScope itemType="https://schema.org/Occupation">
+              <span itemProp="name">Machine Learning Engineer & Data Scientist</span>
+              <span itemProp="description">
+                IBM-certified in Python for Data Science and EDA for Machine Learning. Specialist in Scikit-Learn, CatBoost, predictive pipelines, and statistical analysis.
+              </span>
+            </div>
+            <div itemProp="hasOccupation" itemScope itemType="https://schema.org/Occupation">
+              <span itemProp="name">MERN Stack Software Developer</span>
+              <span itemProp="description">
+                Full-stack web engineering using MongoDB, Express.js, React 19, Next.js 16, Node.js, WebSockets, and TypeScript.
+              </span>
+            </div>
+            <a itemProp="url" href="https://drthummar.me/">
+              Dhruvil Thummar Official Website
+            </a>
+            <a itemProp="sameAs" href="https://github.com/DhruvilThummar">
+              Dhruvil Thummar GitHub
+            </a>
+            <a itemProp="sameAs" href="https://www.linkedin.com/in/dhruvil-thummar-54422731a">
+              Dhruvil Thummar LinkedIn
+            </a>
+          </section>
+
           {/* ── 2. ABOUT / GENESIS DUAL TIMELINE ──────────────────── */}
           <SectionWrapper id="about">
             <SectionHeader

@@ -54,9 +54,9 @@ export interface Profile {
 export const profileData: Profile = {
   name: 'D R Thummar',
   fullName: 'Dhruvil Thummar',
-  title: 'Software Engineer | Machine Learning, Data Analytics & MERN Stack Developer',
+  title: 'Co-founder & CTO at The Intelliverse | Machine Learning Engineer, Data Scientist & MERN Stack Developer',
   statusBadge: 'SYSTEM ONLINE: DHRUVIL THUMMAR',
-  bio: 'Computer Engineering student specializing in Machine Learning (Scikit-Learn, CatBoost), Data Analytics (Pandas, EDA), and MERN Stack web engineering. IBM-certified in Python for Data Science and EDA for ML. Experienced in architecting 3-tier microservice platforms, predictive modeling pipelines, real-time Socket.io applications, and sub-50ms database query optimizations.',
+  bio: 'Dhruvil Thummar (D R Thummar) is the Co-founder & Chief Technology Officer (CTO) at The Intelliverse and Computer Engineering student at L.J. University. Specializing as a Machine Learning Engineer, Data Scientist (IBM-certified in Python for Data Science and EDA for ML), and MERN Stack Software Developer. Experienced in architecting 3-tier microservice platforms, predictive modeling pipelines, real-time Socket.io applications, and sub-50ms database optimizations.',
   location: 'Ahmedabad, Gujarat, India',
   phone: '+91-9265809361',
   email: 'dhruvilthummar1303@gmail.com',

@@ -147,7 +147,7 @@ export function HeroSection() {
           1. 3D WebGL Canvas Layer (PC Desktop Full Background Engine)
           ========================================== */}
       {isMobile === false && (
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 z-0 pointer-events-auto">
           <Suspense fallback={<HeroSkeleton />}>
             <InteractiveHeroCar />
           </Suspense>
@@ -220,27 +220,33 @@ export function HeroSection() {
             </AnimatePresence>
           </motion.div>
 
-          {/* Main Shimmer Headline */}
-          <motion.div variants={itemVariants} className="space-y-1">
+          {/* Main Shimmer Headline — Optimized for #1 Search Rank */}
+          <motion.div variants={itemVariants} className="space-y-2">
             <h1 className="text-[clamp(2.75rem,5.5vw,5.5rem)] font-heading font-extrabold tracking-tight leading-[0.95] text-[#09090B]">
-              D R{' '}
+              Dhruvil{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#09090B] via-[#0066CC] to-[#09090B] animate-pulse">
                 Thummar
               </span>
+              <span className="text-xl sm:text-2xl md:text-3xl text-[#71717A] font-medium block sm:inline sm:ml-3">
+                (D R Thummar)
+              </span>
             </h1>
+            <p className="font-mono text-xs sm:text-sm font-semibold text-[#0066CC] tracking-tight">
+              Co-founder & CTO @ The Intelliverse • Machine Learning Engineer • Data Scientist • MERN Developer
+            </p>
           </motion.div>
 
           {/* Bio & Architectural Summary */}
           <motion.div variants={itemVariants} className="space-y-3">
             <p className="text-sm sm:text-base md:text-lg font-sans leading-[1.65] text-[#27272A] max-w-2xl bg-transparent">
-              Computer Engineering student specializing in{' '}
-              <strong className="font-semibold text-[#09090B]">Machine Learning</strong>,{' '}
-              <strong className="font-semibold text-[#09090B]">Data Analytics</strong>, and{' '}
-              <strong className="font-semibold text-[#09090B]">MERN Stack</strong> systems.{' '}
+              Computer Engineering student at L.J. University and Co-founder & CTO at The Intelliverse. Specializing as a{' '}
+              <strong className="font-semibold text-[#09090B]">Machine Learning Engineer</strong>,{' '}
+              <strong className="font-semibold text-[#09090B]">Data Scientist</strong>, and{' '}
+              <strong className="font-semibold text-[#09090B]">MERN Stack</strong> Software Developer.{' '}
               <span className="inline-flex items-center gap-1 font-mono text-[10px] px-2 py-0.5 rounded-full bg-[#0066CC]/10 border border-[#0066CC]/20 text-[#0066CC] font-bold align-middle mx-1">
                 <CheckCircle2 className="w-3 h-3" /> IBM-CERTIFIED
               </span>{' '}
-              Architecting 3-tier enterprise applications, predictive pipelines, and 60FPS WebGL engines.
+              Architecting 3-tier enterprise platforms, predictive ML pipelines, real-time WebSockets, and 60FPS WebGL engines.
             </p>
           </motion.div>
 

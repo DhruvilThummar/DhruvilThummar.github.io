@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Users,
   Code2,
+  BookOpen,
 } from 'lucide-react';
 import { profileData } from '@/data/profile';
 
@@ -95,9 +96,20 @@ export function CommandPalette() {
       group: 'Navigate',
     },
     {
+      id: 'blog',
+      label: 'Read Engineering Essays & Architecture Blogs',
+      shortcut: '⌘4',
+      icon: <BookOpen className="w-4 h-4 text-[#0066CC]" />,
+      action: () => {
+        setOpen(false);
+        window.location.href = '/blog';
+      },
+      group: 'Navigate',
+    },
+    {
       id: 'team',
       label: 'Meet The Intelliverse Guild',
-      shortcut: '⌘4',
+      shortcut: '⌘5',
       icon: <Users className="w-4 h-4" />,
       action: () => scrollTo('team'),
       group: 'Navigate',
@@ -105,7 +117,7 @@ export function CommandPalette() {
     {
       id: 'contact',
       label: 'Contact D R Thummar',
-      shortcut: '⌘5',
+      shortcut: '⌘6',
       icon: <Mail className="w-4 h-4" />,
       action: () => scrollTo('contact'),
       group: 'Navigate',

@@ -18,6 +18,7 @@ export function Navbar() {
     { label: 'About', href: '#about' },
     { label: 'Skills', href: '#skills' },
     { label: 'Projects', href: '#projects' },
+    { label: 'Articles', href: '#blog' },
     { label: 'Credentials', href: '#certifications' },
     { label: 'Team', href: '#team' },
     { label: 'Contact', href: '#contact' },
@@ -25,6 +26,10 @@ export function Navbar() {
 
   function handleNavClick(href: string) {
     setMobileMenuOpen(false);
+    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+      window.location.href = `/${href}`;
+      return;
+    }
     const id = href.replace('#', '');
     const el = document.getElementById(id);
     if (el) {

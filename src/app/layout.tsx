@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
@@ -332,6 +333,26 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-[#FCFCFC] text-[#09090B] antialiased selection:bg-[#09090B] selection:text-white overflow-x-hidden">
+        {/* Google Analytics Tag (gtag.js) */}
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-VD4K7YG2KP"
+        />
+        <Script
+          id="google-analytics-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-VD4K7YG2KP', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+
         <SmoothScrollProvider>
           <PWAInitializer />
           <CommandPalette />

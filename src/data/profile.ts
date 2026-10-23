@@ -63,7 +63,7 @@ export const profileData: Profile = {
   githubUrl: 'https://github.com/DhruvilThummar',
   linkedinUrl: 'https://www.linkedin.com/in/dhruvil-thummar-54422731a',
   websiteUrl: 'https://drthummar.me/',
-  resumeUrl: 'https://drive.google.com/file/d/1nrIPdXnacxYHWfA_fgeNbIMtEeH7bZJs/view',
+  resumeUrl: 'https://drive.google.com/file/d/1O5GRn3qqFPBQ_2LXo2tR_bBuEMZDkiZk/view?usp=drivesdk',
 
   academic: {
     role: 'The Scholar',

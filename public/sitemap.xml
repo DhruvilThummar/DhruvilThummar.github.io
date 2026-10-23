@@ -24,6 +24,68 @@
   </url>
 
   <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Blog & Architecture Insights Archive (Priority 0.95)       -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <url>
+    <loc>https://drthummar.me/blog</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.95</priority>
+  </url>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <!-- Individual Technical Blog Posts (Priority 0.9)              -->
+  <!-- ═══════════════════════════════════════════════════════════ -->
+  <url>
+    <loc>https://drthummar.me/blog/architecting-high-throughput-3-tier-microservices</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://drthummar.me/blog/catboost-vs-xgboost-financial-prediction-benchmark</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://drthummar.me/blog/mastering-eda-production-machine-learning</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://drthummar.me/blog/scaling-websockets-concurrent-clients-nextjs16</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://drthummar.me/blog/sub-50ms-mongodb-query-optimization-indexing</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://drthummar.me/blog/modern-cto-playbook-engineering-leadership</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://drthummar.me/blog/building-resilient-multi-tenant-saas-architecture</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://drthummar.me/blog/hyperparameter-tuning-bayesian-optimization-optuna</loc>
+    <lastmod>2026-10-23</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- ═══════════════════════════════════════════════════════════ -->
   <!-- Projects Archive: Production Systems & ML Models           -->
   <!-- ═══════════════════════════════════════════════════════════ -->
   <url>
@@ -62,7 +124,7 @@
   <!-- Leadership & The Intelliverse Guild                        -->
   <!-- ═══════════════════════════════════════════════════════════ -->
   <url>
-    <loc>https://drthummar.me/#leadership</loc>
+    <loc>https://drthummar.me/#team</loc>
     <lastmod>2026-10-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

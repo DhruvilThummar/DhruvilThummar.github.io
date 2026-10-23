@@ -33,11 +33,13 @@ import {
   Award,
   CheckCircle2,
   Trophy,
+  Clock,
 } from 'lucide-react';
 import { profileData } from '@/data/profile';
 import { projectsData } from '@/data/projects';
 import { skillsCategories } from '@/data/skills';
 import { certificationsData, achievementsData } from '@/data/certifications';
+import { blogPosts } from '@/data/blogs';
 
 export default function HomePage() {
   // Main home page displays the TOP 3 featured projects
@@ -340,6 +342,78 @@ export default function HomePage() {
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
+      </SectionWrapper>
+
+      {/* ── 4.5. ENGINEERING INSIGHTS & ARTICLES ─────────────── */}
+      <SectionWrapper id="blog">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+          <SectionHeader
+            eyebrow="ENGINEERING INSIGHTS"
+            title="Technical Essays &"
+            italicAccent="Architecture"
+            description="Deep architectural breakdowns on Machine Learning, distributed microservices, database optimizations, and CTO leadership."
+            className="!mb-0"
+          />
+
+          <Link
+            href="/blog"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#09090B] text-white text-xs font-mono font-medium hover:bg-[#0066CC] transition-colors shadow-sm self-start md:self-auto min-h-[44px] touch-target"
+          >
+            <span>Read All {blogPosts.length} Articles</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        <FluidGrid minWidth={320} gap="1.5rem">
+          {blogPosts.slice(0, 3).map((post) => (
+            <Link key={post.slug} href={`/blog/${post.slug}`} className="group block h-full">
+              <GlassCard
+                variant="default"
+                className="p-7 flex flex-col justify-between h-full border border-black/[0.08] hover:border-[#0066CC]/30 transition-all duration-300"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#F2F2F7] border border-black/[0.06] font-mono text-[11px] font-semibold text-[#09090B]">
+                      {post.category}
+                    </span>
+                    <span className="flex items-center gap-1 font-mono text-[11px] text-[#71717A]">
+                      <Clock className="w-3 h-3 text-[#0066CC]" />
+                      {post.readTime}
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-heading font-bold text-[#09090B] group-hover:text-[#0066CC] transition-colors mb-2 leading-snug">
+                    {post.title}
+                  </h3>
+
+                  <p className="text-xs font-sans text-[#71717A] leading-relaxed line-clamp-3 mb-6">
+                    {post.excerpt}
+                  </p>
+                </div>
+
+                <div>
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {post.tags.slice(0, 3).map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-0.5 bg-[#F2F2F7] text-[#71717A] rounded font-mono text-[10px]"
+                      >
+                        #{tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="pt-3 border-t border-black/[0.04] flex items-center justify-between font-mono text-xs">
+                    <span className="text-[#71717A]">{post.date}</span>
+                    <span className="font-semibold text-[#0066CC] flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      Read Essay <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
+                  </div>
+                </div>
+              </GlassCard>
+            </Link>
+          ))}
+        </FluidGrid>
       </SectionWrapper>
 
       {/* ── 5. VERIFIED CREDENTIALS & CERTIFICATIONS ─────────── */}
